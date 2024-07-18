@@ -222,6 +222,20 @@
               </div>
             </el-form-item>
 
+            <el-form-item v-if="seg?.type == 'button'">
+              <div class="type-title" style="font-weight: 500; margin-bottom: 10px;">按钮(icqq)
+                <el-button style="margin-left: 10px" size="small" @click="deleteMsgSeg(index)">
+                  <el-icon>
+                    <CloseBold />
+                  </el-icon>
+                </el-button>
+              </div>
+              <div class="seg_card_box">
+                <!-- appid 和 rows -->
+                <BtnCom v-model:btn-content="seg.content" />
+              </div>
+            </el-form-item>
+
           </div>
         </el-form>
       </el-card>
@@ -256,17 +270,20 @@
 import ImageEditor from './imageEditor/index.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import CusInput from '@/components/CusInput/index.vue'
+import BtnCom from './segment/button.vue'
 import { ref, reactive, watch, onMounted } from 'vue'
 import useDevStore from '@/store/modules/dev'
 import type {
   pluginType,
   messageType,
+  pluginElResponseType,
   pluginResponseType,
   botURIResponseType,
 } from '@/api/dev/plugin/type'
-import { reqAddPlugin, reqEditorPlugin, reqImageJson, reqBotWorkURI } from '@/api/dev/plugin'
+import { reqAddPlugin, reqEditorPlugin, reqImageJson, reqBotWorkURI, reqBtnJson } from '@/api/dev/plugin'
 import type { UploadProps, UploadInstance } from 'element-plus'
 import faceData from '@/assets/qfaces/data.json'
+import { buttonEl } from './segment/default'
 
 // 为图片编辑器传数据
 import { useCommand } from '@/plugins/editor/src/hooks/useCommand'
@@ -336,6 +353,8 @@ const pluginData = ref<pluginType>({
   message: [],
 })
 
+
+
 const messageSeg = ref([
   {
     type: '文本',
@@ -382,6 +401,22 @@ const messageSeg = ref([
     default: {
       type: 'poke',
       data: 0
+    },
+  },
+  {
+    type: '按钮',
+    default: {
+      type: 'button',
+      content: {
+        /** 机器人appid */
+        appid: '',
+        /** rows 数组的每个元素表示每一行按钮 */
+        rows: [
+          {
+            buttons: [buttonEl()]
+          },
+        ],
+      }
     },
   },
 ])
@@ -617,6 +652,7 @@ const goBack = () => {
  * @returns
  */
 const savePlugin = async () => {
+
   pluginData.value.message = messageData.value
 
   let res: pluginResponseType
@@ -657,6 +693,22 @@ const setImageData = (e: { hash: string; data: string, json: string }) => {
   messageData.value[curEditedImage.value].data = e.data
   messageData.value[curEditedImage.value].hash = e.hash
   e.json && (messageData.value[curEditedImage.value].json = e.json)
+}
+
+/**
+ * 进入update模式加载非html资源
+ * @returns
+ */
+const loadResourcesData = async () => {
+  if (devStore.curEditedMode == 'update') {
+    if (messageData.value.find(item => item.type == 'button')) {
+      let res: pluginElResponseType = await reqBtnJson(Object.assign(pluginData.value, { message: messageData.value }))
+      if (res.code == 200) {
+        pluginData.value = res.data
+        messageData.value = res.data.message
+      }
+    }
+  }
 }
 
 /**
@@ -707,9 +759,16 @@ const addMsgSegment = (msgSeg: messageType) => {
       data: 0
     })
   } else {
+    // 只能单独发送的情况
     if (messageData.value.length > 0) {
       ElMessage.warning('已添加的消息类型无法和其它消息类型共存！')
       return
+    }
+    if (msgSeg.type == 'markdown') {
+
+    }
+    if (msgSeg.type == 'button') {
+
     }
     messageData.value.push(msgSeg)
   }
@@ -769,6 +828,7 @@ const openTip = (tip: string, type = 'waring') => {
 
 onMounted(() => {
   // getBotURI()
+  loadResourcesData()
 })
 </script>
 
@@ -796,6 +856,17 @@ onMounted(() => {
   width: 100%;
   justify-content: space-between;
   max-width: 100%;
+}
+
+.seg_card_box {
+  display: block;
+  width: 100%;
+
+  .seg-card-form {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 .demo-image__lazy {

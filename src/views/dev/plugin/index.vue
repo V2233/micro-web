@@ -97,10 +97,11 @@ const goAddPlugin = () => {
  * @param index 插件索引
  * @returns
  */
-const goEditPlugin = (index: number) => {
-  ; (devStore.isPluginEdited = true), (devStore.scene = 1)
+const goEditPlugin = async (index: number) => {
+  devStore.isPluginEdited = true
+  devStore.scene = 1
   devStore.curEditedMode = 'update'
-  // pluginsList.value[index].id = String(index)
+
   editedPluginValue.value = pluginsList.value[index]
 }
 

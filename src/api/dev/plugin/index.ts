@@ -4,6 +4,7 @@ import type {
   botURIResponseType,
   pluginType,
   pluginResponseType,
+  pluginElResponseType
 } from './type'
 
 enum API {
@@ -15,7 +16,8 @@ enum API {
   PUT_PLUGIN_URL = '/plugins/put',
   GET_PLUGINLIST_URL = '/plugins/get',
 
-  GET_HTML_PROJECT_URL = '/plugins/imgJSON'
+  GET_HTML_PROJECT_URL = '/plugins/imgJSON',
+  GET_BUTTON_PROJECT_URL = '/plugins/btnJSON',
 }
 
 /**
@@ -84,6 +86,18 @@ export const reqEditorPlugin = (index: string, plugin: pluginType) => {
 export const reqImageJson = (id: string, hash: string) => {
   return request.get<any, any>(
     API.GET_HTML_PROJECT_URL + '?id=' + id + '&hash=' + hash
+  )
+}
+
+/**
+ * 
+ * @param plugin 插件数据
+ * @returns 
+ */
+export const reqBtnJson = (data: pluginType) => {
+  return request.post<any, pluginElResponseType>(
+    API.GET_BUTTON_PROJECT_URL,
+    data
   )
 }
 

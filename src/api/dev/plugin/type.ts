@@ -35,12 +35,13 @@ export interface BotInfoResponseType extends resCodeType {
 // 插件类型
 export interface messageType {
   type: string,
-  data: string | number,
+  data?: string | number,
   url?: string,
   path?: string,
   hash?: string,
   // json?: { [key: string]: any } | undefined,
-  json?: string
+  json?: string,
+  content?: any
   // }
 }
 
@@ -57,6 +58,9 @@ export type pluginType = {
   groups: string[]
   friends: string[]
   message: messageType[]
+}
+export interface pluginElResponseType extends resCodeType {
+  data: pluginType
 }
 
 export interface pluginResponseType extends resCodeType {
