@@ -222,6 +222,22 @@
               </div>
             </el-form-item>
 
+            <!-- markdown -->
+            <el-form-item v-if="seg?.type == 'markdown'">
+              <div class="type-title" style="font-weight: 500; margin-bottom: 10px;">Markdown
+                <el-button style="margin-left: 10px" size="small" @click="deleteMsgSeg(index)">
+                  <el-icon>
+                    <CloseBold />
+                  </el-icon>
+                </el-button>
+              </div>
+              <div class="seg_card_box">
+                <!-- content -->
+                <MarkdownCom :md-content="seg.content" />
+              </div>
+            </el-form-item>
+
+            <!-- 按钮 -->
             <el-form-item v-if="seg?.type == 'button'">
               <div class="type-title" style="font-weight: 500; margin-bottom: 10px;">按钮(icqq)
                 <el-button style="margin-left: 10px" size="small" @click="deleteMsgSeg(index)">
@@ -271,6 +287,7 @@ import ImageEditor from './imageEditor/index.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import CusInput from '@/components/CusInput/index.vue'
 import BtnCom from './segment/button.vue'
+import MarkdownCom from './segment/markdown.vue'
 import { ref, reactive, watch, onMounted } from 'vue'
 import useDevStore from '@/store/modules/dev'
 import type {
@@ -283,7 +300,7 @@ import type {
 import { reqAddPlugin, reqEditorPlugin, reqImageJson, reqBotWorkURI, reqBtnJson } from '@/api/dev/plugin'
 import type { UploadProps, UploadInstance } from 'element-plus'
 import faceData from '@/assets/qfaces/data.json'
-import { buttonEl } from './segment/default'
+import { buttonEl, markdownEl } from './segment/default'
 
 // 为图片编辑器传数据
 import { useCommand } from '@/plugins/editor/src/hooks/useCommand'
@@ -302,7 +319,7 @@ const extraUploadData = reactive({
   curType: '',
   curMsgIndex: 0,
 })
-// 长传后得到的url
+// 上传后得到的url
 const fileList = ref<
   {
     name: ''
@@ -353,8 +370,6 @@ const pluginData = ref<pluginType>({
   message: [],
 })
 
-
-
 const messageSeg = ref([
   {
     type: '文本',
@@ -402,6 +417,13 @@ const messageSeg = ref([
       type: 'poke',
       data: 0
     },
+  },
+  {
+    type: 'Markdown',
+    default: {
+      type: 'markdown',
+      content: markdownEl()
+    }
   },
   {
     type: '按钮',
@@ -701,7 +723,7 @@ const setImageData = (e: { hash: string; data: string, json: string }) => {
  */
 const loadResourcesData = async () => {
   if (devStore.curEditedMode == 'update') {
-    if (messageData.value.find(item => item.type == 'button')) {
+    if (messageData.value.find(item => item.type == 'button' || item.type == 'markdown')) {
       let res: pluginElResponseType = await reqBtnJson(Object.assign(pluginData.value, { message: messageData.value }))
       if (res.code == 200) {
         pluginData.value = res.data
@@ -758,18 +780,23 @@ const addMsgSegment = (msgSeg: messageType) => {
       type: 'face',
       data: 0
     })
+  } else if (msgSeg.type == 'markdown') {
+    if (
+      messageData.value.some(
+        (seg: messageType) => seg.type !== 'button',
+      )
+    ) {
+      ElMessage.warning('同一条消息中仅可存在该类型和按钮！')
+      return
+    }
+    messageData.value.push(msgSeg)
   } else {
     // 只能单独发送的情况
     if (messageData.value.length > 0) {
       ElMessage.warning('已添加的消息类型无法和其它消息类型共存！')
       return
     }
-    if (msgSeg.type == 'markdown') {
 
-    }
-    if (msgSeg.type == 'button') {
-
-    }
     messageData.value.push(msgSeg)
   }
 }

@@ -41,3 +41,55 @@ export const buttonEl = (): ButtonType => {
         }
     }
 }
+
+export const markdownEl = () => {
+    return {
+
+        "custom_template_id": "101993071_1658748972",
+        "content": "",
+        "params": [{
+            "tempString": '',
+            "key": "title",
+            "values": ["标题"]
+        },
+        {
+            "tempString": '',
+            "key": "image",
+            "values": [
+                "https://resource5-1255303497.cos.ap-guangzhou.myqcloud.com/abcmouse_word_watch/other/mkd_img.png"
+            ]
+        },
+        {
+            "tempString": '',
+            "key": "para1",
+            "values": ["段落1"]
+        },
+        {
+            "tempString": '',
+            "key": "para2",
+            "values": ["段落2"]
+        },
+        {
+            "tempString": '',
+            "key": "desc",
+            "values": ["简介"]
+        },
+        {
+            "tempString": '',
+            "key": "content",
+            "values": ["在这个子频道非常开心"]
+        },
+        {
+            "tempString": '',
+            "key": "link_introduction",
+            "values": ["链接介绍"]
+        },
+        {
+            "tempString": '',
+            "key": "link",
+            "values": ["https://www.qq.com"]
+        }
+        ]
+
+    }
+}

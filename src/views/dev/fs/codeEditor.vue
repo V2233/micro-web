@@ -42,7 +42,20 @@ import type { Ace } from 'ace-builds'
 
 import { registedLangs } from '@/utils/aceConfig'
 
-const props = defineProps(['code', 'ext'])
+const props = defineProps({
+  code: {
+    type: String,
+    default: ''
+  },
+  ext: {
+    type: String,
+    default: 'js'
+  },
+  isImmediate: {
+    type: Boolean,
+    default: false
+  }
+})
 
 const editor = ref<any>()
 const $emits = defineEmits(['getCode'])
@@ -68,6 +81,7 @@ watch(
       curLang.value = langObj.lang
     }
   },
+  { immediate: props.isImmediate }
 )
 
 /**

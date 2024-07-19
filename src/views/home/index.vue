@@ -5,7 +5,7 @@
         class="avatar" />
       <div class="bottom">
         <h4 class="title">{{ getTime() }}好！{{ userStore.username }}</h4>
-        <p class="subtitle">这里是微代码开发管理平台</p>
+        <p class="subtitle">这里是低代码开发管理平台</p>
       </div>
     </div>
   </el-card>
@@ -20,17 +20,20 @@
       <el-table-column label="Tag" prop="countContacts">
         <template #="{ row, $index }">
           <el-tag class="bot_tag mx-1">
-            <el-icon>
+            <!-- <el-icon>
               <Avatar />
-            </el-icon>
+            </el-icon> -->
+            Friends
             {{ row.countContacts.friend }}
           </el-tag>
           <el-tag class="bot_tag mx-1">
-            <SvgIcon name="group" color="#409EFF" />
+            <!-- <SvgIcon name="home" color="#409EFF" /> -->
+            Groups
             {{ row.countContacts.group }}
           </el-tag>
           <el-tag class="bot_tag mx-1">
-            <SvgIcon name="groups" color="#409EFF" />
+            <!-- <SvgIcon name="groups" color="#409EFF" /> -->
+            Users
             {{ row.countContacts.groupMember }}
           </el-tag>
           <el-tag class="bot_tag mx-1">
@@ -76,6 +79,7 @@
 import { onMounted, ref } from 'vue'
 import { getTime } from '@/utils/time'
 import { reqBotInfo } from '@/api/dev/plugin'
+// import SvgIcon from '@/components/SvgIcon/index.vue'
 import type {
   BotInfoListType,
   BotInfoResponseType,

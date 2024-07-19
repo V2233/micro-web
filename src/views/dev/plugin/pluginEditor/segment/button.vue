@@ -176,7 +176,7 @@ const addRow = () => {
 
 const editBtn = (btn: any, btnRowId: number, btnId: number) => {
     // btnData.value.rows[index].buttons.push(buttonEl())
-    console.log(btn)
+    // console.log(btn)
     dialogFormVisible.value = true
     curEditedBtn.row = btnRowId
     curEditedBtn.col = btnId
