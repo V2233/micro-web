@@ -9,7 +9,7 @@ export default defineConfig(({ command, mode }) => {
   let env = loadEnv(mode, process.cwd());
   return {
     build: {
-      outDir: '../src/server/static',
+      outDir: '../public/static',
     },
     plugins: [
       vue(),
