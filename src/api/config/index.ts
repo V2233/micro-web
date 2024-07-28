@@ -12,6 +12,9 @@ enum API {
 
     GET_USER_CONFIG_URL = '/user/getcfg',
     SET_USER_CONFIG_URL = '/user/setcfg',
+
+    GET_PROTOCOL_CONFIG_URL = '/protocol/getcfg',
+    SET_PROTOCOL_CONFIG_URL = '/protocol/setcfg',
 }
 
 /**
@@ -69,5 +72,22 @@ export const reqUserConfig = () => {
  */
 export const reqSetUserConfig = (data: any) => {
     return request.post<any, any>(API.SET_USER_CONFIG_URL, data)
+}
+
+/**
+ * 获取protocol配置
+ * @returns 
+ */
+export const reqProtocolConfig = () => {
+    return request.get<any, any>(API.GET_PROTOCOL_CONFIG_URL)
+}
+
+/**
+ * 设置protocol配置
+ * @param data 
+ * @returns 
+ */
+export const reqSetProtocolConfig = (data: any) => {
+    return request.post<any, any>(API.SET_PROTOCOL_CONFIG_URL, data)
 }
 

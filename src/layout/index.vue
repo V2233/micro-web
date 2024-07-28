@@ -1,24 +1,33 @@
 <template>
   <div class="layout_container">
     <!-- 左侧菜单 -->
-    <div class="layout_slider" :class="{ fold: layoutSettingStore.fold ? true : false }">
+    <div class="layout_slider" :class="{ 
+        fold: layoutSettingStore.foldMode == 1 ? true : false,
+        hidden: layoutSettingStore.foldMode == 0 ? true : false,
+    }">
       <Logo></Logo>
       <!-- 展示菜单 滚动组件 -->
       <el-scrollbar class="scrollbar">
         <!-- 菜单组件 -->
-        <el-menu :collapse="layoutSettingStore.fold ? true : false" :default-active="$route.path"
+        <el-menu :collapse="layoutSettingStore.foldMode == 1 ? true : false" :default-active="$route.path"
           background-color="#001529" text-color="white" active-text-color="yellowgreen">
           <Menu :menuList="useStore.menuRoutes"></Menu>
         </el-menu>
       </el-scrollbar>
     </div>
     <!-- 顶部导航 -->
-    <div class="layout_tabbar" :class="{ fold: layoutSettingStore.fold ? true : false }">
+    <div class="layout_tabbar" :class="{ 
+      fold: layoutSettingStore.foldMode == 1 ? true : false,
+      hidden: layoutSettingStore.foldMode == 0 ? true : false,
+    }">
       <!-- 顶部导航 -->
       <Tabbar></Tabbar>
     </div>
     <!-- 内容展示 -->
-    <div class="layout_main" :class="{ fold: layoutSettingStore.fold ? true : false }">
+    <div class="layout_main" :class="{ 
+      fold: layoutSettingStore.foldMode == 1 ? true : false,
+      hidden: layoutSettingStore.foldMode == 0 ? true : false,
+    }">
       <Main></Main>
     </div>
   </div>
@@ -73,7 +82,13 @@ export default {
     &.fold {
       width: $base-menu-min-width;
     }
+
+    &.hidden {
+      width: 0;
+    }
   }
+
+  
 
   .layout_tabbar {
     position: fixed;
@@ -86,6 +101,11 @@ export default {
     &.fold {
       width: calc(100vw - $base-menu-min-width);
       left: $base-menu-min-width;
+    }
+
+    &.hidden {
+      width: 100vw;
+      left: 0;
     }
   }
 
@@ -103,6 +123,11 @@ export default {
     &.fold {
       width: calc(100vw - $base-menu-min-width);
       left: $base-menu-min-width;
+    }
+
+    &.hidden {
+      width: 100vw;
+      left: 0;
     }
   }
 }

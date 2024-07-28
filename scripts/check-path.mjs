@@ -1,5 +1,5 @@
 import { resolve,join } from 'path';
-import { pluginInfo } from '../../src/env/index.js'
+import { pluginInfo } from '../../dist/env.js'
 
 // 获取当前工作目录
 const currentDir = process.cwd();

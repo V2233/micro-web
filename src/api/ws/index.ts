@@ -2,6 +2,7 @@ import { reqServerPort } from '@/api/user/index'
 
 export default class Ws {
   ws: WebSocket | null
+  url: string
   msgQueue: any[]
   clientId: string
   reConnectSum: number
@@ -9,24 +10,26 @@ export default class Ws {
     publicAddress: string,
     privateAddress: string
   }
-  constructor() {
+  constructor(url = '/micro/webui/chat') {
     this.address = {
       publicAddress: '',
       privateAddress: ''
     }
     this.ws = null
+    this.url = url
     this.msgQueue = []
     this.clientId = ''
     this.reConnectSum = 0
   }
 
-  async openWs(ip = '') {
-    if (!this.address.privateAddress || !this.address.privateAddress) {
+  async openWs(ip = '', cb:Function | null = null) {
+    if (!this.address.privateAddress && !this.address.publicAddress) {
       await this.getServerPort()
     }
-    this.ws = new WebSocket(ip ? this.address.privateAddress : this.address.publicAddress)
+    this.ws = new WebSocket((ip ? ip : this.address.publicAddress) + this.url)
     this.ws.addEventListener('open', (e) => {
       console.log('ws连接成功！' + e.target)
+      cb && cb()
     })
 
     this.ws.addEventListener('message', (e) => {

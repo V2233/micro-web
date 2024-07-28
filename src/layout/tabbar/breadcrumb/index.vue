@@ -1,7 +1,7 @@
 <template>
   <!-- 顶部左侧静态 -->
   <el-icon style="margin-right: 10px" @click="changeIcon">
-    <component :is="layoutSettingStore.fold ? 'Fold' : 'Expand'" />
+    <component :is="layoutSettingStore.foldMode == 2 ? 'Expand':'Fold'" />
   </el-icon>
   <!-- 左侧面包屑 -->
   <el-breadcrumb separator-icon="ArrowRight">
@@ -16,7 +16,6 @@
       </el-icon>
       <span style="margin: 0px 2px">{{ item.meta.title }}</span>
     </el-breadcrumb-item>
-    <!-- <button @click="handler">获取路由</button> -->
   </el-breadcrumb>
 </template>
 
@@ -31,11 +30,14 @@ let $route = useRoute()
 let layoutSettingStore = useLayoutSettingStore()
 // 用于折叠图标切换
 const changeIcon = () => {
-  layoutSettingStore.fold = !layoutSettingStore.fold
+  // layoutSettingStore.fold = !layoutSettingStore.fold
+  // console.log(layoutSettingStore.foldMode)
+  if(layoutSettingStore.foldMode >= 2) {
+    layoutSettingStore.foldMode = 0
+    return
+  }
+  layoutSettingStore.foldMode++
 }
-// const handler = () => {
-
-// }
 </script>
 
 <script lang="ts">

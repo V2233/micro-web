@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 表格视图 -->
-    <el-card v-show="!isEditored" class="box-card" ref="cardRef">
+    <el-card v-show="scene == 0" class="box-card" ref="cardRef">
       <!-- 路径搜索栏 -->
       <div class="search_bar">
         <!-- 左侧 -->
@@ -47,10 +47,6 @@
           粘贴
         </el-button>
 
-        <el-button @click="openUploader" size="small" style="margin-left: 5px">
-          上传
-        </el-button>
-
         <el-button v-if="tempDirStorage.length > 0" :disabled="tempDirStorage.every((item) => item.handlerMode == '复制')"
           type="primary" @click="fileSelectedHandler('复制')" size="small" style="margin-left: 5px">
           复制
@@ -59,6 +55,14 @@
         <el-button v-if="tempDirStorage.length > 0" :disabled="tempDirStorage.every((item) => item.handlerMode == '移动')"
           type="primary" @click="fileSelectedHandler('移动')" size="small" style="margin-left: 5px">
           移动
+        </el-button>
+
+        <el-button @click="openUploader" size="small" style="margin-left: 5px">
+          上传
+        </el-button>
+
+        <el-button @click="openTerminal" size="small" style="margin-left: 5px">
+          终端
         </el-button>
       </div>
       <!-- 文件表格 -->
@@ -130,11 +134,18 @@
       </el-table>
     </el-card>
 
-    <el-card v-show="isEditored">
-      <el-button style="margin-bottom: 5px" @click="isEditored = false">
+    <el-card v-show="scene == 1">
+      <el-button style="margin-bottom: 5px" @click="scene = 0">
         返回
       </el-button>
       <Editor :code="fileContent" :ext="ext" @getCode="saveFile" />
+    </el-card>
+
+    <el-card v-if="scene == 2">
+      <el-button style="margin-bottom: 5px" @click="scene = 0">
+        <el-icon><Back /></el-icon>
+      </el-button>
+      <Terminal :dirPath="curPath"/>
     </el-card>
 
     <!--    <el-pagination
@@ -187,6 +198,11 @@
         </video>
       </div>
 
+      <!-- 终端 -->
+      <!-- <div v-if="dialogMode == 'terminal'" style="width: 100; max-height: 100%">
+        <Terminal :dirPath="curPath"/>
+      </div> -->
+
       <template #footer v-if="dialogMode == 'upload'">
         <el-button type="primary" size="default" @click="confirmUpload">
           确认提交
@@ -203,6 +219,7 @@ import * as reqFs from '@/api/dev/fs/index'
 import type { UploadInstance } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import Editor from './codeEditor.vue'
+import Terminal from './terminal.vue'
 
 interface dirObjType {
   name: string
@@ -308,8 +325,9 @@ let searchText = ref<string>('')
 // 存储读取的文件
 let fileContent = ref<string>('')
 
-// 控制编辑器显示
-let isEditored = ref<boolean>(false)
+// 控制场景显示 (0:文件列表；1:编辑器；2:终端)
+// let isEditored = ref<boolean>(false)
+let scene = ref(0)
 
 // 避免回车触发blur
 // let enterPressed = ref<boolean>(false)
@@ -501,7 +519,8 @@ const getChildDir = async (row: dirObjType) => {
     // dialogFormVisible.value = true
     let res: any = await reqFs.reqReadFile(row.path)
     if (res.code == 200) {
-      isEditored.value = true
+      // isEditored.value = true
+      scene.value = 1
       fileContent.value = res.data
       ext.value = getFileExtension(row.name)
     }
@@ -515,11 +534,11 @@ const getChildDir = async (row: dirObjType) => {
  * @returns
  */
 const saveFile = async (code: string) => {
-  // dialogFormVisible.value = false
   let res: any = await reqFs.reqSaveFile(curPathObj.path, code.toString())
   if (res.code == 200) {
     ElMessage.success('保存成功！')
-    isEditored.value = false
+    // isEditored.value = false
+    scene.value = 0
     fileContent.value = ''
   }
 }
@@ -730,6 +749,16 @@ const openUploader = () => {
   extraUploadData.path = curPath.value
   dialogMode.value = 'upload'
   dialogFormVisible.value = true
+}
+
+/**
+ * 打开终端
+ * @returns
+ */
+const openTerminal = () => {
+  // dialogMode.value = 'terminal'
+  // dialogFormVisible.value = true
+  scene.value = 2
 }
 
 /**

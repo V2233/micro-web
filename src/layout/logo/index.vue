@@ -1,7 +1,7 @@
 <template>
   <div class="logo" v-if="setting.logoHidden == false">
-    <img :src="setting.logo" />
-    <p>{{ layoutSettingStore.fold ? '' : setting.title }}</p>
+    <img :src="setting.logo" v-if="layoutSettingStore.foldMode == 0?false:true"/>
+    <p>{{ layoutSettingStore.foldMode == 2 ? setting.title : '' }}</p>
   </div>
 </template>
 

@@ -90,6 +90,10 @@ const routeMap = ref([
     title: "Bot配置"
   },
   {
+    route: "Protocol",
+    title: "协议配置"
+  },
+  {
     route: "Plugins",
     title: "其它配置"
   },
