@@ -517,7 +517,7 @@ const handleUploadSuccess: UploadProps['onSuccess'] = (
 ) => {
   console.log(res)
   console.log(uploadFile)
-  messageData.value[extraUploadData.curMsgIndex].url = 'file:///' + res.data
+  messageData.value[extraUploadData.curMsgIndex].url = 'file://' + res.data
 }
 
 /**
@@ -555,7 +555,7 @@ const uploadFile = async (index: number, type: string) => {
   dialogFormVisible.value = true
   let res: botURIResponseType = await reqBotWorkURI()
   if (res.code == 200) {
-    let path = res.data.replace(/^file:\/\/\//, '')
+    let path = res.data.replace(/^file:\/\//, '')
     extraUploadData.path =
       path +
       'data/micro-plugin/plugins/' +
