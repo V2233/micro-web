@@ -222,6 +222,60 @@
               </div>
             </el-form-item>
 
+            <!-- 骰子 -->
+            <el-form-item v-if="seg?.type == 'dice'" label="骰子">
+              <div class="input_box">
+
+                <el-popover placement="top-start" title="骰子(协议端不一定可用)" :width="220" trigger="hover">
+                  <div class="face-box" style="height: 120px;">
+                    <el-image class="face-image" v-for="(diceId, id) in 6" :key="id" :src="`/dice/${diceId}.png`"
+                      style="width: 50px; height: 50px;"
+                      @click="(seg.data = Number(diceId), messageData[index].path = `/dice/${diceId}.png`)" />
+                  </div>
+
+                  <template #reference>
+                    <el-input-number v-model="seg.data" :min="0" :max="6"></el-input-number>
+                  </template>
+                </el-popover>
+                <el-button v-if="messageData[index].path">
+                  <el-image class="face-image" :key="index" :src="messageData[index].path"
+                    style="width: 30px; height: 30px;" />
+                </el-button>
+                <el-button style="margin-left: 10px" @click="deleteMsgSeg(index)">
+                  <el-icon>
+                    <CloseBold />
+                  </el-icon>
+                </el-button>
+              </div>
+            </el-form-item>
+
+            <!-- 猜拳 -->
+            <el-form-item v-if="seg?.type == 'rps'" label="猜拳">
+              <div class="input_box">
+
+                <el-popover placement="top-start" title="猜拳(协议端不一定可用)" :width="220" trigger="hover">
+                  <div class="face-box" style="height: 60px;">
+                    <el-image class="face-image" v-for="(rpsId, id) in 3" :key="id" :src="`/rps/${rpsId}.png`"
+                      style="width: 50px; height: 50px;"
+                      @click="(seg.data = Number(rpsId), messageData[index].path = `/rps/${rpsId}.png`)" />
+                  </div>
+
+                  <template #reference>
+                    <el-input-number v-model="seg.data" :min="0" :max="6"></el-input-number>
+                  </template>
+                </el-popover>
+                <el-button v-if="messageData[index].path">
+                  <el-image class="face-image" :key="index" :src="messageData[index].path"
+                    style="width: 30px; height: 30px;" />
+                </el-button>
+                <el-button style="margin-left: 10px" @click="deleteMsgSeg(index)">
+                  <el-icon>
+                    <CloseBold />
+                  </el-icon>
+                </el-button>
+              </div>
+            </el-form-item>
+
             <!-- markdown -->
             <el-form-item v-if="seg?.type == 'markdown'">
               <div class="type-title" style="font-weight: 500; margin-bottom: 10px;">Markdown
@@ -416,6 +470,20 @@ const messageSeg = ref([
     default: {
       type: 'poke',
       data: 0
+    },
+  },
+  {
+    type: '骰子',
+    default: {
+      type: 'dice',
+      data: 1
+    },
+  },
+  {
+    type: '猜拳',
+    default: {
+      type: 'rps',
+      data: 1
     },
   },
   {

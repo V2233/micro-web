@@ -1,12 +1,15 @@
 import request from '@/utils/request'
 import type {
-    userConfigResponseType
+    userConfigResponseType,
+    guobaPluginsInfoResponseType,
+    guobaPluginsConfigResponseType
 } from './type'
 
 enum API {
     GET_CONFIG_URL = '/bot/getcfg',
     SET_CONFIG_URL = '/bot/setcfg',
 
+    GET_PLUGIN_INFO_URL = '/plugins/getinfo',
     GET_PLUGIN_CONFIG_URL = '/plugins/getcfg',
     SET_PLUGIN_CONFIG_URL = '/plugins/setcfg',
 
@@ -37,24 +40,33 @@ export const reqSetBotConfig = (name: string, data: any) => {
 }
 
 /**
- * 获取plugin配置
- * @param appName
- * @param name 
+ * 获取插件列表
+ * @param source 
  * @returns 
  */
-export const reqPluginConfig = (appName: string, name: string) => {
-    return request.get<any, any>(API.GET_CONFIG_URL + '?name=' + name + '&app=' + appName)
+export const reqPluginInfo = (source: string) => {
+    return request.get<any, guobaPluginsInfoResponseType>(API.GET_PLUGIN_INFO_URL + '?source=' + source)
+}
+
+/**
+ * 获取plugin配置
+ * @param pluginName 
+ * @param source 
+ * @returns 
+ */
+export const reqPluginConfig = (pluginName: string, source: string) => {
+    return request.get<any, guobaPluginsConfigResponseType>(API.GET_PLUGIN_CONFIG_URL + '?source=' + source + '&pluginName=' + pluginName)
 }
 
 /**
  * 设置plugin配置
- * @param appName
- * @param name 
+ * @param pluginName 
+ * @param source 
  * @param data 
  * @returns 
  */
-export const reqSetPluginConfig = (appName: string, name: string, data: any) => {
-    return request.post<any, any>(API.SET_CONFIG_URL + '?name=' + name + '&app=' + appName, data)
+export const reqSetPluginConfig = (pluginName: string, source: string, data:any) => {
+    return request.post<any, any>(API.SET_PLUGIN_CONFIG_URL + '?source=' + source + '&pluginName=' + pluginName, data)
 }
 
 /**

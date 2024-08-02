@@ -135,6 +135,16 @@ export const asnycRoute = [
         },
       },
       {
+        name: 'Plugins',
+        path: '/config/plugins',
+        component: () => import('@/views/config/plugins/index.vue'),
+        meta: {
+          title: '插件配置',
+          hidden: false,
+          icon: 'HelpFilled',
+        },
+      },
+      {
         name: 'Protocol',
         path: '/config/protocol',
         component: () => import('@/views/config/protocol/index.vue'),
@@ -142,16 +152,6 @@ export const asnycRoute = [
           title: '协议配置',
           hidden: false,
           icon: 'Iphone',
-        },
-      },
-      {
-        name: 'Plugins',
-        path: '/config/plugins',
-        component: () => import('@/views/config/plugins/index.vue'),
-        meta: {
-          title: '其它配置',
-          hidden: false,
-          icon: 'HelpFilled',
         },
       },
     ],

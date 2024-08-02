@@ -13,9 +13,9 @@ if (currentDir !== projectRoot) {
   process.exit(0);
 }
 
-if (!/yarn/.test(process.env.npm_execpath || '')) {
+if (!/yarn|pnpm/.test(process.env.npm_execpath || '')) {
     console.warn(
-      `\u001b[33m @Micro-plugin/frontend must using yarn as the package manager ` +
+      `\u001b[33m @Micro-plugin/frontend must using pnpm as the package manager ` +
         `for package build scripts to work properly.\u001b[39m\n`,
     )
     process.exit(0)
