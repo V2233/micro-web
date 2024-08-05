@@ -290,10 +290,12 @@ onMounted(() => {
 
 @media (orientation: landscape) {  
   .plugins-info {
+    width: 100%; 
     flex-direction: row; 
+    flex-wrap: wrap;
     .info-card {  
-      width: 33%;
-      margin: 0 5px; 
+      width: calc((100% - 30px)/3);
+      margin: 5px 5px; 
     }
   }
 }
