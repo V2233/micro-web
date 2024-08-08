@@ -10,8 +10,13 @@ let useDevStore = defineStore('Dev', {
       isPluginEdited: false,
       // 插件模块场景切换
       curPluginId: '',
+      // 当前插件编辑场景(0-列表添加页，1-指令编辑页，2-图片编辑器)
       scene: 0,
+      // 当前插件编辑模式(add or update)
       curEditedMode: 'add',
+
+      // 沙箱场景
+      qqScene: 0
     }
   },
   actions: {},

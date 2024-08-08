@@ -16,6 +16,7 @@ export interface DevState {
   scene: number
   curEditedMode: string
   curPluginId: string
+  qqScene: number
 }
 
 interface settingType {

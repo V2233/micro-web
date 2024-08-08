@@ -29,7 +29,6 @@ export const constantRoute = [
     meta: {
       title: '登录',
       hidden: true,
-      // element-plus图标
       icon: 'Promotion',
     },
   },
@@ -61,7 +60,7 @@ export const asnycRoute = [
       {
         name: 'Status',
         path: '/screen/status',
-        component: () => import('@/views/screen/index.vue'),
+        component: () => import('@/views/screen/status/index.vue'),
         meta: {
           title: '状态',
           hidden: false,
@@ -111,6 +110,16 @@ export const asnycRoute = [
           icon: 'ChromeFilled',
         },
       },
+      {
+        name: 'Sandbox',
+        path: '/dev/sandbox',
+        component: () => import('@/views/dev/sandbox/index.vue'),
+        meta: {
+          title: '沙箱',
+          hidden: false,
+          icon: 'Promotion',
+        },
+      },
     ],
   },
   {
@@ -157,10 +166,10 @@ export const asnycRoute = [
     ],
   },
   {
-    name: 'Acl',
-    path: '/acl',
+    name: 'Other',
+    path: '/other',
     component: () => import('@/layout/index.vue'),
-    redirect: '/acl/permission',
+    redirect: '/other/permission',
     meta: {
       title: '其它',
       hidden: false,
@@ -169,8 +178,8 @@ export const asnycRoute = [
     children: [
       {
         name: 'Permission',
-        path: '/acl/permission',
-        component: () => import('@/views/acl/permission/index.vue'),
+        path: '/other/permission',
+        component: () => import('@/views/other/permission/index.vue'),
         meta: {
           title: '权限管理',
           hidden: false,
@@ -179,8 +188,8 @@ export const asnycRoute = [
       },
       {
         name: 'About',
-        path: '/acl/about',
-        component: () => import('@/views/acl/about/index.vue'),
+        path: '/other/about',
+        component: () => import('@/views/other/about/index.vue'),
         meta: {
           title: '关于',
           hidden: false,
@@ -196,7 +205,6 @@ export const asnycRoute = [
     meta: {
       title: '登录',
       hidden: true,
-      // element-plus图标
       icon: 'Promotion',
     },
   },

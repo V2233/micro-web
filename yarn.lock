@@ -46,7 +46,7 @@
   dependencies:
     "@babel/types" "^7.25.2"
 
-"@babel/runtime@^7.12.5", "@babel/runtime@^7.14.0":
+"@babel/runtime@^7.12.5", "@babel/runtime@^7.14.0", "@babel/runtime@^7.18.6":
   version "7.25.0"
   resolved "https://registry.npmmirror.com/@babel/runtime/-/runtime-7.25.0.tgz#3af9a91c1b739c569d5d80cc917280919c544ecb"
   integrity sha512-7dRy4DwXwtzBrPbZflqxnvfxLF8kdZXPkhymtDeFoFqE6ldzjQFgYTtYIFARcLEYDrqfBfYcZt1WqFxRoyC9Rw==
@@ -1485,6 +1485,11 @@ copy-descriptor@^0.1.0:
   resolved "https://registry.npmmirror.com/copy-descriptor/-/copy-descriptor-0.1.1.tgz#676f6eb3c39997c2ee1ac3a924fd6124748f578d"
   integrity sha512-XgZ0pFcakEUlbwQEVNg3+QAis1FyTL3Qel9FYy8pSkQqoG3PNoT0bOCQtOXcOkur21r2Eq2kI+IE+gsmAEVlYw==
 
+core-js@^3.23.5:
+  version "3.38.0"
+  resolved "https://registry.npmmirror.com/core-js/-/core-js-3.38.0.tgz#8acb7c050bf2ccbb35f938c0d040132f6110f636"
+  integrity sha512-XPpwqEodRljce9KswjZShh95qJ1URisBeKCjUdq27YdenkslVe7OO0ZJhlYXAChW7OhXaRLl8AAba7IBfoIHug==
+
 core-js@^3.6.0, core-js@^3.8.3:
   version "3.37.1"
   resolved "https://registry.npmmirror.com/core-js/-/core-js-3.37.1.tgz#d21751ddb756518ac5a00e4d66499df981a62db9"
@@ -1888,6 +1893,14 @@ element-plus@^2.7.6:
     lodash-unified "^1.0.2"
     memoize-one "^6.0.0"
     normalize-wheel-es "^1.2.0"
+
+emoji-mart-vue-fast@^15.0.2:
+  version "15.0.2"
+  resolved "https://registry.npmmirror.com/emoji-mart-vue-fast/-/emoji-mart-vue-fast-15.0.2.tgz#462425925d2977ff1f837d44828f833e265f6ee1"
+  integrity sha512-q7VaE6yRrlQd+jpHPToh1XnIatgACkQjBj0vQ7uNaWrbVsKlhZaOsqZVoegT5IZt5XkYoR2x4MHMNep/BJP9rw==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+    core-js "^3.23.5"
 
 emoji-regex@^8.0.0:
   version "8.0.0"

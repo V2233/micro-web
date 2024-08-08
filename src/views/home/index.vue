@@ -12,7 +12,7 @@
   <el-card style="margin-top: 20px">
     <el-table class="bot_list" :data="botInfoList">
       <el-table-column label="昵称" prop="nickname" width="80px"></el-table-column>
-      <el-table-column label="头像" width="60px">
+      <el-table-column label="头像" width="56px">
         <template #="{ row, $index }">
           <img class="bot_avatar" :src="row.avatarUrl" />
         </template>

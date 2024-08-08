@@ -35,7 +35,7 @@ defineProps(['title', 'location'])
 
 <style scoped lang="scss">
 .box {
-  background: url(@/views/screen/images/dataScreen-main-lb.png) no-repeat;
+  background: url(./images/dataScreen-main-lb.png) no-repeat;
   background-size: 100% 100%;
   margin-top: 10px;
   .top_box {
@@ -58,7 +58,7 @@ defineProps(['title', 'location'])
         .bg {
           width: 100%;
           height: 7px;
-          background: url(@/views/screen/images/dataScreen-title.png) no-repeat;
+          background: url(./images/dataScreen-title.png) no-repeat;
           margin-top: 10px;
         }
       }
