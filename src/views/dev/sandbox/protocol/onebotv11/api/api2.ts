@@ -6,11 +6,13 @@ interface actionType {
 
 type retcodeType = 0 | 10001 | 10002 | 10003 | 10004 | 10005 | 10006 | 10007 | 10101 | 10102 | 20001 | 20002
 
-class Res {
-    ws: WebSocket
+import type { groupInfoType,groupMemberInfoType } from './type'
 
-    constructor(url:string) {
-        this.ws = new WebSocket(url)
+export class Res {
+    self_id: number
+    constructor(public ws: WebSocket) {
+        this.ws = ws
+        this.self_id = 114514
     }
 
     sendApi(
@@ -78,11 +80,16 @@ class Res {
             get_status: this.get_status,
             get_version_info: this.get_version_info,
             set_restart: this.set_restart,
-            clean_cache: this.clean_cache
+            clean_cache: this.clean_cache,
+            _set_model_show: this._set_model_show
         }
 
         if(data.action in actionMap) {
-            actionMap[data.action]()
+            const reply = actionMap[data.action](data.params)
+            this.ok(data.echo, reply, '', 0)
+        } else {
+            console.log('不存在此方法！')
+            this.failed(data.echo, {}, '不存在此方法！')
         }
 
     }
@@ -92,10 +99,35 @@ class Res {
     }
 
     send_group_msg(params:any) {
+        let groups:groupMemberInfoType[] = [{
+            group_id: 441307983,
+            user_id: 2330660495,
+            nickname: 'v',
+            card: 'v',
+            sex: 'female',
+            age: 18,
+            area: '',
+            join_time: 123456789,
+            last_sent_time:	123456789,
+            level: 'lv100',
+            role: 'owner',
+            unfriendly:	false,
+            title: '主人',
+            title_expire_time: 987654321,
+            card_changeable: true
+        }]
+        let group = groups.find(g => g.group_id == params.group_id)
+        
         return 
     }
     
     send_msg(params:any) {
+        let message_type = 'group'
+        if(params.message_type) message_type = params.message_type
+        else {
+            if(params.group_id) message_type = 'group'
+            else message_type = 'private'
+        }
         return 
     }
         
@@ -164,7 +196,10 @@ class Res {
     }
 
     get_login_info(params:any) {
-        return 
+        return {
+            user_id: this.self_id,
+            nickname: 'v崽'
+        }
     }
 
     get_stranger_info(params:any) {
@@ -172,23 +207,79 @@ class Res {
     }
 
     get_friend_list(params:any) {
+        let friends = []
+        friends.push({
+            nickname: "v崽G1",
+            remark: "",
+            user_id: 428498194
+        })
         return 
     }
 
     get_group_info(params:any) {
-        return 
+        let groups:groupInfoType[] = [{
+            group_id: 441307983,
+            group_name: "v崽测试",
+            max_member_count: 200,
+            member_count: 7
+        }]
+        let group = groups.find(g => g.group_id == params.group_id)
+        return group || {}
     }
 
     get_group_list(params:any) {
-        return 
+        let groups = []
+        groups.push({
+            group_id: 441307983,
+            group_name: "v崽测试",
+            max_member_count: 200,
+            member_count: 7
+        })
+        return groups
     }
 
     get_group_member_info(params:any) {
-        return 
+        let groups:groupMemberInfoType[] = [{
+            group_id: 441307983,
+            user_id: 2330660495,
+            nickname: 'v',
+            card: 'v',
+            sex: 'female',
+            age: 18,
+            area: '',
+            join_time: 123456789,
+            last_sent_time:	123456789,
+            level: 'lv100',
+            role: 'owner',
+            unfriendly:	false,
+            title: '主人',
+            title_expire_time: 987654321,
+            card_changeable: true
+        }]
+        let group = groups.find(g => g.group_id == params.group_id && g.user_id == params.user_id)
+        return group || {}
     }
 
     get_group_member_list(params:any) {
-        return 
+        let groups:groupMemberInfoType[] = []
+        groups.push({
+            group_id: 441307983,
+            user_id: 2330660495,
+            nickname: 'v',
+            card: 'v',
+            sex: 'female',
+            age: 18,
+            area: '',
+            join_time: 123456789,
+            last_sent_time:	123456789,
+            level: 'lv100',
+            role: 'owner',
+            unfriendly:	false,
+            title: '主人',
+            title_expire_time: 987654321,
+            card_changeable: true
+        })
+        return groups
     }
 
     get_group_honor_info(params:any) {
@@ -196,15 +287,22 @@ class Res {
     }
 
     get_cookies(params:any) {
-        return 
+        return {
+            cookies: ''
+        }
     }
 
     get_csrf_token(params:any) {
-        return 
+        return {
+            token: 114514
+        }
     }
 
     get_credentials(params:any) {
-        return 
+        return {
+            cookies: '',
+            token: 114514
+        }
     }
 
     get_record(params:any) {
@@ -216,19 +314,30 @@ class Res {
     }
 
     can_send_image(params:any) {
-        return 
+        return {
+            yes: true
+        }
     }
 
     can_send_record(params:any) {
-        return 
+        return {
+            yes: true
+        }
     }
 
     get_status(params:any) {
-        return 
+        return {
+            online: true,
+            good: true
+        }
     }
 
     get_version_info(params:any) {
-        return 
+        return {
+            app_name: 'micro.dev',
+            app_version: '0.0.1',
+            protocol_version: 'v11'
+        }
     }
 
     set_restart(params:any) {
@@ -237,5 +346,11 @@ class Res {
 
     clean_cache(params:any) {
         return 
+    }
+
+    _set_model_show(params:any) {
+        console.log(params.model)
+        console.log(params.model_show)
+        return 'ok'
     }
 }

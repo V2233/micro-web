@@ -5,10 +5,10 @@
                 <div class="msglist__tabbar__avatar__state" :style="{backgroundColor: `#2CEA8C`}"></div>
             </div>
             <div class="msglist__tabbar__top">
-                <div class="msglist__tabbar__top__icon">
+                <div class="msglist__tabbar__top__icon" @click="$emit('clickTabbar','messages')">
                     <svg-icon name="message" width="40px" height="40px" color="black"/>
                 </div>
-                <div class="msglist__tabbar__top__icon">
+                <div class="msglist__tabbar__top__icon" @click="$emit('clickTabbar','contacts')">
                     <svg-icon name="contacts" width="26px" height="26px" color="black"/>
                 </div>
             </div>
@@ -41,15 +41,8 @@
         </div> -->
         <div class="msglist-main">
             <slot name="main"></slot>
-            <!-- <div class="msglist-main-logo">
-                Yunzai-Sandbox
-            </div> -->
         </div>
-        <!-- <div class="msglist-footer">
-            <div class="msglist-footer__tabbar">
-                <el-icon><ChatDotRound /></el-icon>
-            </div>
-        </div> -->
+
     </div>
 </template>
 
@@ -65,6 +58,8 @@ const props = defineProps({
     searchText: { type: String, default: ''},
     // state: { type: String, default: '离线' },
 })
+
+const $emit = defineEmits(['clickTabbar'])
 
 const setWindowFullScreen = () => {
     // document.documentElement.requestFullscreen()
@@ -102,8 +97,8 @@ const exitWindowFullScreen = () => {
             .msglist__tabbar__avatar__state {
                 position: absolute;
                 border: 2px solid #E5E5E5;
-                width: 16px;
-                height: 16px;
+                width: 14px;
+                height: 14px;
                 right: 0;
                 bottom: 0;
                 border-radius: 50%;
@@ -133,7 +128,8 @@ const exitWindowFullScreen = () => {
         width: 400px;
         height: calc(100vh - $base-tabbar-height);
         .msglist__messages__search {
-            // border: 2px solid red;
+            position: relative;
+            border: 0.1px solid rgba(220, 220, 220, 0.326);
             width: 100%;
             height: 60px;
             .msglist__messages__search__frame {
@@ -195,11 +191,6 @@ const exitWindowFullScreen = () => {
         display: flex;
         justify-content: center;
         align-items: center;
-        .msglist-main-logo {
-            color: #b6b6b6;
-            font-size: 50px;
-            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
     }
     .msglist-footer__tabbar {
         position: absolute;

@@ -2,7 +2,11 @@
     <div class="fakeqq-message fakeqq-forward" :class="[onright ? 'right-chat' : 'left-chat']">
         <div :style="{ 'background-image': `url(${avatar})` }" class="fakeqq-message__avatar"></div>
         <div class="fakeqq-message__content">
-            <div class="fakeqq-message__name">{{ name }}</div>
+            <div class="fakeqq-message__name">
+                <span v-if="onright" :class="memberTitleClass">{{ role_title }}</span>
+                {{ name }}
+                <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
+            </div>
             <div class="fakeqq-message__bubble">
                 <div class="fakeqq-message__bubble-arrow"></div>
                 <div class="fakeqq-forward__title">{{ title }}的聊天记录</div>
@@ -18,13 +22,29 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
 
 const props = defineProps({
     name: { type: String, required: true },
     avatar: { type: String, required: true },
+    role: { type: String, default: 'admin' },
+    role_title: { type: String, default: 'LV1' },
     title: { type: String, required: true },
     contents: { type: Array, required: true },
     counts: { type: [Number, String], default: 0 },
     onright: Boolean,
+})
+
+const memberTitleClass = computed(()=>{
+    switch(props.role) {
+        case 'owner':
+            return 'fakeqq-message__title__owner'
+        case 'admin':
+            return 'fakeqq-message__title__admin'
+        case 'member':
+            return 'fakeqq-message__title__member'
+        default: 
+            return ''
+    }
 })
 </script>

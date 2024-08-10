@@ -10,9 +10,9 @@
 import type { MessageElem } from '../message/message.elem'
 
 
-class Events {
+export default new class Events {
 
-    self_id = 123456
+    self_id = 114514
 
     /**
      * 基本字段
@@ -64,6 +64,25 @@ class Events {
     }
 
     /** ---------------------消息--------------------- */
+
+    /**
+     * 制作CQ
+     * @param message
+     * @returns 
+     */
+    makeCQ(message:MessageElem[]) {
+        let raw_message = ''
+        message.forEach((seg:any) => {
+            let data = Object.keys(seg.data).map(key=>{
+                if (typeof seg.data[key] == 'string') {
+                    return `${key}=${seg.data[key].replace(/base64:\/\/.*?(,|]|")/g, "base64://...$1")}`
+                }
+                return `${key}=${seg.data[key]}`
+            })
+            raw_message += `[CQ:${seg.type},${data.join(',')}]`
+        });
+        return raw_message
+    }
 
     /**
      * 构造私聊消息
@@ -167,7 +186,7 @@ class Events {
         return {
             ...this.baseProp('message'),
             /** 消息类型 */
-            message_type: 'private', 
+            message_type: 'group', 
             /** 消息子类型，正常消息是 normal，匿名消息是 anonymous，系统提示（如「管理员已禁止群内匿名聊天」）是 notice */
             sub_type,
             /** 到下次心跳的间隔，单位毫秒 */

@@ -17,6 +17,7 @@ export interface DevState {
   curEditedMode: string
   curPluginId: string
   qqScene: number
+  onebotDB: any
 }
 
 interface settingType {

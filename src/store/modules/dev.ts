@@ -16,7 +16,14 @@ let useDevStore = defineStore('Dev', {
       curEditedMode: 'add',
 
       // 沙箱场景
-      qqScene: 0
+      qqScene: 0,
+      // onebot 数据库
+      onebotDB: {
+        // 消息队列
+        msgQueue: [],
+        // 群聊列表
+        group_list: [],
+      }
     }
   },
   actions: {},

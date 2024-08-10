@@ -14,10 +14,10 @@
         <div class="fakeqq-footer">
             <form class="fakeqq-footer__input">
                 <textarea class="fakeqq-footer__input-text" contenteditable="true" v-model="inputValue"></textarea>
-                <button class="fakeqq-footer__input-btn" type="reset">发送</button>
+                <button class="fakeqq-footer__input-btn" type="reset" @click="$emit('sendInput',inputValue)">发送</button>
             </form>
             <div class="fakeqq-footer__btn">
-                <svg-icon name="voice" />
+                <svg-icon name="voice" @click="$emit('connectWs',{})"/>
                 <svg-icon name="pic" />
 
                 <!-- Emoji表情 -->
@@ -111,7 +111,6 @@ import { reqPluginsLoader } from '@/api/dev/sandbox/index'
 const devStore = useDevStore()
 const pkgs = ref<any[]>([])
 
-const curTool = ref(0)
 const emojiIndex = ref(new EmojiIndex(data))
 
 const inputValue = ref('')
@@ -122,6 +121,10 @@ const props = defineProps({
     title: { type: String, required: true },
     count: { type: [String, Number], default: '' },
 })
+
+const $emit = defineEmits(['sendInput','connectWs'])
+
+
 
 /**
  * 进入设置
@@ -159,11 +162,10 @@ const handleInput = (type:string, i:any) => {
             const reg = str.match(regex) ? str.match(regex).join('') : str;  
             inputValue.value += reg
         case "emoji":
-        isRegsVisible.value = false
-        inputValue.value += i.native
+            isRegsVisible.value = false
+            inputValue.value += i.native
     }
 }
-
 
 </script>
 

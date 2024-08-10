@@ -5,20 +5,42 @@
             <span class="fakeqq-message__text-avatar">{{ name[0] }}</span>
         </div>
         <div class="fakeqq-message__content">
-            <div class="fakeqq-message__name">{{ name }}</div>
-            <img :src="src" :style="{ 'max-width': maxWidth }" />
+            <div class="fakeqq-message__name">
+                <span v-if="onright" :class="memberTitleClass">{{ role_title }}</span>
+                {{ name }}
+                <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
+            </div>
+            <el-image :src="src" :preview-src-list="srcList" :initial-index="0" :style="{ 'max-width': maxWidth }" />
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
 
 const props = defineProps({
     name: { type: String, required: true },
     avatar: String,
+    role: { type: String, default: 'admin' },
+    role_title: { type: String, default: 'LV1' },
     src: { type: String, required: true },
     onright: Boolean,
     maxWidth: { type: String, default: '250px' },
+    srcList: {type: Array, default: []},
+    initialIndex: {type: Number, default: 0}
+})
+
+const memberTitleClass = computed(()=>{
+    switch(props.role) {
+        case 'owner':
+            return 'fakeqq-message__title__owner'
+        case 'admin':
+            return 'fakeqq-message__title__admin'
+        case 'member':
+            return 'fakeqq-message__title__member'
+        default: 
+            return ''
+    }
 })
 
 </script>

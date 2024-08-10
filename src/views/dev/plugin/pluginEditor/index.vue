@@ -113,6 +113,7 @@
               </div>
             </el-form-item>
 
+            <!-- 图片 -->
             <el-form-item v-if="seg.type == 'image'" label="图片">
               <div class="input_box">
                 <el-autocomplete v-model="seg.url" :fetch-suggestions="querySearchTip" clearable
@@ -136,6 +137,7 @@
               </div>
             </el-form-item>
 
+            <!-- 音频 -->
             <el-form-item v-if="seg.type == 'record'" label="音频">
               <div class="input_box">
                 <el-autocomplete v-model="seg.url" :fetch-suggestions="querySearchTip" clearable
@@ -152,6 +154,7 @@
               </div>
             </el-form-item>
 
+            <!-- 视频 -->
             <el-form-item v-if="seg?.type == 'video'" label="视频">
               <div class="input_box">
                 <el-autocomplete v-model="seg.url" :fetch-suggestions="querySearchTip" clearable
@@ -168,6 +171,7 @@
               </div>
             </el-form-item>
 
+            <!-- 表情 -->
             <el-form-item v-if="seg?.type == 'face'" label="表情">
               <div class="input_box">
 
@@ -196,6 +200,7 @@
               </div>
             </el-form-item>
 
+            <!-- 戳一戳 -->
             <el-form-item v-if="seg?.type == 'poke'" label="戳一戳">
               <div class="input_box">
 

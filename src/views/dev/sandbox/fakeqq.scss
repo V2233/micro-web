@@ -18,6 +18,7 @@
     display: flex;
     flex-direction: column;
     max-width: 65%;
+    min-width: 1rem;
 }
 
 .fakeqq-message__content>img {
@@ -31,6 +32,30 @@
     margin-bottom: 5px;
     font-size: 12px;
     color: #8b8b8b;
+
+    .fakeqq-message__title__owner,
+    .fakeqq-message__title__member,
+    .fakeqq-message__title__admin {
+        border-radius: 5px;
+        margin: 0 2px;
+        padding: 0 5px;
+        font-size: 12px;
+    }
+
+    .fakeqq-message__title__owner {
+        color: #FF8D40;
+        background-color: #F5DDCB; 
+    }
+
+    .fakeqq-message__title__admin {
+        color: #0099FF;
+        background-color: #C2E1F5; 
+    }
+
+    .fakeqq-message__title__member {
+        color: #BBBBBB;
+        background-color: #E2E2E2; 
+    }
 }
 
 .right-chat .fakeqq-message__name {
@@ -82,9 +107,11 @@
 .fakeqq-message__bubble {
     position: relative;
     padding: 12px;
+    width: auto;
     min-height: 1em;
     min-width: 1em;
-    border-radius: 15px;
+    line-height: 1.2em;
+    border-radius: 10px;
     overflow-wrap: break-word;
     background-color: white;
 
@@ -99,9 +126,9 @@
         background-color: #0098fe;
         color: #fff;
 
-        // .fakeqq-message__bubble-arrow {
-        //   border-top-color: #0098fe;
-        // }
+        .fakeqq-message__bubble-arrow {
+          border-top-color: #0098fe;
+        }
 
         .fakeqq-message__quote {
             background-color: #1fa4ff;

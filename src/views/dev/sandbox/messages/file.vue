@@ -5,7 +5,11 @@
             <span class="fakeqq-message__text-avatar">{{ name[0] }}</span>
         </div>
         <div class="fakeqq-message__content" :onclick="click">
-            <div class="fakeqq-message__name">{{ name }}</div>
+            <div class="fakeqq-message__name">
+                <span v-if="onright" :class="memberTitleClass">{{ role_title }}</span>
+                {{ name }}
+                <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
+            </div>
             <a ref="fileRef" target="_blank" style="text-decoration: none; color: #000">
                 <div class="fakeqq-message__bubble" style="cursor: pointer">
                     <div class="fakeqq-message__bubble-arrow"></div>
@@ -25,7 +29,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted,ref } from 'vue'
+import { onMounted,ref,computed } from 'vue'
 
 const fileRef = ref()
 
@@ -37,6 +41,14 @@ const props = defineProps({
     },
     avatar: {
         type: String,
+    },
+    role: {
+        type: String, 
+        default: 'admin' 
+    },
+    role_title: { 
+        type: String, 
+        default: 'LV1' 
     },
     filename: {
         type: String,
@@ -59,6 +71,19 @@ const props = defineProps({
         type: Function, 
         default: function () { } 
     }, // eslint-disable-line
+})
+
+const memberTitleClass = computed(()=>{
+    switch(props.role) {
+        case 'owner':
+            return 'fakeqq-message__title__owner'
+        case 'admin':
+            return 'fakeqq-message__title__admin'
+        case 'member':
+            return 'fakeqq-message__title__member'
+        default: 
+            return ''
+    }
 })
 
 onMounted(() => {

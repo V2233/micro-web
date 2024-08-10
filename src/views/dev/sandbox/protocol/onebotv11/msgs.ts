@@ -1,4 +1,4 @@
-import type { MessageElem } from './onebot.Elem'
+import type { MessageElem } from './message/message.elem'
 
 class Api {
     self_id = 123456789

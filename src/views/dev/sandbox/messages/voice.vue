@@ -5,7 +5,11 @@
             <span class="fakeqq-message__text-avatar">{{ name[0] }}</span>
         </div>
         <div class="fakeqq-message__content">
-            <div class="fakeqq-message__name">{{ name }}</div>
+            <div class="fakeqq-message__name">
+                <span v-if="onright" :class="memberTitleClass">{{ role_title }}</span>
+                {{ name }}
+                <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
+            </div>
             <div class="fakeqq-message__bubble" :onclick="playVoice" style="cursor: pointer">
                 <div class="fakeqq-message__bubble-arrow"></div>
                 <div class="fakeqq-voice">
@@ -26,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const audio = ref<HTMLAudioElement>()
 const voiceLine = ref()
@@ -38,8 +42,23 @@ const formatedDuration = ref('')
 const props = defineProps({
     name: { type: String, required: true },
     avatar: String,
+    role: { type: String, default: 'admin' },
+    role_title: { type: String, default: 'LV1' },
     src: { type: String, required: true },
     onright: Boolean,
+})
+
+const memberTitleClass = computed(()=>{
+    switch(props.role) {
+        case 'owner':
+            return 'fakeqq-message__title__owner'
+        case 'admin':
+            return 'fakeqq-message__title__admin'
+        case 'member':
+            return 'fakeqq-message__title__member'
+        default: 
+            return ''
+    }
 })
 
 const getLineCount = (num: number) => {

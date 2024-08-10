@@ -5,7 +5,11 @@
             <span class="fakeqq-message__text-avatar">{{ name[0] }}</span>
         </div>
         <div class="fakeqq-message__content">
-            <div class="fakeqq-message__name">{{ name }}</div>
+            <div class="fakeqq-message__name">
+                <span v-if="onright" :class="memberTitleClass">{{ role_title }}</span>
+                {{ name }}
+                <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
+            </div>
             <div class="fakeqq-message__bubble">
                 <div class="fakeqq-message__bubble-arrow"></div>
                 <slot></slot>
@@ -16,10 +20,26 @@
 
 <script lang="ts" setup>
 
+import { computed } from 'vue'
+
 const props = defineProps({
     name: { type: String, required: true },
+    role: { type: String, default: 'admin' },
+    role_title: { type: String, default: 'LV1' },
     avatar: String,
     onright: Boolean,
 })
 
+const memberTitleClass = computed(()=>{
+    switch(props.role) {
+        case 'owner':
+            return 'fakeqq-message__title__owner'
+        case 'admin':
+            return 'fakeqq-message__title__admin'
+        case 'member':
+            return 'fakeqq-message__title__member'
+        default: 
+            return ''
+    }
+})
 </script>
