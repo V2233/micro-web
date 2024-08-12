@@ -10,17 +10,22 @@
                 {{ name }}
                 <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
             </div>
-            <div class="fakeqq-message__bubble">
-                <div class="fakeqq-message__bubble-arrow"></div>
-                <slot></slot>
-            </div>
+            <!-- 气泡 -->
+            <msg-menu @msg-operation="$emit('msg-operation',$event)">
+                <div class="fakeqq-message__bubble">
+                    <div class="fakeqq-message__bubble-arrow"></div>
+                    <slot></slot>
+                </div>
+            </msg-menu>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-
 import { computed } from 'vue'
+import MsgMenu from './msg-operate.vue'
+
+const $emit = defineEmits(['msg-operation'])
 
 const props = defineProps({
     name: { type: String, required: true },
@@ -42,4 +47,6 @@ const memberTitleClass = computed(()=>{
             return ''
     }
 })
+
+
 </script>

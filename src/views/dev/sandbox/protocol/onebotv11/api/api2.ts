@@ -327,8 +327,11 @@ export class Res {
 
     get_status(params:any) {
         return {
-            online: true,
-            good: true
+            app_initialized:true,
+            app_enabled:true,
+            app_good:true,
+            online:true,
+            good:true
         }
     }
 

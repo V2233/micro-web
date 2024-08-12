@@ -1,7 +1,7 @@
 <template>
     <div class="fakeqq-window">
         <div class="fakeqq-header">
-            <svg-icon name="back" class="fakeqq-header__bth" @click="devStore.qqScene = 0" />
+            <svg-icon name="back" class="fakeqq-header__bth" @click="show_footer?devStore.qqScene = 0:devStore.qqScene = 1" />
             <span class="fakeqq-header__title">
                 <svg-icon name="ear" class="fakeqq-header__bth" color="#000000"/>
                 {{ title }}{{ count ? '(' + count + ')' : '' }}
@@ -11,7 +11,7 @@
         <div class="fakeqq-container">
             <slot></slot>
         </div>
-        <div class="fakeqq-footer">
+        <div class="fakeqq-footer" v-if="show_footer">
             <form class="fakeqq-footer__input">
                 <textarea class="fakeqq-footer__input-text" contenteditable="true" v-model="inputValue"></textarea>
                 <button class="fakeqq-footer__input-btn" type="reset" @click="$emit('sendInput',inputValue)">发送</button>
@@ -81,7 +81,7 @@
                   <div class="face-box">
                     <el-image class="face-image" v-for="face in faceData" :key="face.QSid"
                       :src="`/qfaces/s${face.QSid}.gif`"
-                      @click="" />
+                      @click="$emit('qqFace',face.QSid)" />
                   </div>
 
                   <template #reference>
@@ -120,9 +120,10 @@ const isRegsVisible = ref(false)
 const props = defineProps({
     title: { type: String, required: true },
     count: { type: [String, Number], default: '' },
+    show_footer: {type: Boolean, default: true}
 })
 
-const $emit = defineEmits(['sendInput','connectWs'])
+const $emit = defineEmits(['sendInput','connectWs','qqFace'])
 
 
 

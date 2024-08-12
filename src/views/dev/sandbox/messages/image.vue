@@ -10,13 +10,18 @@
                 {{ name }}
                 <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
             </div>
-            <el-image :src="src" :preview-src-list="srcList" :initial-index="0" :style="{ 'max-width': maxWidth }" />
+            <msg-menu @msg-operation="$emit('msg-operation',$event)">
+                <el-image :src="src" :preview-src-list="srcList" :initial-index="0" :style="{ 'max-width': maxWidth, 'border-radius': '5px' }" />
+            </msg-menu>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue'
+import MsgMenu from './msg-operate.vue'
+
+const $emit = defineEmits(['msg-operation'])
 
 const props = defineProps({
     name: { type: String, required: true },

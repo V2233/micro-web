@@ -10,7 +10,8 @@
                 {{ name }}
                 <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
             </div>
-            <div class="fakeqq-message__bubble" :onclick="playVoice" style="cursor: pointer">
+            <msg-menu @msg-operation="$emit('msg-operation',$event)">
+                <div class="fakeqq-message__bubble" :onclick="playVoice" style="cursor: pointer">
                 <div class="fakeqq-message__bubble-arrow"></div>
                 <div class="fakeqq-voice">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
@@ -25,12 +26,17 @@
                     {{ formatedDuration }}
                 </div>
             </div>
+            </msg-menu>
+            
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
+import MsgMenu from './msg-operate.vue'
+
+const $emit = defineEmits(['msg-operation'])
 
 const audio = ref<HTMLAudioElement>()
 const voiceLine = ref()
@@ -80,7 +86,7 @@ const reset = () => {
 
 const onLoadedmetadata = () => {
     const audioElem = audio.value as HTMLAudioElement
-    duration.value = Math.round(audioElem.duration)
+    duration.value = Math.round(audioElem.duration??114514)
     const m = Math.floor(audioElem.duration / 60)
     const s = Math.round(audioElem.duration % 60)
     formatedDuration.value = m > 0 ? `${m}'${s}"` : `${s}"`

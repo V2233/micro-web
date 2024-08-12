@@ -10,26 +10,31 @@
                 {{ name }}
                 <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
             </div>
-            <a ref="fileRef" target="_blank" style="text-decoration: none; color: #000">
-                <div class="fakeqq-message__bubble" style="cursor: pointer">
-                    <div class="fakeqq-message__bubble-arrow"></div>
-                    <div class="fakeqq-file__content">
-                        <div class="fakeqq-file__info">
-                            <div class="fakeqq-file__name">{{ filename }}</div>
-                            <div class="fakeqq-file__size">{{ filesize }}</div>
-                        </div>
-                        <div class="fakeqq-file__icon">
-                            <img :src="fileicon" />
+            <msg-menu @msg-operation="$emit('msg-operation',$event)">
+                <a ref="fileRef" target="_blank" style="text-decoration: none; color: #000">
+                    <div class="fakeqq-message__bubble" style="cursor: pointer">
+                        <div class="fakeqq-message__bubble-arrow"></div>
+                        <div class="fakeqq-file__content">
+                            <div class="fakeqq-file__info">
+                                <div class="fakeqq-file__name">{{ filename }}</div>
+                                <div class="fakeqq-file__size">{{ filesize }}</div>
+                            </div>
+                            <div class="fakeqq-file__icon">
+                                <img :src="fileicon" />
+                            </div>
                         </div>
                     </div>
-                </div>
-            </a>
+                </a>
+            </msg-menu>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted,ref,computed } from 'vue'
+import MsgMenu from './msg-operate.vue'
+
+const $emit = defineEmits(['msg-operation'])
 
 const fileRef = ref()
 

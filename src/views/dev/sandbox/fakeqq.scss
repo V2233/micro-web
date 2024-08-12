@@ -18,7 +18,7 @@
     display: flex;
     flex-direction: column;
     max-width: 65%;
-    min-width: 1rem;
+    min-width: 1em;
 }
 
 .fakeqq-message__content>img {
@@ -26,6 +26,24 @@
     min-width: 100px;
     max-height: 400px;
     border-radius: 15px;
+}
+
+.fakeqq-message-operations {
+    display: flex;
+    overflow: wrap;
+    .fakeqq-message-operations-item {
+        // display: flex;
+        padding: 3px;
+        border-radius: 3px;
+        .fakeqq-message-operations-item-title {
+            font-size: 10px;
+            font-family: sans-serif;
+        }
+    }
+    .fakeqq-message-operations-item:hover {
+        background-color: #F2F2F2;
+        cursor: pointer;
+    }
 }
 
 .fakeqq-message__name {
@@ -139,7 +157,7 @@
 .fakeqq-window {
     display: flex;
     width: 100%;
-    min-width: 400px;
+    min-width: 300px;
     height: calc(100vh - $base-tabbar-height);
     flex-direction: column;
     justify-content: space-between;

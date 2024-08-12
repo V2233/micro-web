@@ -222,10 +222,14 @@ export interface NodeElem {
         id?: string,
         /** 发送者 QQ 号 */
         user_id?: string,
+        /** 兼容一下 */
+        uin?: number,
         /** 发送者昵称 */
         nickname?: string,
+        /** 兼容昵称 */
+        name?: string,
         /** 消息内容，支持发送消息时的 message 数据类型 */
-        content?: string | MessageElem
+        content?: string | MessageElem[]
     }
 }
 
@@ -245,4 +249,41 @@ export interface JsonElem {
     }
 }
 
-export type MessageElem = TextElem | FaceElem | ImageElem | AtElem | ReplyElem | RecordElem | VideoElem | JsonElem | XmlElem | PokeElem | LocationElem | ShareElem | FaceElem | NodeElem | ShakeElem | MusicElem;
+/** 骰子 */
+export interface DiceElem {
+    type: "dice",
+    data: {
+        id: string
+    }
+}
+
+/** 猜拳 */
+export interface RpsElem {
+    type: "rps",
+    data: {
+        id: string
+    }
+}
+
+/** Markdown消息 */
+export interface MarkdownElem {
+    type: "markdown",
+    data: {
+        content: any;
+    }
+}
+
+/** Button消息 */
+export interface ButtonElem {
+    type: "button" | "keyboard",
+    content: {
+        /** 机器人appid */
+        appid: number;
+        /** rows 数组的每个元素表示每一行按钮 */
+        rows: {
+            buttons: any[];
+        }[];
+    };
+}
+
+export type MessageElem = TextElem | FaceElem | ImageElem | AtElem | ReplyElem | RecordElem | VideoElem | JsonElem | XmlElem | PokeElem | LocationElem | ShareElem | FaceElem | NodeElem | ShakeElem | MusicElem | RpsElem | DiceElem | MarkdownElem | ButtonElem;

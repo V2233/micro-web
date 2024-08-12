@@ -6,12 +6,15 @@
         </div>
         <div class="fakeqq-message__content">
             <div class="fakeqq-message__name">{{ name }}</div>
-            <div class="fakeqq-video">
-                <video controls ref="videoElement" :style="{ 'max-width': maxWidth,'object-fit': 'cover','border-radius': '10px' }" style="width: 100%; height: 100%; ">
-                    <source :src="src" type="video/mp4" />
-                    <source :src="src" type="video/ogg" />
-                </video>
-            </div>
+            <msg-menu @msg-operation="$emit('msg-operation',$event)">
+                <div class="fakeqq-video">
+                    <video controls ref="videoElement" :style="{ 'max-width': maxWidth,'object-fit': 'cover','border-radius': '10px' }" style="width: 100%; height: 100%; ">
+                        <source :src="src" type="video/mp4" />
+                        <source :src="src" type="video/ogg" />
+                    </video>
+                </div>
+            </msg-menu>
+            
             <!-- <div class="fakeqq-message__bubble" style="cursor: pointer">
                 <div class="fakeqq-message__bubble-arrow"></div>
                 
@@ -21,6 +24,10 @@
 </template>
 
 <script lang="ts" setup>
+    import MsgMenu from './msg-operate.vue'
+
+    const $emit = defineEmits(['msg-operation'])
+
     const props = defineProps({
         name: { type: String, required: true },
         avatar: String,
