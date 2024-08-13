@@ -1,9 +1,11 @@
 <template>
     <div class="fakeqq-msglist">
         <div class="msglist__tabbar">
+            <!-- 导航栏头像 -->
             <div class="msglist__tabbar__avatar" :style="{backgroundImage: `url(${avatar})`}">
                 <div class="msglist__tabbar__avatar__state" :style="{backgroundColor: `#2CEA8C`}"></div>
             </div>
+            <!-- 导航栏顶端 -->
             <div class="msglist__tabbar__top">
                 <div class="msglist__tabbar__top__icon" @click="$emit('clickTabbar','messages')">
                     <svg-icon name="message" width="40px" height="40px" color="black"/>
@@ -11,9 +13,18 @@
                 <div class="msglist__tabbar__top__icon" @click="$emit('clickTabbar','contacts')">
                     <svg-icon name="contacts" width="26px" height="26px" color="black"/>
                 </div>
+                <div class="msglist__tabbar__top__icon" @click="$emit('clickTabbar','contacts')">
+                    <svg-icon name="channel" width="20px" height="26px" color="black"/>
+                </div>
+            </div>
+            <!-- 导航栏底部 -->
+            <div class="msglist__tabbar__bottom">
+                <div class="msglist__tabbar__bottom__icon" @click="$emit('clickTabbar','contacts')">
+                    <el-icon size="26"><Expand /></el-icon>
+                </div>
             </div>
         </div>
-
+        <!-- 列表栏 -->
         <div class="msglist__messages">
             <div class="msglist__messages__search">
                 <div class="msglist__messages__search__frame">
@@ -29,16 +40,7 @@
             <slot name="messages"></slot>
         </div>
 
-        <!-- <div class="fakeqq-header">
-            <div>
-                
-            </div>
-            
-            <span class="fakeqq-header__nickname">
-                {{ title }}
-            </span>
-            <el-icon class="fakeqq-header__bth" name="Plus" />
-        </div> -->
+        <!-- 主视图 -->
         <div class="msglist-main">
             <slot name="main"></slot>
         </div>
@@ -47,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { ref } from 'vue'
 
 const curTool = ref(0)
 const emojiRef = ref()
@@ -76,7 +78,7 @@ const exitWindowFullScreen = () => {
 // @import './fakeqq.scss';
 .fakeqq-msglist {
     position: relative;
-    margin: -20px;
+    // margin: -20px;
     height: calc(100vh - $base-tabbar-height);
     display: flex;
     .msglist__tabbar {
@@ -85,7 +87,7 @@ const exitWindowFullScreen = () => {
         flex-direction: column;
         align-items: center;
         height: calc(100vh - $base-tabbar-height);
-        width: 60px;
+        width: 75px;
         left: 0;
         background-color: #E5E5E5;
         .msglist__tabbar__avatar {
@@ -107,7 +109,7 @@ const exitWindowFullScreen = () => {
         .msglist__tabbar__top {
             position: relative;
             width: 40px;
-            height: 30vh;
+            // height: 30vh;
             .msglist__tabbar__top__icon {
                 margin-top: 10px;
                 height: 40px;
@@ -117,6 +119,23 @@ const exitWindowFullScreen = () => {
                 align-items: center;
             }
             .msglist__tabbar__top__icon:hover {
+                background-color: #DCDCDC;
+            }
+        }
+
+        .msglist__tabbar__bottom {
+            position: relative;
+            width: 40px;
+            margin-top: auto;
+            .msglist__tabbar__bottom__icon {
+                margin-top: 10px;
+                height: 40px;
+                border-radius: 8px; 
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .msglist__tabbar__bottom__icon:hover {
                 background-color: #DCDCDC;
             }
         }
@@ -202,4 +221,10 @@ const exitWindowFullScreen = () => {
         background-color: #8b8b8b;
     }
 }
+
+// @media (orientation: portrait) {
+//   .layout_main {
+//     padding: 6px !important;
+//   }
+// }
 </style>

@@ -1,17 +1,29 @@
 <template>
     <div class="fakeqq-window">
         <div class="fakeqq-header">
-            <svg-icon name="back" class="fakeqq-header__bth" @click="show_footer?devStore.qqScene = 0:devStore.qqScene = 1" />
+            <svg-icon name="back" class="fakeqq-header__bth" color="#000000" @click="footer_type == 'none'?devStore.qqScene = 1:devStore.qqScene = 0"/>
             <span class="fakeqq-header__title">
                 <svg-icon name="ear" class="fakeqq-header__bth" color="#000000"/>
                 {{ title }}{{ count ? '(' + count + ')' : '' }}
             </span>
-            <svg-icon name="menu" class="fakeqq-header__bth" color="#000000" @click="goSetting" />
+            <svg-icon name="menu" width="24px" height="24px" class="fakeqq-header__bth" color="#000000" @click="goSetting" />
         </div>
-        <div class="fakeqq-container">
-            <slot></slot>
+        <div class="fakeqq-container" ref="containerRef">
+            <div class="fakeqq-container-drawer">
+                <el-drawer 
+                    v-model="isDrawerOpen" 
+                    size="50%" 
+                    title="群聊设置" 
+                    :with-header="false" 
+                    @close="goSetting(false)"
+                    style="background-color: #F2F2F2;"
+                >
+                    <slot name="drawer"></slot>
+                </el-drawer>
+            </div>
+            <slot name="chat"></slot>
         </div>
-        <div class="fakeqq-footer" v-if="show_footer">
+        <div class="fakeqq-footer" v-show="footer_type == 'Input'">
             <form class="fakeqq-footer__input">
                 <textarea class="fakeqq-footer__input-text" contenteditable="true" v-model="inputValue"></textarea>
                 <button class="fakeqq-footer__input-btn" type="reset" @click="$emit('sendInput',inputValue)">发送</button>
@@ -91,7 +103,21 @@
                 <svg-icon name="more" />
             </div>
             
-            
+        </div>
+        <div class="fakeqq-footer-multicheck" v-if="footer_type == 'MultiCheck'">
+            <div class="fakeqq-footer-multicheck-icon">
+                <svg-icon name="forward" width="30px" height="30px"></svg-icon>
+            </div>
+            <div class="fakeqq-footer-multicheck-icon">
+                <svg-icon name="multiforward" width="24px" height="24px"></svg-icon>
+            </div>
+            <div class="fakeqq-footer-multicheck-icon">
+                <el-icon size="26"><Delete /></el-icon>
+            </div>
+            <div class="fakeqq-footer-multicheck-icon">
+                <el-icon size="30"><Close /></el-icon>
+            </div>
+
         </div>
     </div>
 </template>
@@ -103,7 +129,7 @@ import data from "emoji-mart-vue-fast/data/all.json";
 import "emoji-mart-vue-fast/css/emoji-mart.css";
 //@ts-ignore
 import { Picker, EmojiIndex } from "emoji-mart-vue-fast/src";
-import { onMounted, onUnmounted, ref } from 'vue'
+import { watch, ref, nextTick } from 'vue'
 import faceData from '@/assets/qfaces/data.json'
 import useDevStore from '@/store/modules/dev';
 import { reqPluginsLoader } from '@/api/dev/sandbox/index'
@@ -111,28 +137,58 @@ import { reqPluginsLoader } from '@/api/dev/sandbox/index'
 const devStore = useDevStore()
 const pkgs = ref<any[]>([])
 
+/** 表情索引实例 */
 const emojiIndex = ref(new EmojiIndex(data))
 
+/** input输入内容 */
 const inputValue = ref('')
 
+/** 指令可视化 */
 const isRegsVisible = ref(false)
+
+/** 聊天容器实例 */
+const containerRef = ref()
+
+/** 抽屉打开状态 */
+const isDrawerOpen = ref(false)
 
 const props = defineProps({
     title: { type: String, required: true },
     count: { type: [String, Number], default: '' },
-    show_footer: {type: Boolean, default: true}
+    /** 页脚类型(none-无，Input-输入框，MultiCheck-多选) */
+    footer_type: {type: String, default: 'Input'},
+    /** 用于刷新滚动条 */
+    msgs_length: {type: Number, default: 0}
 })
 
-const $emit = defineEmits(['sendInput','connectWs','qqFace'])
+/** 监听窗口高度变化 */
+watch(()=> props.msgs_length,()=>{
+    nextTick(() => { 
+        containerRef.value.scrollTop = containerRef.value.scrollHeight;  
+    })
+})
+
+const $emit = defineEmits(['sendInput','connectWs','qqFace','goSetting'])
 
 
 
 /**
  * 进入设置
  */
-const goSetting = () => {
-    // document.documentElement.requestFullscreen()
-    //     screen.orientation.lock('portrait')
+const goSetting = (closed?:boolean) => {
+    if(closed === false) {
+        isDrawerOpen.value = false
+        $emit('goSetting',false)
+        return
+    }
+    if(isDrawerOpen.value) {
+        isDrawerOpen.value = false
+        $emit('goSetting',false)
+    } else {
+        isDrawerOpen.value = true
+        $emit('goSetting',true)
+    }
+    
 }
 
 /**
@@ -144,7 +200,6 @@ const getPluginsLoader = async() => {
     if(res.code == 200) {
         pkgs.value = res.data
     }
-
 }
 
 /**
@@ -195,5 +250,36 @@ const handleInput = (type:string, i:any) => {
   width: 100%;
   height: 300px;
   cursor: pointer;
+}
+
+.fakeqq-container-drawer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    .el-overlay {
+        position: absolute;
+        overflow: hidden;
+        .el-drawer__body {
+            padding: 0;
+        }
+    }
+}
+
+.fakeqq-footer-multicheck {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #f5f4f2;
+    height: 100px; 
+    // border: 2px solid red;
+    .fakeqq-footer-multicheck-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%; 
+        background-color: #FFFFFF;
+    }
 }
 </style>

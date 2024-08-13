@@ -27,10 +27,10 @@
         </el-button>
         <div class="contacts-notice">
           <div class="contacts-notice-item">
-            <span>好友通知</span><el-icon><ArrowRightBold /></el-icon>
+            <span>好友通知</span><el-icon><ArrowRight /></el-icon>
           </div>
           <div class="contacts-notice-item">
-            <span>群通知</span><el-icon><ArrowRightBold /></el-icon>
+            <span>群通知</span><el-icon><ArrowRight /></el-icon>
           </div>
         </div>
         <div class="contacts-tab">
@@ -44,11 +44,9 @@
                 <div class="message-room-info">
                   <div class="message-room-info-top">
                     <span style="font-size: 14px;">{{ row.nickname }}</span>
-                    <span style="font-size: 12px;">{{ row.botRunTime }}</span>
                   </div>
                   <div class="message-room-info-bottom">
                     <span style="font-size: 12px;">{{ row.platform }}</span>
-                    <el-badge :value="100" :max="10" class="item"></el-badge>
                   </div>
                 </div>
               </div>
@@ -80,281 +78,272 @@
       <QQWindow class="chatroom" v-if="devStore.qqScene == 1" 
         :title="title" 
         :count="count" 
+        :msgs_length="Ws.msgQueue.length"
+        :footer_type="footer_type"
         @connect-ws="Ws.connect(114514)"
         @send-input="sendWs($event,'text')"
         @qq-face="sendWs($event,'face')"
+        @go-setting="handleDrawerSetting"
       >
-        <!-- <ToastMessage>2022/5/17 星期二 上午 10:58:39</ToastMessage>
-        <ForwardMessage
-          name="Evyde HF"
-          :avatar="userStore.avatar ? userStore.avatar : `https://q1.qlogo.cn/g?b=qq&s=0&nk=${userStore.masterQQ}`"
-          title="转发"
-          :contents="['LIAN-小明: [图片]', 'LIAN-小明: 隔壁群的机器人已经可以识别本子了', 'LIAN-小明: [图片]']"
-          counts="10"
-        />
-        <ToastMessage>2022/5/17 星期二 上午 11:28:06</ToastMessage>
-        <NormalMessage name="某痕" avatar="http://q.qlogo.cn/headimg_dl?dst_uin=1365197927&spec=100">
-          <QuoteMessage name="Evyde HF" time="2022/5/17 星期二 上午 10:58:39">[聊天记录]</QuoteMessage>
-          这个是<br />
-          我的真寻<br />
-          本来是用的sagiri
-        </NormalMessage>
-        <ImageMessage
-          name="某痕"
-          avatar="http://q.qlogo.cn/headimg_dl?dst_uin=1365197927&spec=100"
-          src="/sandbox/biaoqing1.jpg"
-          max-width="150px"
-        />
-        <ToastMessage>某痕 撤回了一条消息</ToastMessage>
-        <NormalMessage name="某痕" avatar="http://q.qlogo.cn/headimg_dl?dst_uin=907247545&spec=100">
-          <QuoteMessage name="某痕" time="2022/5/17 星期二 上午 11:28:14">
-            <img src="/sandbox/biaoqing1.jpg" />
-            
-          </QuoteMessage>
-          对不起了sagiri，我真的很需要本子机器人
-          <img
-            src="/sandbox/biaoqing2.png"
-            style="height: 1.3em; width: 1.3em; vertical-align: text-bottom"
+        <template #chat>
+          <!-- <ToastMessage>2022/5/17 星期二 上午 10:58:39</ToastMessage>
+          <ForwardMessage
+            name="Evyde HF"
+            :avatar="userStore.avatar ? userStore.avatar : `https://q1.qlogo.cn/g?b=qq&s=0&nk=${userStore.masterQQ}`"
+            title="转发"
+            :contents="['LIAN-小明: [图片]', 'LIAN-小明: 隔壁群的机器人已经可以识别本子了', 'LIAN-小明: [图片]']"
+            counts="10"
           />
-        </NormalMessage>
+          <ToastMessage>2022/5/17 星期二 上午 11:28:06</ToastMessage>
+          <NormalMessage name="某痕" avatar="http://q.qlogo.cn/headimg_dl?dst_uin=1365197927&spec=100">
+            <QuoteMessage name="Evyde HF" time="2022/5/17 星期二 上午 10:58:39">[聊天记录]</QuoteMessage>
+            这个是<br />
+            我的真寻<br />
+            本来是用的sagiri
+          </NormalMessage>
+          <FileMessage
+            name="Sagiri"
+            avatar="http://q.qlogo.cn/headimg_dl?dst_uin=762802224&spec=100"
+            filename="secret.zip"
+            filesize="6.33MB"
+            fileicon="/logo.png"
+            :click="downloadFile"
+          /> -->
 
-
-        <FileMessage
-          name="Sagiri"
-          avatar="http://q.qlogo.cn/headimg_dl?dst_uin=762802224&spec=100"
-          filename="secret.zip"
-          filesize="6.33MB"
-          fileicon="/logo.png"
-          :click="downloadFile"
-        /> -->
-
-        <div v-for="(msg,id) in Ws.msgQueue" :key="id" style="display: flex;">
-          <div v-if="isMultiCheckMode == true" class="chatroom-multicheck-box">
-            <el-icon class="chatroom-multicheck-icon-checked" v-if="multicheckIndex[id]" color="#0099FF" size="24" @click="handleMultiCheck(id)"><CircleCheckFilled /></el-icon>
-            <el-icon class="chatroom-multicheck-icon-unchecked" v-if="!multicheckIndex[id]" color="#C7C7C7" size="24" @click="handleMultiCheck(id)"><Remove /></el-icon>
+          <div v-for="(msg,id) in Ws.msgQueue" :key="id" style="display: flex;">
+            <div v-if="isMultiCheckMode == true" class="chatroom-multicheck-box">
+              <el-icon class="chatroom-multicheck-icon-checked" v-if="multicheckIndex[id]" color="#0099FF" size="24" @click="handleMultiCheck(id)"><CircleCheckFilled /></el-icon>
+              <el-icon class="chatroom-multicheck-icon-unchecked" v-if="!multicheckIndex[id]" color="#C7C7C7" size="24" @click="handleMultiCheck(id)"><Remove /></el-icon>
+            </div>
+            <!-- 机器人消息 -->
+            <div v-if="!msg.isSelf && msg.params?.message && msg.params?.message?.length > 0" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']" style="width: 100%;">
+              <NormalMessage
+                v-if="msg.params.message.some((s:MessageElem)=> s.type == 'text' || msg.params.message.length > 1)"
+                :avatar="selfAvatar"
+                :name="userStore.username" 
+                role="member"
+                role_title="LV1"
+                @msg-operation="handleMsgOperation($event,msg,id)"
+              >
+                <div v-for="(seg,segId) in msg.params.message">
+                  <QuoteMessage
+                    v-if="seg.type == 'reply'"
+                    :name="quotePreview(seg.data.id).sender.nickname" :time="quotePreview(seg.data.id).time">
+                    <span v-if="quotePreview(seg.data.id).message[0].type == 'text'">{{ quotePreview(seg.data.id).message[0].data.text }}</span>
+                    
+                  </QuoteMessage>
+                  <span v-if="seg.type == 'at'" style="color: blue;">
+                    @{{ seg.data.qq }}
+                  </span>
+                  <span v-if="seg.type == 'text'">{{ seg.data.text }}</span>
+                  <el-image
+                    v-if="seg.type == 'image' && msg.params.message.length > 1"
+                    :src="seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
+                    :src-list="[seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
+                    :initial-index="0"
+                    style="width: 200px;"
+                  />
+                  <img 
+                    v-if="seg.type == 'face' && msg.params.message.length > 1"
+                    :src="`/qfaces/s${seg.data.id}.gif`"
+                    style="width: 24px;"
+                  />
+                </div>
+              </NormalMessage>
+              <ImageMessage
+                v-if="msg.params.message.length == 1 && msg.params.message.some((s:MessageElem) => s.type == 'image')"
+                :avatar="selfAvatar"
+                :name="userStore.username" 
+                role="member"
+                role_title="LV1"
+                :src="msg.params.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
+                :src-list="[msg.params.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
+                :initial-index="0"
+                max-width="300px"
+                @msg-operation="handleMsgOperation($event,msg,id)"
+              />
+              <ImageMessage
+                v-if="msg.params.message.length == 1 && msg.params.message.some((s:MessageElem) => s.type == 'face')"
+                :avatar="selfAvatar"
+                :name="userStore.username" 
+                role="member"
+                role_title="LV1"
+                :src="`/qfaces/s${msg.params.message[0].data.id}.gif`"
+                max-width="80px"
+                @msg-operation="handleMsgOperation($event,msg,id)"
+              />
+              <VoiceMessage
+                v-if="msg.params.message.length == 1 && msg.params.message.some((s:MessageElem) => s.type == 'record')"
+                :avatar="selfAvatar"
+                :name="userStore.username" 
+                role="member"
+                role_title="LV1"
+                :src="msg.params.message[0].data.file.replace(/^base64:\/\//,'data:audio/mp3;base64,')"
+                :duration="15"
+                @msg-operation="handleMsgOperation($event,msg,id)"
+              />
+              <VideoMessage
+                v-if="msg.params.message.length == 1 && msg.params.message.some((s:MessageElem) => s.type == 'video')"
+                :avatar="selfAvatar"
+                :name="userStore.username" 
+                role="member"
+                role_title="LV1"
+                :src="msg.params.message[0].data.file.replace(/^base64:\/\//,'data:video/mp4;base64,')"
+                max-width="300px"
+                @msg-operation="handleMsgOperation($event,msg,id)"
+              />
+              
+            </div>
+            <!-- 合并转发 -->
+            <div style="width: 100%;" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']">
+              <ForwardMessage
+                v-if="!msg.isSelf && msg.params?.messages && msg.params?.messages?.length > 0"
+                class="chatroom-forward"
+                :name="userStore.username"
+                :avatar="selfAvatar"
+                title="转发"
+                :contents="makeForwardPreview(msg.params?.messages)"
+                counts="10"
+                @click="(devStore.qqScene = 2,curForwardMessages = msg)"
+                @msg-operation="handleMsgOperation($event,msg,id)"
+              />
+              <ToastMessage v-if="msg.isDeleted">{{ userStore.username }} 撤回了一条消息</ToastMessage>
+            </div>
+            <!-- 自己的消息 -->
+            <div v-if="msg.isSelf == true && msg.message && msg.message?.length > 0" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']" style="width: 100%;">
+              <NormalMessage
+                v-if="msg.message.some((s:MessageElem)=> s.type == 'text' || msg.params.message.length > 1)"
+                :avatar="selfAvatar"
+                :name="userStore.username"
+                role="owner"
+                role_title="LV1"
+                onright
+                @msg-operation="handleMsgOperation($event,msg,id)"
+              >
+                <div v-for="(seg,segId) in msg.message">
+                  <span v-if="seg.type == 'text'">{{ seg.data.text }}</span>
+                  <el-image 
+                    v-if="seg.type == 'image' && msg.params.message.length > 1"
+                    :src="seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
+                    :src-list="[seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
+                    :initial-index="0"
+                    style="width: 200px;"
+                  />
+                  <img 
+                    v-if="seg.type == 'face' && msg.params.message.length > 1"
+                    :src="`/qfaces/s${seg.data.id}.gif`"
+                    style="width: 24px;"
+                  />
+                </div>
+              </NormalMessage>
+              <ImageMessage
+                v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'image')"
+                :avatar="selfAvatar"
+                :name="userStore.username" 
+                role="owner"
+                role_title="LV1"
+                :src="msg.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
+                :src-list="[msg.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
+                :initial-index="0"
+                max-width="300px"
+                onright
+                @msg-operation="handleMsgOperation($event,msg,id)"
+              />
+              <ImageMessage
+                v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'face')"
+                :avatar="selfAvatar"
+                :name="userStore.username" 
+                role="owner"
+                role_title="LV1"
+                :src="`/qfaces/s${msg.message[0]?.data?.id}.gif`"
+                max-width="80px"
+                onright
+                @msg-operation="handleMsgOperation($event,msg,id)"
+              />
+              
+            </div>
           </div>
-          <!-- 机器人消息 -->
-          <div v-if="!msg.isSelf && msg.params?.message && msg.params?.message?.length > 0" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']" style="width: 100%;">
-            <NormalMessage
-              v-if="msg.params.message.some((s:MessageElem)=> s.type == 'text' || msg.params.message.length > 1)"
-              :avatar="selfAvatar"
-              :name="userStore.username" 
-              role="member"
-              role_title="LV1"
-              @msg-operation="handleMsgOperation($event,msg,id)"
-            >
-              <div v-for="(seg,segId) in msg.params.message">
-                <QuoteMessage
-                  v-if="seg.type == 'reply'"
-                  :name="quotePreview(seg.data.id).sender.nickname" :time="quotePreview(seg.data.id).time">
-                  <span v-if="quotePreview(seg.data.id).message[0].type == 'text'">{{ quotePreview(seg.data.id).message[0].data.text }}</span>
-                  
-                </QuoteMessage>
-                <span v-if="seg.type == 'at'" style="color: blue;">
-                  @{{ seg.data.qq }}
-                </span>
-                <span v-if="seg.type == 'text'">{{ seg.data.text }}</span>
-                <el-image
-                  v-if="seg.type == 'image' && msg.params.message.length > 1"
-                  :src="seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-                  :src-list="[seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
-                  :initial-index="0"
-                  style="width: 200px;"
-                />
-                <img 
-                  v-if="seg.type == 'face' && msg.params.message.length > 1"
-                  :src="`/qfaces/s${seg.data.id}.gif`"
-                  style="width: 24px;"
-                />
-              </div>
-            </NormalMessage>
-            <ImageMessage
-              v-if="msg.params.message.length == 1 && msg.params.message.some((s:MessageElem) => s.type == 'image')"
-              :avatar="selfAvatar"
-              :name="userStore.username" 
-              role="member"
-              role_title="LV1"
-              :src="msg.params.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-              :src-list="[msg.params.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
-              :initial-index="0"
-              max-width="300px"
-              @msg-operation="handleMsgOperation($event,msg,id)"
-            />
-            <ImageMessage
-              v-if="msg.params.message.length == 1 && msg.params.message.some((s:MessageElem) => s.type == 'face')"
-              :avatar="selfAvatar"
-              :name="userStore.username" 
-              role="member"
-              role_title="LV1"
-              :src="`/qfaces/s${msg.params.message[0].data.id}.gif`"
-              max-width="80px"
-              @msg-operation="handleMsgOperation($event,msg,id)"
-            />
-            <VoiceMessage
-              v-if="msg.params.message.length == 1 && msg.params.message.some((s:MessageElem) => s.type == 'record')"
-              :avatar="selfAvatar"
-              :name="userStore.username" 
-              role="member"
-              role_title="LV1"
-              :src="msg.params.message[0].data.file.replace(/^base64:\/\//,'data:audio/mp3;base64,')"
-              :duration="15"
-              @msg-operation="handleMsgOperation($event,msg,id)"
-            />
-            <VideoMessage
-              v-if="msg.params.message.length == 1 && msg.params.message.some((s:MessageElem) => s.type == 'video')"
-              :avatar="selfAvatar"
-              :name="userStore.username" 
-              role="member"
-              role_title="LV1"
-              :src="msg.params.message[0].data.file.replace(/^base64:\/\//,'data:video/mp4;base64,')"
-              max-width="300px"
-              @msg-operation="handleMsgOperation($event,msg,id)"
-            />
-            
-          </div>
-          <!-- 合并转发 -->
-          <div style="width: 100%;" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']">
-            <ForwardMessage
-              v-if="!msg.isSelf && msg.params?.messages && msg.params?.messages?.length > 0"
-              class="chatroom-forward"
-              :name="userStore.username"
-              :avatar="selfAvatar"
-              title="转发"
-              :contents="makeForwardPreview(msg.params?.messages)"
-              counts="10"
-              @click="(devStore.qqScene = 2,curForwardMessages = msg)"
-              @msg-operation="handleMsgOperation($event,msg,id)"
-            />
-          </div>
-          <!-- 自己的消息 -->
-          <div v-if="msg.isSelf == true && msg.message" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']" style="width: 100%;">
-            <NormalMessage
-              v-if="msg.message.some((s:MessageElem)=> s.type == 'text' || msg.params.message.length > 1)"
-              :avatar="selfAvatar"
-              :name="userStore.username"
-              role="owner"
-              role_title="LV1"
-              onright
-              @msg-operation="handleMsgOperation($event,msg,id)"
-            >
-              <div v-for="(seg,segId) in msg.message">
-                <span v-if="seg.type == 'text'">{{ seg.data.text }}</span>
-                <el-image 
-                  v-if="seg.type == 'image' && msg.params.message.length > 1"
-                  :src="seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-                  :src-list="[seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
-                  :initial-index="0"
-                  style="width: 200px;"
-                />
-                <img 
-                  v-if="seg.type == 'face' && msg.params.message.length > 1"
-                  :src="`/qfaces/s${seg.data.id}.gif`"
-                  style="width: 24px;"
-                />
-              </div>
-            </NormalMessage>
-            <ImageMessage
-              v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'image')"
-              :avatar="selfAvatar"
-              :name="userStore.username" 
-              role="owner"
-              role_title="LV1"
-              :src="msg.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-              :src-list="[msg.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
-              :initial-index="0"
-              max-width="300px"
-              onright
-              @msg-operation="handleMsgOperation($event,msg,id)"
-            />
-            <ImageMessage
-              v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'face')"
-              :avatar="selfAvatar"
-              :name="userStore.username" 
-              role="owner"
-              role_title="LV1"
-              :src="`/qfaces/s${msg.message[0]?.data?.id}.gif`"
-              max-width="80px"
-              onright
-              @msg-operation="handleMsgOperation($event,msg,id)"
-            />
-            
-          </div>
-        </div>
+        </template>
+        <template #drawer>
+          <GroupSetting />
+        </template>
       </QQWindow>
       <!-- 合并转发 -->
       <QQWindow class="chatroom" v-if="devStore.qqScene == 2" 
         :title="title" 
         :count="count" 
-        :show_footer="false"
+        footer_type="none"
       >
-        <div v-for="(node, nodeId) in curForwardMessages.params?.messages" :key="nodeId" style="display: flex;">
-          <div v-if="node.type == 'node'" style="width: 100%;">
-            <NormalMessage
-              v-if="node.data.content.some((s:MessageElem)=> s.type == 'text' || node.data.content.length > 1)"
-              :avatar="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${node.data.uin}`"
-              :name="node.data?.name"
-              role="member"
-              role_title="LV1"
-            >
-              <div v-for="(seg,segId) in node.data?.content">
-                <span v-if="seg.type == 'at'" style="color: blue;">
-                  @{{ seg.data.qq }}
-                </span>
-                <span v-if="seg.type == 'text'">{{ seg.data.text }}</span>
-                <el-image 
-                  v-if="seg.type == 'image' && node.data?.content.length > 1"
-                  :src="seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-                  :src-list="[seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
-                  :initial-index="0"
-                  style="width: 200px;"
-                />
-                <img 
-                  v-if="seg.type == 'face' && node.data?.content.length > 1"
-                  :src="`/qfaces/s${seg.data.id}.gif`"
-                  style="width: 24px;"
-                />
-              </div>
-            </NormalMessage>
-            <ImageMessage
-              v-if="node.data.content.length == 1 && node.data.content.some((s:MessageElem) => s.type == 'image')"
-              :avatar="selfAvatar"
-              :name="userStore.username" 
-              role="member"
-              role_title="LV1"
-              :src="node.data.content[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-              :src-list="[node.data.content[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
-              :initial-index="0"
-              max-width="300px"
-            />
-            <ImageMessage
-              v-if="node.data.content.length == 1 && node.data.content.some((s:MessageElem) => s.type == 'face')"
-              :avatar="selfAvatar"
-              :name="userStore.username" 
-              role="member"
-              role_title="LV1"
-              :src="`/qfaces/s${node.data.content[0].data.id}.gif`"
-              max-width="80px"
-            />
-            <VoiceMessage
-              v-if="node.data.content.length == 1 && node.data.content.some((s:MessageElem) => s.type == 'record')"
-              :avatar="selfAvatar"
-              :name="userStore.username" 
-              role="member"
-              role_title="LV1"
-              :src="node.data.content[0].data.file.replace(/^base64:\/\//,'data:audio/mp3;base64,')"
-              :duration="15"
-            />
-            <VideoMessage
-              v-if="node.data.content.length == 1 && node.data.content.some((s:MessageElem) => s.type == 'video')"
-              :avatar="selfAvatar"
-              :name="userStore.username" 
-              role="member"
-              role_title="LV1"
-              :src="node.data.content[0].data.file.replace(/^base64:\/\//,'data:video/mp4;base64,')"
-              max-width="300px"
-            />
+        <template #chat>
+          <div v-for="(node, nodeId) in curForwardMessages.params?.messages" :key="nodeId" style="display: flex;">
+            <div v-if="node.type == 'node'" style="width: 100%;">
+              <NormalMessage
+                v-if="node.data.content.some((s:MessageElem)=> s.type == 'text' || node.data.content.length > 1)"
+                :avatar="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${node.data.uin}`"
+                :name="node.data?.name"
+                role="member"
+                role_title="LV1"
+              >
+                <div v-for="(seg,segId) in node.data?.content">
+                  <span v-if="seg.type == 'at'" style="color: blue;">
+                    @{{ seg.data.qq }}
+                  </span>
+                  <span v-if="seg.type == 'text'">{{ seg.data.text }}</span>
+                  <el-image 
+                    v-if="seg.type == 'image' && node.data?.content.length > 1"
+                    :src="seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
+                    :src-list="[seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
+                    :initial-index="0"
+                    style="width: 200px;"
+                  />
+                  <img 
+                    v-if="seg.type == 'face' && node.data?.content.length > 1"
+                    :src="`/qfaces/s${seg.data.id}.gif`"
+                    style="width: 24px;"
+                  />
+                </div>
+              </NormalMessage>
+              <ImageMessage
+                v-if="node.data.content.length == 1 && node.data.content.some((s:MessageElem) => s.type == 'image')"
+                :avatar="selfAvatar"
+                :name="userStore.username" 
+                role="member"
+                role_title="LV1"
+                :src="node.data.content[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
+                :src-list="[node.data.content[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
+                :initial-index="0"
+                max-width="300px"
+              />
+              <ImageMessage
+                v-if="node.data.content.length == 1 && node.data.content.some((s:MessageElem) => s.type == 'face')"
+                :avatar="selfAvatar"
+                :name="userStore.username" 
+                role="member"
+                role_title="LV1"
+                :src="`/qfaces/s${node.data.content[0].data.id}.gif`"
+                max-width="80px"
+              />
+              <VoiceMessage
+                v-if="node.data.content.length == 1 && node.data.content.some((s:MessageElem) => s.type == 'record')"
+                :avatar="selfAvatar"
+                :name="userStore.username" 
+                role="member"
+                role_title="LV1"
+                :src="node.data.content[0].data.file.replace(/^base64:\/\//,'data:audio/mp3;base64,')"
+                :duration="15"
+              />
+              <VideoMessage
+                v-if="node.data.content.length == 1 && node.data.content.some((s:MessageElem) => s.type == 'video')"
+                :avatar="selfAvatar"
+                :name="userStore.username" 
+                role="member"
+                role_title="LV1"
+                :src="node.data.content[0].data.file.replace(/^base64:\/\//,'data:video/mp4;base64,')"
+                max-width="300px"
+              />
+            </div>
           </div>
-        </div>
+        </template>
       </QQWindow>
     </template>
   </Msglist>
@@ -375,6 +364,7 @@ import FileMessage from './messages/file.vue'
 
 // QQ-messagesList
 import Msglist from './msglist.vue';
+import GroupSetting from './groupSetting.vue'
 
 // 小组件
 import SildeTab from './components/tab.vue'
@@ -430,6 +420,9 @@ const multicheckIndex = ref<any>({})
 
 /** 是否为多选模式 */
 const isMultiCheckMode = ref(false)
+
+/** 聊天室底层控件类型 */
+const footer_type = ref<'Input' | 'MultiCheck' | 'none'>('Input')
 
 /**
  * 折叠面板折叠事件
@@ -559,6 +552,11 @@ const handleMsgOperation = async(e:{type:string},msg:any,id:number) => {
     case 'delete':
       Ws.value.msgQueue.splice(id,1)
       break;
+    case 'withdraw':
+      msg.isDeleted = true
+      if(msg.message) msg.message = []
+      if(msg.params?.message) msg.params.message = []
+      break;
     case 'copy':
       navigator.clipboard && await navigator?.clipboard?.writeText(msg.raw_message);  
       break;
@@ -575,11 +573,25 @@ const handleMultiCheck = (index:number) => {
   } else {
     delete multicheckIndex.value[index]
   }
+  if(Object.keys(multicheckIndex.value).length > 0) {
+    footer_type.value = 'MultiCheck'
+  } else {
+    footer_type.value = 'Input'
+  }
 }
 
 /** 多选后的消息操作逻辑 */
 const handleMultiMsgs = () => {
   console.log(multicheckIndex.value)
+}
+
+/** 打开设置抽屉的事件处理 */
+const handleDrawerSetting = (isOpen:boolean) => {
+  if(isOpen) {
+    footer_type.value = 'none'
+  } else {
+    footer_type.value = 'Input'
+  }
 }
 </script>
 
@@ -635,6 +647,7 @@ const handleMultiMsgs = () => {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding: 5px;
       }
       .contacts-notice-item:hover {
         background-color: #F5F5F5;
@@ -643,8 +656,9 @@ const handleMultiMsgs = () => {
     }
     .contacts-tab {
       width: calc(100% - 20px);
-      height: 40px;
-      margin: 0 10px;
+      height: 30px;
+      margin: 5px 10px;
+      // border: 2px solid red;
     }
   }
   

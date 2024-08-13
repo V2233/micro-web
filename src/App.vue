@@ -22,8 +22,8 @@
     --el-menu-base-level-padding: 10px;
   }
 
-  .layout_main {
-    padding: 6px !important;
-  }
+}
+.layout_main {
+  padding: 0 !important;
 }
 </style>
