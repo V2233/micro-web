@@ -35,10 +35,10 @@
         // display: flex;
         padding: 3px;
         border-radius: 3px;
-        .fakeqq-message-operations-item-title {
-            font-size: 10px;
-            font-family: sans-serif;
-        }
+        // .fakeqq-message-operations-item-title {
+        //     font-size: 14px;
+        //     font-family: sans-serif;
+        // }
     }
     .fakeqq-message-operations-item:hover {
         background-color: #F2F2F2;
@@ -259,6 +259,11 @@
 .fakeqq-footer__btn img,
 .fakeqq-footer__btn svg {
     height: 20px;
+}
+
+.fakeqq-footer__btn img,
+.fakeqq-footer__btn svg:hover {
+    cursor: pointer;
 }
 
 .fakeqq-message__quote {

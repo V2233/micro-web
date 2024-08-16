@@ -1,10 +1,10 @@
 <template>
   <QQCard>
     <div class="introduction">
-        <img class="introduction-avatar" src="https://q1.qlogo.cn/g?b=qq&s=0&nk=1593519730"/>
+        <img class="introduction-avatar" :src="`https://p.qlogo.cn/gh/${curGroup?.group_id}/${curGroup?.group_id}/640`"/>
         <div class="introduction-content">
             <div class="introduction-content-left">
-                <span style="font-size: 14px;">沙箱测试群</span>
+                <span style="font-size: 14px;">{{ curGroup?.group_name }}</span>
             </div>
             <div class="introduction-content-right">
                 <el-icon><ArrowRight /></el-icon>
@@ -16,14 +16,17 @@
     <div class="group-members">
         <div class="group-members-title">
             <span>群聊成员</span>
-            <span class="card-desc">查看{{ group_size }}名群成员</span>
+            <span class="card-desc">查看{{ curGroup?.member_list?.length }}名群成员</span>
             <el-icon><ArrowRight /></el-icon>
         </div>
         <div class="group-members-list">
-            <div class="group-members-item" v-for="item in 10" :key="item">
-                <img class="group-members-item-avatar" src="https://q1.qlogo.cn/g?b=qq&s=0&nk=1593519730">
+            <div class="group-members-item" 
+                v-for="(member,memberId) in curGroup?.member_list" 
+                :key="memberId" 
+            >
+                <img class="group-members-item-avatar" :src="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${member.user_id}`">
                 <div class="group-members-item-nickname">
-                    {{ nickname }}
+                    {{ member.nickname }}
                 </div>
             </div>
             <div class="group-members-item">
@@ -49,19 +52,29 @@
   <QQCard>
     <div class="card-list-item">
         <span>群聊名称</span>
-        <span class="card-desc">{{ group_name }}</span>
+        <span class="card-desc">{{ curGroup?.group_name }}</span>
         <el-icon><ArrowRight /></el-icon>
     </div>
     <div class="card-list-divider"></div>
     <div class="card-list-item">
         <span>群号</span>
-        <span class="card-desc">{{ group_id }}</span>
+        <span class="card-desc" 
+            :style="{
+                backgroundColor:' #F5F5F5',
+                borderRadius: '3px',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '2px'
+            }"
+        >
+            <el-icon style="margin-right: 3px;"><Lock /></el-icon>{{ curGroup?.group_id }}
+        </span>
         <el-icon><ArrowRight /></el-icon>
     </div>
     <div class="card-list-divider"></div>
     <div class="card-list-item">
         <span>我的本群昵称</span>
-        <span class="card-desc">{{ card }}</span>
+        <span class="card-desc">{{ curGroup?.member_list?.find((member:any) => member.user_id == devStore.onebot11.cur_master_id)?.card }}</span>
         <el-icon><ArrowRight /></el-icon>
     </div>
   </QQCard>
@@ -86,9 +99,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
 import QQCard from './components/qqcard.vue';
-import { number } from 'echarts';
+import { computed, ref } from 'vue'
+import useDevStore from '@/store/modules/dev';
+
+const devStore = useDevStore()
 
 const isTop = ref(false)
 
@@ -100,6 +115,11 @@ const props = defineProps({
     nickname: {type: String, default: '未知'},
     group_name: {type: String, default: '群聊沙箱'},
     card: {type: String, default: '未知'},
+})
+
+/** 获取当前群聊数据 */
+const curGroup = computed(()=>{
+    return devStore.onebot11.group_list.find((group:any) => group.group_id == devStore.onebot11.cur_group_id) || {}
 })
 
 </script>

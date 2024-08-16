@@ -7,7 +7,12 @@
 
 // 在所有能够推送事件的通信方式中（HTTP POST、正向和反向 WebSocket），事件都以 JSON 格式表示。
 
-import type { MessageElem } from '../message/message.elem'
+import type { MessageElem, NodeElem } from '../message/message.elem'
+
+import type { groupMsgType,privateMsgType } from './type'
+
+import useDevStore from '@/store/modules/dev'; 
+const devStore = useDevStore()
 
 
 export default new class Events {
@@ -24,7 +29,7 @@ export default new class Events {
             /** (int64)	事件发生的时间戳 */
             time: Math.round(Date.now() / 1000), 
             /** (int64)	收到事件的机器人 QQ 号 */
-            self_id: this.self_id,
+            self_id: devStore.onebot11.cur_self_id,
             /** 事件类型 */
             post_type: post_type, 
         }
@@ -86,140 +91,119 @@ export default new class Events {
 
     /**
      * 构造私聊消息
-     * @param message_id 消息 ID
-     * @param user_id 发送者 QQ 号
-     * @param nickname 昵称
-     * @param message 消息内容
-     * @param raw_message 原始消息内容
-     * @param sub_type 消息子类型，如果是好友则是 friend，如果是群临时会话则是 group
-
-     * @param sex 性别
-     * @param age 年龄
-     * @param font 字体
+     * @param data 数据对象
+     * @param data.message_id 消息 ID
+     * @param data.user_id 发送者 QQ 号
+     * @param data.nickname 昵称
+     * @param data.message 消息内容
+     * @param data.messages 合并消息内容
+     * @param data.raw_message 原始消息内容
+     * @param data.sub_type 消息子类型，如果是好友则是 friend，如果是群临时会话则是 group
+     * @param data.avatar 头像
+     * @param data.sex 性别
+     * @param data.age 年龄
+     * @param data.font 字体
      * @returns 
      */
-    private_message(
-        
-        message_id: number,
-        user_id: number,
-        nickname: string,
-        message: MessageElem[],
-        raw_message: string,
-        sub_type: 'friend' | 'group' | 'other' = 'friend',
-        sex: 'male' | 'female' | 'unknown' = 'unknown',
-        age: number = 1,
-        font: string = ''
-    ) {
+    private_message(data:privateMsgType) {
         return {
             ...this.baseProp('message'),
             /** 消息类型 */
             message_type: 'private', 
             /** 消息子类型，如果是好友则是 friend，如果是群临时会话则是 group */
-            sub_type,
+            sub_type: data.sub_type || 'friend',
             /** 到下次心跳的间隔，单位毫秒 */
             interval: 5000,
             /** 消息 ID */
-            message_id,
+            message_id: data.message_id,
             /** 发送者 QQ 号 */
-            user_id,
+            user_id: data.user_id,
             /** 消息内容 */
-            message,
+            message: data.message,
+            /** 合并消息 */
+            messages: data.messages || undefined,
             /** 原始消息内容 */
-            raw_message,
+            raw_message: data.raw_message,
             /** 字体 */
-            font,
+            font: data.font || '',
             /** 发送人信息 */
             sender: {
-                user_id,
-                nickname,
-                sex,
-                age
+                user_id: data.user_id,
+                nickname: data.nickname,
+                sex: data.sex || 'unknown',
+                age: data.age || 1,
+                avatar: data.avatar || `https://q1.qlogo.cn/g?b=qq&s=0&nk=${data.user_id}`
             }
         }
     }
 
+
+
     /**
      * 构造群消息
-     * @param message_id 消息 ID 
-     * @param group_id 群号
-     * @param user_id 发送者 QQ 号
-     * @param nickname 昵称
-     * @param message 消息内容
-     * @param raw_message 原始消息内容
-     * @param sub_type 消息子类型，正常消息是 normal，匿名消息是 anonymous，系统提示（如「管理员已禁止群内匿名聊天」）是 notice
-     * @param role 角色，owner 或 admin 或 member
-     * @param card 群名片／备注
-     * @param level 成员等级
-     * @param sex 性别
-     * @param age 年龄
-     * @param area 地区
-     * @param title 专属头衔
-     * @param font 字体
-     * @param id 匿名用户 ID
-     * @param name 匿名用户名称
-     * @param flag 匿名用户 flag，在调用禁言 API 时需要传入
+     * @param data 数据对象
+     * @param data.message_id 消息 ID 
+     * @param data.group_id 群号
+     * @param data.user_id 发送者 QQ 号
+     * @param data.nickname 昵称
+     * @param data.message 消息内容
+     * @param data.raw_message 原始消息内容
+     * @param data.sub_type 消息子类型，正常消息是 normal，匿名消息是 anonymous，系统提示（如「管理员已禁止群内匿名聊天」）是 notice
+     * @param data.role 角色，owner 或 admin 或 member
+     * @param data.card 群名片／备注
+     * @param data.avatar 头像
+     * @param data.level 成员等级
+     * @param data.sex 性别
+     * @param data.age 年龄
+     * @param data.area 地区
+     * @param data.title 专属头衔
+     * @param data.font 字体
+     * @param data.id 匿名用户 ID
+     * @param data.name 匿名用户名称
+     * @param data.flag 匿名用户 flag，在调用禁言 API 时需要传入
      * @returns 
      */
-    group_message(
-        message_id: number,
-        group_id: number,
-        user_id: number,
-        nickname: string,
-        message: MessageElem[],
-        raw_message: string,
-        sub_type: 'normal' | 'anonymous' | 'notice' = 'normal',
-
-        role: 'owner' | 'admin' | 'member',
-        card: string = nickname,
-        level: string = '1',
-        sex: 'male' | 'female' | 'unknown' = 'unknown',
-        age: number = 1,
-        area: string = '',
-        title: string = '',
-
-        font: string = '',
-
-        id: number = 114514,
-        name: string = '憨憨',
-        flag: string = ''
-    ) {
+    group_message(data:groupMsgType) {
         return {
             ...this.baseProp('message'),
             /** 消息类型 */
             message_type: 'group', 
             /** 消息子类型，正常消息是 normal，匿名消息是 anonymous，系统提示（如「管理员已禁止群内匿名聊天」）是 notice */
-            sub_type,
+            sub_type: data.sub_type || 'normal',
             /** 到下次心跳的间隔，单位毫秒 */
             interval: 5000,
             /** 消息 ID */
-            message_id,
+            message_id: data.message_id,
             /** 群号 */
-            group_id,
+            group_id: data.group_id,
             /** 发送者 QQ 号 */
-            user_id,
+            user_id: data.user_id,
             /** 匿名信息，如果不是匿名消息则为 null */
             anonymous: {
-                id,
-                name,
-                flag
+                id: data.id || 114514,
+                name: data.name || '憨憨',
+                flag: data.flag || ''
             },
             /** 消息内容 */
-            message,
+            message: data.message,
+            /** 合并消息 */
+            messages: data.messages || undefined,
             /** 原始消息内容 */
-            raw_message,
+            raw_message: data.raw_message,
             /** 字体 */
-            font,
+            font: data.font || '',
             /** 发送人信息 */
             sender: {
-                user_id,
-                nickname,
-                sex,
-                age,
-                card,
-                area,
-                level,
-                role,
-                title
+                user_id: data.user_id,
+                nickname: data.nickname,
+                sex: data.sex || 'unknown',
+                age: data.age || 1,
+                card: data.card || data.nickname,
+                area: data.area || '',
+                level: data.level || '1',
+                role: data.role || 'member',
+                title: data.title || '',
+                avatar: data.avatar || `https://q1.qlogo.cn/g?b=qq&s=0&nk=${data.user_id}`
             }
         }
     }

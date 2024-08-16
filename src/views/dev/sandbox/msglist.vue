@@ -25,23 +25,51 @@
             </div>
         </div>
         <!-- 列表栏 -->
-        <div class="msglist__messages">
+        <div class="msglist__messages" ref="messagesRef">
             <div class="msglist__messages__search">
                 <div class="msglist__messages__search__frame">
                     <div class="msglist__messages__search__frame__left">
                         <el-icon size="large" color="#9F9F9F"><Search /></el-icon>
                         <input class="msglist__messages__search__frame__input" :value="searchText" placeholder="搜索"></input>
                     </div>
-                    <div class="msglist__messages__search__frame__right">
-                        <el-icon size="large" color="#9F9F9F"><Plus /></el-icon>
-                    </div>
+                    <el-popover
+                        placement="top-end"
+                        :width="140"
+                        trigger="click"
+                        v-model:visible = "isAddMenuVisible"
+                    >   
+                        <template #reference>
+                            <div class="msglist__messages__search__frame__right">
+                                <el-icon size="large" color="#9F9F9F"><Plus /></el-icon>
+                            </div>
+                        </template>
+                        <div class="msglist__messages__menu__add">
+                            <div class="msglist__messages__menu__add__item">
+                                <svg-icon name="create-group" width="16px" height="16px"></svg-icon>
+                                <span class="msglist__messages__menu__item__desc">创建群聊</span>
+                            </div>
+                            <div class="msglist__messages__menu__add__item">
+                                <svg-icon name="add-friend" width="16px" height="16px"></svg-icon>
+                                <span class="msglist__messages__menu__item__desc">加好友/群</span>
+                            </div>
+                        </div>
+                        
+                    </el-popover>
                 </div>
             </div>
             <slot name="messages"></slot>
         </div>
 
+        <!-- 分割线 -->
+        <div class="msglist__messages__main__resizer">
+            <div class="msglist__messages__main__resizer__extend" 
+                ref="dividerRef"
+                @mousedown="startDragDivider"
+            ></div>
+        </div>
+
         <!-- 主视图 -->
-        <div class="msglist-main">
+        <div class="msglist-main" ref="mainRef">
             <slot name="main"></slot>
         </div>
 
@@ -49,10 +77,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref,onMounted,onBeforeUnmount } from 'vue'
 
-const curTool = ref(0)
-const emojiRef = ref()
+/** 添加操作栏 */
+const isAddMenuVisible = ref(false)
 
 const props = defineProps({
     avatar: { type: String, required: true },
@@ -63,32 +91,86 @@ const props = defineProps({
 
 const $emit = defineEmits(['clickTabbar'])
 
-const setWindowFullScreen = () => {
-    // document.documentElement.requestFullscreen()
-    // screen.orientation.lock('portrait')
+/** 点击消息栏菜单按钮事件 */
+const clickAddBtn = () => {
+
 }
 
-const exitWindowFullScreen = () => {
-    // document.exitFullscreen()
+/** 处理分隔线移动 */
+const isDividerDragging = ref(false)
+
+const messagesRef = ref()
+
+const dividerRef = ref()
+
+const mainRef = ref()
+
+const maxX = ref(1280)
+
+/** 拖拽事件 */
+const handleDragDivider = function(e:any) {
+    // console.log(e)
+    if(isDividerDragging.value) {
+        const x = e.clientX
+        const dividerWidth = dividerRef.value.offsetWidth;
+        if(messagesRef.value.offsetWidth == 500) maxX.value = x
+        // console.log(maxX.value)
+        if(x > maxX.value) return
+        mainRef.value.style.width = `${window.innerWidth - x - dividerWidth / 2}px`;
+    }
+    
 }
 
+/**
+ * 开始拖拽
+ * @returns
+ */
+const startDragDivider = function() {
+    isDividerDragging.value = true
+    // console.log(isDividerDragging.value)
+    // console.log(window.innerWidth)
+    document.onmousemove = handleDragDivider
+}
+
+/**
+ * 停止拖拽
+ * @returns
+ */
+const stopDragDivider = function() {
+    isDividerDragging.value = false
+    // console.log(isDividerDragging.value)
+    window.onmousemove = null
+}
+
+
+onMounted(()=>{
+    // window.addEventListener('mousedown', startDragDivider);  
+    window.addEventListener('mouseup', stopDragDivider);  
+})
+
+onBeforeUnmount(()=>{
+    // window.removeEventListener('mousedown', startDragDivider);  
+    window.removeEventListener('mouseup', stopDragDivider);
+})
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 // @import './fakeqq.scss';
 .fakeqq-msglist {
-    position: relative;
-    // margin: -20px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    position: absolute;
     height: calc(100vh - $base-tabbar-height);
     display: flex;
     .msglist__tabbar {
         position: relative;
         display: flex;
+        flex-shrink: 0;
         flex-direction: column;
         align-items: center;
-        height: calc(100vh - $base-tabbar-height);
-        width: 75px;
-        left: 0;
+        height: 100%;
+        width: 54px;
         background-color: #E5E5E5;
         .msglist__tabbar__avatar {
             position: relative;
@@ -109,7 +191,6 @@ const exitWindowFullScreen = () => {
         .msglist__tabbar__top {
             position: relative;
             width: 40px;
-            // height: 30vh;
             .msglist__tabbar__top__icon {
                 margin-top: 10px;
                 height: 40px;
@@ -144,13 +225,16 @@ const exitWindowFullScreen = () => {
     }
     .msglist__messages {
         // border: 2px solid red;
-        width: 400px;
-        height: calc(100vh - $base-tabbar-height);
+        min-width: 300px;
+        max-width: 500px;
+        flex: 1;
+        height: 100%;
         .msglist__messages__search {
             position: relative;
             border: 0.1px solid rgba(220, 220, 220, 0.326);
             width: 100%;
             height: 60px;
+
             .msglist__messages__search__frame {
                 display: flex;
                 justify-content: space-between;
@@ -188,9 +272,41 @@ const exitWindowFullScreen = () => {
                     align-items: center;
                     border-radius: 5px;
                 }
-                
+                .msglist__messages__search__frame__right:hover {
+                    cursor: pointer;
+                }
+
             }
         }
+    }
+
+    .msglist__messages__main__resizer {
+        position: relative;
+        background-color: #E5E5E5;
+        // cursor: e-resize;
+        height: 100%;
+        width: 0.1px;
+        margin: 0;
+        padding: 0;
+        .msglist__messages__main__resizer__extend {
+            width: 10px;
+            position: absolute;
+            height: 100%;
+            left: -5px;
+            background-color: transparent;
+            cursor: e-resize;
+        }
+    }
+
+    .msglist-main {
+        background-color: #E5E5E5;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        // flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .msglist-header {
@@ -201,15 +317,6 @@ const exitWindowFullScreen = () => {
         align-items: center;
         background-image: #f0f0f0;
         border-bottom: 1px solid #ffffff;
-    }
-    .msglist-main {
-        background-color: #E5E5E5;
-        position: relative;
-        width: 100%;
-        height: calc(100vh - $base-tabbar-height);
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
     .msglist-footer__tabbar {
         position: absolute;
@@ -222,6 +329,27 @@ const exitWindowFullScreen = () => {
     }
 }
 
+.msglist__messages__menu__add {
+    // border: 2px solid red;
+    .msglist__messages__menu__add__item {
+        height: 30px;
+        display: flex;
+        align-items: center;
+        border-radius: 5px;
+        padding-left: 5px;
+        .msglist__messages__menu__item__desc {
+            margin-left: 5px;
+        }
+    }
+    .msglist__messages__menu__add__item:hover {
+        cursor: pointer;
+        background-color: #F2F2F2;
+    }
+}
+
+.el-popover.el-popper {
+    padding: 5px !important;
+}
 // @media (orientation: portrait) {
 //   .layout_main {
 //     padding: 6px !important;

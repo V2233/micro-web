@@ -8,27 +8,27 @@
         <div class="fakeqq-message-operations">
             <div class="fakeqq-message-operations-item" @click="clickOperation('copy')">
                 <el-icon size="24"><CopyDocument /></el-icon>
-                <div>复制</div>
+                <div class="fakeqq-message-operations-item-title">复制</div>
             </div>
             <div class="fakeqq-message-operations-item" @click="clickOperation('forward')">
                 <el-icon size="24"><Promotion /></el-icon>
-                <div>转发</div>
+                <div class="fakeqq-message-operations-item-title">转发</div>
             </div>
             <div class="fakeqq-message-operations-item" @click="clickOperation('withdraw')">
                 <el-icon size="24"><Back /></el-icon>
-                <div>撤回</div>
+                <div class="fakeqq-message-operations-item-title">撤回</div>
             </div>
             <div class="fakeqq-message-operations-item" @click="clickOperation('delete')">
                 <el-icon size="24"><Delete /></el-icon>
-                <div>删除</div>
+                <div class="fakeqq-message-operations-item-title">删除</div>
             </div>
             <div class="fakeqq-message-operations-item" @click="clickOperation('quote')">
                 <el-icon size="24"><ChatLineRound /></el-icon>
-                <div>引用</div>
+                <div class="fakeqq-message-operations-item-title">引用</div>
             </div>
             <div class="fakeqq-message-operations-item" @click="clickOperation('multicheck')">
                 <el-icon size="24"><CircleCheck /></el-icon>
-                <div>多选</div>
+                <div class="fakeqq-message-operations-item-title">多选</div>
             </div>
         </div>
         <template #reference>

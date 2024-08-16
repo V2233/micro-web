@@ -1,3 +1,4 @@
+import { group_list } from './../../../../../../store/modules/default/sandbox';
 interface actionType {
     echo: string,
     action: string,
@@ -7,12 +8,14 @@ interface actionType {
 type retcodeType = 0 | 10001 | 10002 | 10003 | 10004 | 10005 | 10006 | 10007 | 10101 | 10102 | 20001 | 20002
 
 import type { groupInfoType,groupMemberInfoType } from './type'
+import  useDevStore from '@/store/modules/dev'; 
+const devStore = useDevStore()
 
 export class Res {
     self_id: number
     constructor(public ws: WebSocket) {
         this.ws = ws
-        this.self_id = 114514
+        this.self_id = 1593519730
     }
 
     sendApi(
@@ -99,24 +102,6 @@ export class Res {
     }
 
     send_group_msg(params:any) {
-        let groups:groupMemberInfoType[] = [{
-            group_id: 441307983,
-            user_id: 2330660495,
-            nickname: 'v',
-            card: 'v',
-            sex: 'female',
-            age: 18,
-            area: '',
-            join_time: 123456789,
-            last_sent_time:	123456789,
-            level: 'lv100',
-            role: 'owner',
-            unfriendly:	false,
-            title: '主人',
-            title_expire_time: 987654321,
-            card_changeable: true
-        }]
-        let group = groups.find(g => g.group_id == params.group_id)
         
         return 
     }
@@ -143,7 +128,10 @@ export class Res {
         return 
     }
 
+    /** 点赞 */
     send_like(params:any) {
+        const { user_id, times } = params
+
         return 
     }
 
@@ -197,93 +185,53 @@ export class Res {
 
     get_login_info(params:any) {
         return {
-            user_id: this.self_id,
+            user_id: devStore.onebot11.cur_self_id,
             nickname: 'v崽'
         }
     }
 
     get_stranger_info(params:any) {
-        return 
+        return {}
     }
 
     get_friend_list(params:any) {
-        let friends = []
-        friends.push({
-            nickname: "v崽G1",
-            remark: "",
-            user_id: 428498194
-        })
-        return 
+        return devStore.onebot11.friend_list
     }
 
     get_group_info(params:any) {
-        let groups:groupInfoType[] = [{
-            group_id: 441307983,
-            group_name: "v崽测试",
-            max_member_count: 200,
-            member_count: 7
-        }]
-        let group = groups.find(g => g.group_id == params.group_id)
+        let group = devStore.onebot11.group_list.find(g => g.group_id == params.group_id)
         return group || {}
     }
 
     get_group_list(params:any) {
-        let groups = []
-        groups.push({
-            group_id: 441307983,
-            group_name: "v崽测试",
-            max_member_count: 200,
-            member_count: 7
+        let groups = devStore.onebot11.group_list.map(group => {
+            
+            return {
+                group_id: group.group_id,
+                group_name: group.group_name,
+                max_member_count: group.max_member_count,
+                member_count: group.member_list?.length,
+            }
         })
-        return groups
+        return groups || []
     }
 
     get_group_member_info(params:any) {
-        let groups:groupMemberInfoType[] = [{
-            group_id: 441307983,
-            user_id: 2330660495,
-            nickname: 'v',
-            card: 'v',
-            sex: 'female',
-            age: 18,
-            area: '',
-            join_time: 123456789,
-            last_sent_time:	123456789,
-            level: 'lv100',
-            role: 'owner',
-            unfriendly:	false,
-            title: '主人',
-            title_expire_time: 987654321,
-            card_changeable: true
-        }]
-        let group = groups.find(g => g.group_id == params.group_id && g.user_id == params.user_id)
-        return group || {}
+        let group = devStore.onebot11.group_list.find(g => g.group_id == params.group_id)
+        if(group) {
+            let member = group?.member_list?.find((m:groupMemberInfoType) => m.user_id == params.user_id)
+            if(member) return member
+        }
+        return {}
     }
 
     get_group_member_list(params:any) {
-        let groups:groupMemberInfoType[] = []
-        groups.push({
-            group_id: 441307983,
-            user_id: 2330660495,
-            nickname: 'v',
-            card: 'v',
-            sex: 'female',
-            age: 18,
-            area: '',
-            join_time: 123456789,
-            last_sent_time:	123456789,
-            level: 'lv100',
-            role: 'owner',
-            unfriendly:	false,
-            title: '主人',
-            title_expire_time: 987654321,
-            card_changeable: true
-        })
-        return groups
+        let group = devStore.onebot11.group_list.find(g => g.group_id == params.group_id)
+        return group?.member_list
     }
 
     get_group_honor_info(params:any) {
-        return 
+        return {}
     }
 
     get_cookies(params:any) {
@@ -306,11 +254,13 @@ export class Res {
     }
 
     get_record(params:any) {
-        return 
+        const { file } = params
+        return 'http://127.0.0.1:23306/api/File/' + file
     }
 
     get_image(params:any) {
-        return 
+        const { file } = params
+        return 'http://127.0.0.1:23306/api/File/' + file
     }
 
     can_send_image(params:any) {
@@ -337,18 +287,18 @@ export class Res {
 
     get_version_info(params:any) {
         return {
-            app_name: 'micro.dev',
+            app_name: 'sandbox.onebot',
             app_version: '0.0.1',
             protocol_version: 'v11'
         }
     }
 
     set_restart(params:any) {
-        return 
+        return 'Cannot restart!'
     }
 
     clean_cache(params:any) {
-        return 
+        return 'ok'
     }
 
     _set_model_show(params:any) {

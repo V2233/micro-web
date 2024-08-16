@@ -311,6 +311,17 @@
               </div>
             </el-form-item>
 
+            <!-- 代码段 -->
+            <el-form-item v-if="seg?.type == 'code'">
+              <div class="type-title" style="font-weight: 500; margin-bottom: 10px;">自定义代码
+                <el-button style="margin-left: 10px" size="small" @click="deleteMsgSeg(index)">
+                  <el-icon>
+                    <CloseBold />
+                  </el-icon>
+                </el-button>
+              </div>
+              <Editor :code="seg.data as string" ext="js" @getCode="saveCodeSeg($event,seg)"/>
+            </el-form-item>
           </div>
         </el-form>
       </el-card>
@@ -342,6 +353,7 @@
 </template>
 
 <script setup lang="ts">
+import Editor from '../../fs/codeEditor.vue'
 import ImageEditor from './imageEditor/index.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import CusInput from '@/components/CusInput/index.vue'
@@ -360,6 +372,8 @@ import { reqAddPlugin, reqEditorPlugin, reqImageJson, reqBotWorkURI, reqBtnJson 
 import type { UploadProps, UploadInstance } from 'element-plus'
 import faceData from '@/assets/qfaces/data.json'
 import { buttonEl, markdownEl } from './segment/default'
+import { codeTip } from './utils/codeTip'
+import { getMD5Hash } from '@/utils/hash'
 
 // 为图片编辑器传数据
 import { useCommand } from '@/plugins/editor/src/hooks/useCommand'
@@ -430,6 +444,14 @@ const pluginData = ref<pluginType>({
 })
 
 const messageSeg = ref([
+  {
+    type: '代码',
+    default: {
+      type: 'code',
+      data: codeTip(),
+      hash: ''
+    },
+  },
   {
     type: '文本',
     default: {
@@ -791,12 +813,22 @@ const setImageData = (e: { hash: string; data: string, json: string }) => {
 }
 
 /**
+ * 保存代码段
+ * @returns
+ */
+const saveCodeSeg = async($event:string,seg:any) => {
+  seg.data = $event
+  seg.hash = await getMD5Hash($event)
+  ElMessage.success('保存代码段成功，可点击此页顶端保存按钮保存插件~')
+}
+
+/**
  * 进入update模式加载非html资源
  * @returns
  */
 const loadResourcesData = async () => {
   if (devStore.curEditedMode == 'update') {
-    if (messageData.value.find(item => item.type == 'button' || item.type == 'markdown')) {
+    if (messageData.value.find(item => item.type == 'button' || item.type == 'markdown' || item.type == 'code')) {
       let res: pluginElResponseType = await reqBtnJson(Object.assign(pluginData.value, { message: messageData.value }))
       if (res.code == 200) {
         pluginData.value = res.data

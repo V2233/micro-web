@@ -13,7 +13,7 @@ export const getTime = () => {
   return message
 }
 
-export const getFormatDate = (date = new Date(), type = 1) => {
+export const getFormatDate = (date = new Date(), type = 1):string => {
   let year = date.getFullYear()
   let month = String(date.getMonth() + 1).padStart(2, '0') // 月份是从0开始的
   let day = String(date.getDate()).padStart(2, '0')
@@ -22,5 +22,8 @@ export const getFormatDate = (date = new Date(), type = 1) => {
   let seconds = String(date.getSeconds()).padStart(2, '0')
   if(type == 1) return `${year}${month}${day}-${hours}${minutes}${seconds}`
   if(type == 2) return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`
+  if(hours == 'NaN' || minutes == 'NaN' || seconds == 'NaN') return ''
+  if(type == 3) return `${hours}:${minutes}:${seconds}`
+  return `${year}${month}${day}-${hours}${minutes}${seconds}`
 }
 

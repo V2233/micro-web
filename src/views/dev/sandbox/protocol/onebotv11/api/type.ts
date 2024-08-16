@@ -1,9 +1,12 @@
+import type {msgQueueItemType} from '../event/type'
 
 export interface groupInfoType {
     group_id: number,
     group_name: string,
     max_member_count: number,
-    member_count: number
+    member_count: number,
+    msg_queue?: Array<msgQueueItemType> | [],
+    member_list?: groupMemberInfoType[]
 }
 
 export interface friendInfoType {

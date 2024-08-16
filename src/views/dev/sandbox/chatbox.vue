@@ -1,5 +1,6 @@
 <template>
     <div class="fakeqq-window">
+        <!-- 顶部 -->
         <div class="fakeqq-header">
             <svg-icon name="back" class="fakeqq-header__bth" color="#000000" @click="footer_type == 'none'?devStore.qqScene = 1:devStore.qqScene = 0"/>
             <span class="fakeqq-header__title">
@@ -8,6 +9,7 @@
             </span>
             <svg-icon name="menu" width="24px" height="24px" class="fakeqq-header__bth" color="#000000" @click="goSetting" />
         </div>
+        <!-- 聊天区域 -->
         <div class="fakeqq-container" ref="containerRef">
             <div class="fakeqq-container-drawer">
                 <el-drawer 
@@ -23,14 +25,27 @@
             </div>
             <slot name="chat"></slot>
         </div>
+        <!-- 输入框 -->
         <div class="fakeqq-footer" v-show="footer_type == 'Input'">
             <form class="fakeqq-footer__input">
-                <textarea class="fakeqq-footer__input-text" contenteditable="true" v-model="inputValue"></textarea>
-                <button class="fakeqq-footer__input-btn" type="reset" @click="$emit('sendInput',inputValue)">发送</button>
+                <!-- 唤出at列表 -->
+                <el-popover
+                    placement="top-start"
+                    :width="300"
+                    trigger="contextmenu"
+                    v-model:visible = "isAtListVisible"
+                >   
+                    <template #reference>
+                        <textarea class="fakeqq-footer__input-text" contenteditable="true" v-model="inputValue" @input="exposeInnerText" @focus="$emit('footerBtn','none')"></textarea>
+                    </template>
+                    <slot name="atlist"></slot>
+                </el-popover>
+                <button class="fakeqq-footer__input-btn" type="reset" @click="$emit('sendInput',{type: 'text', data: {text: inputValue}})">发送</button>
             </form>
             <div class="fakeqq-footer__btn">
-                <svg-icon name="voice" @click="$emit('connectWs',{})"/>
-                <svg-icon name="pic" />
+                <svg-icon name="voice" @click="$emit('footerBtn','audio')"/>
+
+                <svg-icon name="pic" @click="$emit('connectWs',{})"/>
 
                 <!-- Emoji表情 -->
                 <el-popover placement="top-start" title="Emoji" :width="320" trigger="click">
@@ -89,33 +104,38 @@
                 </el-popover>
                 
                 <!-- QQ表情 -->
-                <el-popover placement="top-start" title="QQFaces" :width="300" trigger="click">
-                  <div class="face-box">
-                    <el-image class="face-image" v-for="face in faceData" :key="face.QSid"
-                      :src="`/qfaces/s${face.QSid}.gif`"
-                      @click="$emit('qqFace',face.QSid)" />
-                  </div>
-
-                  <template #reference>
-                    <svg-icon name="emoji" />
-                  </template>
-                </el-popover>
-                <svg-icon name="more" />
+                <svg-icon name="emoji" @click="$emit('footerBtn','face')"/>
+                <svg-icon name="more" @click="$emit('footerBtn','file')"/>
             </div>
-            
         </div>
+        <div class="fakeqq-footer-toolview" v-if="footerview_visible">
+            <slot name="tools"></slot>
+        </div>
+        <!-- 多选操作栏 -->
         <div class="fakeqq-footer-multicheck" v-if="footer_type == 'MultiCheck'">
-            <div class="fakeqq-footer-multicheck-icon">
-                <svg-icon name="forward" width="30px" height="30px"></svg-icon>
+            <div class="fakeqq-footer-multicheck-item">
+                <div class="fakeqq-footer-multicheck-icon" @click="$emit('multiCheck','forward')">
+                    <svg-icon name="forward" width="30px" height="30px"></svg-icon>
+                </div>
+                <div class="fakeqq-footer-multicheck-icon-desc">逐条转发</div>
             </div>
-            <div class="fakeqq-footer-multicheck-icon">
-                <svg-icon name="multiforward" width="24px" height="24px"></svg-icon>
+            <div class="fakeqq-footer-multicheck-item">
+                <div class="fakeqq-footer-multicheck-icon" @click="$emit('multiCheck','multiforward')">
+                    <svg-icon name="multiforward" width="24px" height="24px"></svg-icon>
+                </div>
+                <div class="fakeqq-footer-multicheck-icon-desc">合并转发</div>
             </div>
-            <div class="fakeqq-footer-multicheck-icon">
-                <el-icon size="26"><Delete /></el-icon>
+            <div class="fakeqq-footer-multicheck-item">
+                <div class="fakeqq-footer-multicheck-icon" @click="$emit('multiCheck','delete')">
+                    <el-icon size="26"><Delete /></el-icon>
+                </div>
+                <div class="fakeqq-footer-multicheck-icon-desc">删除</div>
             </div>
-            <div class="fakeqq-footer-multicheck-icon">
-                <el-icon size="30"><Close /></el-icon>
+            <div class="fakeqq-footer-multicheck-item">
+                <div class="fakeqq-footer-multicheck-icon" @click="$emit('multiCheck','close')">
+                    <el-icon size="30"><Close /></el-icon>
+                </div>
+                <div class="fakeqq-footer-multicheck-icon-desc">关闭</div>
             </div>
 
         </div>
@@ -130,7 +150,7 @@ import "emoji-mart-vue-fast/css/emoji-mart.css";
 //@ts-ignore
 import { Picker, EmojiIndex } from "emoji-mart-vue-fast/src";
 import { watch, ref, nextTick } from 'vue'
-import faceData from '@/assets/qfaces/data.json'
+
 import useDevStore from '@/store/modules/dev';
 import { reqPluginsLoader } from '@/api/dev/sandbox/index'
 
@@ -152,13 +172,22 @@ const containerRef = ref()
 /** 抽屉打开状态 */
 const isDrawerOpen = ref(false)
 
+// const footerview_visible = ref(false)
+
+/** 记录@符号个数 */
+let sepCount = 0
+
+const isAtListVisible = ref(false)
+
 const props = defineProps({
     title: { type: String, required: true },
     count: { type: [String, Number], default: '' },
     /** 页脚类型(none-无，Input-输入框，MultiCheck-多选) */
     footer_type: {type: String, default: 'Input'},
     /** 用于刷新滚动条 */
-    msgs_length: {type: Number, default: 0}
+    msgs_length: {type: Number, default: 0},
+    /** 是否展示工具栏试图 */
+    footerview_visible: {type: Boolean, default: false},
 })
 
 /** 监听窗口高度变化 */
@@ -168,9 +197,17 @@ watch(()=> props.msgs_length,()=>{
     })
 })
 
-const $emit = defineEmits(['sendInput','connectWs','qqFace','goSetting'])
+const $emit = defineEmits(['sendInput','connectWs','goSetting','multiCheck','inputContent','footerBtn'])
 
-
+const exposeInnerText = () => {
+  $emit('inputContent', inputValue.value)
+  // 兼容软键盘
+  const curSepCount = (inputValue.value.match(/\//g)) || []
+  if (curSepCount.length == (sepCount + 1)) {
+    isAtListVisible.value = true
+  }
+  sepCount = curSepCount.length
+}
 
 /**
  * 进入设置
@@ -227,17 +264,6 @@ const handleInput = (type:string, i:any) => {
 
 <style lang="scss">
 @import './fakeqq.scss';
-.face-box {
-  width: 100%;
-  height: 300px;
-  overflow-y: scroll;
-  cursor: pointer;
-
-  .face-image {
-    width: 25px;
-    height: 25px;
-  }
-}
 
 .regs-box {
   width: 100%;
@@ -265,21 +291,48 @@ const handleInput = (type:string, i:any) => {
     }
 }
 
+.fakeqq-footer-toolview {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #f5f4f2;
+    border-top: 1px solid #c1c1c19f;
+    height: auto; 
+}
+
 .fakeqq-footer-multicheck {
     display: flex;
     align-items: center;
     justify-content: space-around;
     background-color: #f5f4f2;
-    height: 100px; 
+    height: 80px; 
     // border: 2px solid red;
-    .fakeqq-footer-multicheck-icon {
+    .fakeqq-footer-multicheck-item {
+        width: 60px;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%; 
-        background-color: #FFFFFF;
+        .fakeqq-footer-multicheck-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%; 
+            background-color: #FFFFFF;
+        }
+        .fakeqq-footer-multicheck-icon:hover {
+            background-color: #F5F5F5;
+        }
+        .fakeqq-footer-multicheck-icon-desc {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 12px;
+            // border: 2px solid red;
+        }
     }
+    
 }
+
+
 </style>
