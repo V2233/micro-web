@@ -27,8 +27,12 @@ export interface DevState {
     friend_list: Array<any>,
     /** 频道列表 */
     guild_list: Array<any>,
+    /** 当前是群聊还是私聊场景 */
+    cur_message_type: 'group' | 'private',
     /** 当前所在群号 */
     cur_group_id: number,
+    /** 当前所在私聊场景对方id，和cur_group_id之间必有一个为0 */
+    cur_private_id: number,
     /** 当前操作者账号 */
     cur_master_id: number,
     /** 当前机器人id */

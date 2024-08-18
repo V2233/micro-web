@@ -22,7 +22,7 @@ export interface groupMsgType {
     /** 群名片 */
     card?: string,
     /** 角色 */
-    role?: 'owner' | 'admin' | 'member',
+    role?: 'owner' | 'admin' | 'member' | 'bot',
     /** 群聊等级 */
     level?: string,
     /** 发送者性别 */
@@ -109,7 +109,7 @@ export interface groupMsgQueueItemType {
         card: string,
         area: string,
         level: string,
-        role: 'owner' | 'admin' | 'member',
+        role: 'owner' | 'admin' | 'member' | 'bot',
         title: string,
         avatar: string
     }

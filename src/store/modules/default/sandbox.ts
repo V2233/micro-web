@@ -25,7 +25,7 @@ export const group_list:groupInfoType[] = [
                 join_time: 123456789,
                 last_sent_time: 123456789,
                 level: 'lv1',
-                role: 'admin',
+                role: 'bot',
                 unfriendly: false,
                 title: '机器人',
                 title_expire_time: 987654321,
@@ -44,7 +44,7 @@ export const group_list:groupInfoType[] = [
                 level: 'lv100',
                 role: 'owner',
                 unfriendly: false,
-                title: '主人',
+                title: '',
                 title_expire_time: 987654321,
                 card_changeable: true
             },
@@ -61,7 +61,51 @@ export const group_list:groupInfoType[] = [
                 level: 'lv1',
                 role: 'member',
                 unfriendly: false,
+                title: '',
+                title_expire_time: 987654321,
+                card_changeable: true
+            }
+        ]
+    },
+    {
+        group_id: 617703908,
+        group_name: "Yunzai",
+        max_member_count: 200,
+        member_count: 3,
+        /** 每个群的消息队列 */
+        msg_queue: [],
+        member_list: [
+            {
+                group_id: 617703908,
+                user_id: 2854196310,
+                nickname: 'Q群管家',
+                card: 'Q群管家',
+                sex: 'unknown',
+                age: 18,
+                area: '',
+                join_time: 123456789,
+                last_sent_time: 123456789,
+                level: 'lv1',
+                role: 'bot',
+                unfriendly: false,
                 title: '机器人',
+                title_expire_time: 987654321,
+                card_changeable: true
+            },
+            {
+                group_id: 617703908,
+                user_id: 1715713638,
+                nickname: '柠檬冲水',
+                card: '柠檬冲水',
+                sex: 'male',
+                age: 25,
+                area: '',
+                join_time: 123456789,
+                last_sent_time: 123456789,
+                level: 'lv100',
+                role: 'owner',
+                unfriendly: false,
+                title: '',
                 title_expire_time: 987654321,
                 card_changeable: true
             }

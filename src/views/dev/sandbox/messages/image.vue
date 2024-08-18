@@ -1,9 +1,11 @@
 <template>
     <div class="fakeqq-message" :class="[onright ? 'right-chat' : 'left-chat']">
-        <div v-if="avatar" :style="{ 'background-image': `url(${avatar})` }" class="fakeqq-message__avatar"></div>
-        <div v-else class="fakeqq-message__avatar">
-            <span class="fakeqq-message__text-avatar">{{ name[0] }}</span>
-        </div>
+        <AvatarMenu :onright="onright" @avatar-operation="$emit('avatar-operation',$event)">
+            <div v-if="avatar" :style="{ 'background-image': `url(${avatar})` }" class="fakeqq-message__avatar"></div>
+            <div v-else class="fakeqq-message__avatar">
+                <span class="fakeqq-message__text-avatar">{{ name[0] }}</span>
+            </div>
+        </AvatarMenu>
         <div class="fakeqq-message__content">
             <div class="fakeqq-message__name">
                 <span v-if="onright" :class="memberTitleClass">{{ role_title }}</span>
@@ -20,8 +22,9 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import MsgMenu from './msg-operate.vue'
+import AvatarMenu from './avatar-operate.vue'
 
-const $emit = defineEmits(['msg-operation'])
+const $emit = defineEmits(['msg-operation','avatar-operation'])
 
 const props = defineProps({
     name: { type: String, required: true },

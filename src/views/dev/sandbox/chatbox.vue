@@ -1,8 +1,8 @@
 <template>
     <div class="fakeqq-window">
         <!-- 顶部 -->
-        <div class="fakeqq-header">
-            <svg-icon name="back" class="fakeqq-header__bth" color="#000000" @click="footer_type == 'none'?devStore.qqScene = 1:devStore.qqScene = 0"/>
+        <div class="fakeqq-header" v-show="header_visible">
+            <el-icon class="fakeqq-header__bth" size="24" @click="footer_type == 'none'?devStore.qqScene = 1:devStore.qqScene = 0"><ArrowLeft /></el-icon>
             <span class="fakeqq-header__title">
                 <svg-icon name="ear" class="fakeqq-header__bth" color="#000000"/>
                 {{ title }}{{ count ? '(' + count + ')' : '' }}
@@ -11,10 +11,22 @@
         </div>
         <!-- 聊天区域 -->
         <div class="fakeqq-container" ref="containerRef">
+            <slot name="chat"></slot>
+        </div>
+        <!-- 抽屉 -->
+        <div class="fakeqq-container" 
+            v-show="isDrawerOpen"
+            :style="{
+                position: 'absolute', 
+                width: '100%', 
+                height: '100%', 
+                top: '0px'
+            }"
+        >
             <div class="fakeqq-container-drawer">
                 <el-drawer 
                     v-model="isDrawerOpen" 
-                    size="50%" 
+                    :size="drawerWidth" 
                     title="群聊设置" 
                     :with-header="false" 
                     @close="goSetting(false)"
@@ -23,7 +35,6 @@
                     <slot name="drawer"></slot>
                 </el-drawer>
             </div>
-            <slot name="chat"></slot>
         </div>
         <!-- 输入框 -->
         <div class="fakeqq-footer" v-show="footer_type == 'Input'">
@@ -36,7 +47,13 @@
                     v-model:visible = "isAtListVisible"
                 >   
                     <template #reference>
-                        <textarea class="fakeqq-footer__input-text" contenteditable="true" v-model="inputValue" @input="exposeInnerText" @focus="$emit('footerBtn','none')"></textarea>
+                        <textarea class="fakeqq-footer__input-text" 
+                            contenteditable="true" 
+                            v-model="inputValue" 
+                            @input="exposeInnerText" 
+                            @focus="$emit('footerBtn','none')"
+                        >
+                        </textarea>
                     </template>
                     <slot name="atlist"></slot>
                 </el-popover>
@@ -65,7 +82,9 @@
                     <svg-icon name="emoji" />
                   </template>
                 </el-popover>
-                <!-- <svg-icon name="camera" /> -->
+
+                <!-- QQ表情 -->
+                <svg-icon name="emoji" @click="$emit('footerBtn','face')"/>
 
                 <!-- 指令列表 -->
                 <el-popover placement="top-start" title="指令列表" :width="360" trigger="click" v-model:visible="isRegsVisible">
@@ -99,12 +118,11 @@
                     </div>
 
                     <template #reference>
-                        <svg-icon name="redpack" @click="getPluginsLoader"/>
+                        <svg-icon name="robot" color="#515151" @click="getPluginsLoader"/>
                     </template>
                 </el-popover>
                 
-                <!-- QQ表情 -->
-                <svg-icon name="emoji" @click="$emit('footerBtn','face')"/>
+                
                 <svg-icon name="more" @click="$emit('footerBtn','file')"/>
             </div>
         </div>
@@ -149,7 +167,7 @@ import data from "emoji-mart-vue-fast/data/all.json";
 import "emoji-mart-vue-fast/css/emoji-mart.css";
 //@ts-ignore
 import { Picker, EmojiIndex } from "emoji-mart-vue-fast/src";
-import { watch, ref, nextTick } from 'vue'
+import { watch, ref, nextTick, onBeforeUnmount, onMounted } from 'vue'
 
 import useDevStore from '@/store/modules/dev';
 import { reqPluginsLoader } from '@/api/dev/sandbox/index'
@@ -172,6 +190,9 @@ const containerRef = ref()
 /** 抽屉打开状态 */
 const isDrawerOpen = ref(false)
 
+/** 抽屉宽度，适配移动端 */
+const drawerWidth = ref('50%')
+
 // const footerview_visible = ref(false)
 
 /** 记录@符号个数 */
@@ -182,6 +203,8 @@ const isAtListVisible = ref(false)
 const props = defineProps({
     title: { type: String, required: true },
     count: { type: [String, Number], default: '' },
+    /** 是否展示header */
+    header_visible: {type: Boolean, default: true},
     /** 页脚类型(none-无，Input-输入框，MultiCheck-多选) */
     footer_type: {type: String, default: 'Input'},
     /** 用于刷新滚动条 */
@@ -202,7 +225,7 @@ const $emit = defineEmits(['sendInput','connectWs','goSetting','multiCheck','inp
 const exposeInnerText = () => {
   $emit('inputContent', inputValue.value)
   // 兼容软键盘
-  const curSepCount = (inputValue.value.match(/\//g)) || []
+  const curSepCount = (inputValue.value.match(/@/g)) || []
   if (curSepCount.length == (sepCount + 1)) {
     isAtListVisible.value = true
   }
@@ -213,11 +236,13 @@ const exposeInnerText = () => {
  * 进入设置
  */
 const goSetting = (closed?:boolean) => {
+    // 主动关闭
     if(closed === false) {
         isDrawerOpen.value = false
         $emit('goSetting',false)
         return
     }
+    // 被动切换
     if(isDrawerOpen.value) {
         isDrawerOpen.value = false
         $emit('goSetting',false)
@@ -260,6 +285,26 @@ const handleInput = (type:string, i:any) => {
     }
 }
 
+defineExpose({inputValue, isDrawerOpen})
+
+/** 调整抽屉大小 */
+const resizeDrawer = () => {
+    if(window.innerWidth > window.innerHeight) drawerWidth.value = '50%'
+    else drawerWidth.value = '100%'
+}
+
+window.onresize = () => {
+    resizeDrawer()
+}
+
+onMounted(()=>{
+    resizeDrawer()
+})
+
+onBeforeUnmount(() => {
+    window.onresize = null
+})
+
 </script>
 
 <style lang="scss">
@@ -296,7 +341,7 @@ const handleInput = (type:string, i:any) => {
     align-items: center;
     justify-content: space-around;
     background-color: #f5f4f2;
-    border-top: 1px solid #c1c1c19f;
+    border-top: 1px solid #f3f2f263;
     height: auto; 
 }
 

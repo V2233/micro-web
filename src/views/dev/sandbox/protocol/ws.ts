@@ -1,6 +1,3 @@
-import { onebotv11 } from './../../../../../../src/server/controller/config/protocolCfgMap';
-import { DevState } from './../../../../store/modules/types/type';
-import { group } from './../../../../../../src/server/controller/config/botCfgMap';
 import  useDevStore from '@/store/modules/dev'; 
 import Events from '../protocol/onebotv11/event/event'
 import { Res } from './onebotv11/api/api2'

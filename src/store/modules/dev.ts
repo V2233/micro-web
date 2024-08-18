@@ -31,8 +31,12 @@ let useDevStore = defineStore('Dev', {
         friend_list: friend_list,
         /** 频道列表 */
         guild_list: [],
-        /** 当前所在群号 */
+        /** 当前是群聊还是私聊场景 */
+        cur_message_type: 'group',
+        /** 当前所在群聊场景群号 */
         cur_group_id: 397798018,
+        /** 当前所在私聊场景对方id，和cur_group_id之间必有一个为0 */
+        cur_private_id: 0,
         /** 当前操作者账号 */
         cur_master_id: 2330660495,
         /** 当前机器人id */

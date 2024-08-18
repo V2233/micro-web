@@ -33,7 +33,7 @@ export interface groupMemberInfoType {
     join_time: number,
     last_sent_time:	number,
     level: string,
-    role: 'owner' | 'admin' | 'member',
+    role: 'owner' | 'admin' | 'member' | 'bot',
     unfriendly:	boolean,
     title: string,
     title_expire_time: number,

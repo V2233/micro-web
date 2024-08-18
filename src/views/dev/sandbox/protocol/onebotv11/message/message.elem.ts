@@ -58,7 +58,7 @@ export interface RecordElem {
         /** 音频url地址，接收时有效 */
         url?: string;
         /** 发送时可选，默认 0，设置为 1 表示变声 */
-        magic: 0 | 1;
+        magic?: 0 | 1;
         
     }
 }

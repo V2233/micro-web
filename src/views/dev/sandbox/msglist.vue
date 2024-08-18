@@ -2,24 +2,32 @@
     <div class="fakeqq-msglist">
         <div class="msglist__tabbar">
             <!-- 导航栏头像 -->
-            <div class="msglist__tabbar__avatar" :style="{backgroundImage: `url(${avatar})`}">
+            <div class="msglist__tabbar__avatar">
+                <img class="msglist__tabbar__avatar__img" :src="`${avatar}`"/>
                 <div class="msglist__tabbar__avatar__state" :style="{backgroundColor: `#2CEA8C`}"></div>
             </div>
             <!-- 导航栏顶端 -->
             <div class="msglist__tabbar__top">
-                <div class="msglist__tabbar__top__icon" @click="$emit('clickTabbar','messages')">
+                <div class="msglist__tabbar__top__icon" 
+                    :class="[curTabbarIcon == 'messages'?'msglist__tabbar__top__icon__selected':'']" 
+                    @click="clickTabbarIcon('messages')"
+                >
                     <svg-icon name="message" width="40px" height="40px" color="black"/>
                 </div>
-                <div class="msglist__tabbar__top__icon" @click="$emit('clickTabbar','contacts')">
+                <div class="msglist__tabbar__top__icon" 
+                    :class="[curTabbarIcon == 'contacts'?'msglist__tabbar__top__icon__selected':'']"
+                    @click="clickTabbarIcon('contacts')">
                     <svg-icon name="contacts" width="26px" height="26px" color="black"/>
                 </div>
-                <div class="msglist__tabbar__top__icon" @click="$emit('clickTabbar','contacts')">
+                <!-- <div class="msglist__tabbar__top__icon" @click="$emit('clickTabbar','contacts')">
                     <svg-icon name="channel" width="20px" height="26px" color="black"/>
-                </div>
+                </div> -->
             </div>
             <!-- 导航栏底部 -->
             <div class="msglist__tabbar__bottom">
-                <div class="msglist__tabbar__bottom__icon" @click="$emit('clickTabbar','contacts')">
+                <div class="msglist__tabbar__bottom__icon" 
+                    :class="[curTabbarIcon == 'settings'?'msglist__tabbar__top__icon__selected':'']"
+                    @click="clickTabbarIcon('settings')">
                     <el-icon size="26"><Expand /></el-icon>
                 </div>
             </div>
@@ -79,8 +87,7 @@
 <script lang="ts" setup>
 import { ref,onMounted,onBeforeUnmount } from 'vue'
 
-/** 添加操作栏 */
-const isAddMenuVisible = ref(false)
+const $emit = defineEmits(['clickTabbar'])
 
 const props = defineProps({
     avatar: { type: String, required: true },
@@ -89,11 +96,15 @@ const props = defineProps({
     // state: { type: String, default: '离线' },
 })
 
-const $emit = defineEmits(['clickTabbar'])
+/** 添加操作栏 */
+const isAddMenuVisible = ref(false)
 
+/** 当前导航栏状态 */
+const curTabbarIcon = ref('messages')
 /** 点击消息栏菜单按钮事件 */
-const clickAddBtn = () => {
-
+const clickTabbarIcon = (type:string) => {
+    $emit('clickTabbar', type)
+    curTabbarIcon.value = type
 }
 
 /** 处理分隔线移动 */
@@ -144,12 +155,10 @@ const stopDragDivider = function() {
 
 
 onMounted(()=>{
-    // window.addEventListener('mousedown', startDragDivider);  
     window.addEventListener('mouseup', stopDragDivider);  
 })
 
 onBeforeUnmount(()=>{
-    // window.removeEventListener('mousedown', startDragDivider);  
     window.removeEventListener('mouseup', stopDragDivider);
 })
 </script>
@@ -178,6 +187,11 @@ onBeforeUnmount(()=>{
             width: 36px;
             height: 36px;
             border-radius: 50%;
+            .msglist__tabbar__avatar__img {
+                width: 100%; 
+                height: 100%;
+                border-radius: 50%;
+            }
             .msglist__tabbar__avatar__state {
                 position: absolute;
                 border: 2px solid #E5E5E5;
@@ -200,6 +214,9 @@ onBeforeUnmount(()=>{
                 align-items: center;
             }
             .msglist__tabbar__top__icon:hover {
+                background-color: #DCDCDC;
+            }
+            .msglist__tabbar__top__icon__selected {
                 background-color: #DCDCDC;
             }
         }
@@ -225,7 +242,7 @@ onBeforeUnmount(()=>{
     }
     .msglist__messages {
         // border: 2px solid red;
-        min-width: 300px;
+        min-width: 250px;
         max-width: 500px;
         flex: 1;
         height: 100%;

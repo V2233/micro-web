@@ -213,7 +213,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, nextTick, computed } from 'vue'
+import { ref, onMounted, onBeforeMount, reactive, nextTick, computed } from 'vue'
 //@ts-ignore
 import * as reqFs from '@/api/dev/fs/index'
 import type { UploadInstance } from 'element-plus'
@@ -907,6 +907,10 @@ const handleUpload = (file: any) => {
 
 onMounted(() => {
   getDir('0')
+})
+
+onBeforeMount(()=>{
+  window.onresize = null
 })
 </script>
 

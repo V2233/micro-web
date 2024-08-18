@@ -181,7 +181,7 @@ export default new class Events {
             /** 匿名信息，如果不是匿名消息则为 null */
             anonymous: {
                 id: data.id || 114514,
-                name: data.name || '憨憨',
+                name: data.name || '',
                 flag: data.flag || ''
             },
             /** 消息内容 */
@@ -200,7 +200,7 @@ export default new class Events {
                 age: data.age || 1,
                 card: data.card || data.nickname,
                 area: data.area || '',
-                level: data.level || '1',
+                level: data.level || 'lv1',
                 role: data.role || 'member',
                 title: data.title || '',
                 avatar: data.avatar || `https://q1.qlogo.cn/g?b=qq&s=0&nk=${data.user_id}`

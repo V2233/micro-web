@@ -125,7 +125,7 @@
 .fakeqq-message__bubble {
     position: relative;
     padding: 12px;
-    width: auto;
+    width: max-content;
     min-height: 1em;
     min-width: 1em;
     line-height: 1.2em;
@@ -143,6 +143,7 @@
     .right-chat & {
         background-color: #0098fe;
         color: #fff;
+        margin-left: auto;
 
         .fakeqq-message__bubble-arrow {
           border-top-color: #0098fe;
@@ -167,6 +168,7 @@
 
 .fakeqq-header {
     display: flex;
+    height: 50px;
     padding: 12px 0;
     // color: white;
     text-align: center;
@@ -175,7 +177,6 @@
     // background-image: linear-gradient(to right, #00dafe, #00ceff 12%, #01c5ff 25%, #01b9ff 50%, #01a7ff 85%);
     background-image: #f0f0f0;
     border-bottom: 1px solid #ffffff;
-// }
 }
 
 .fakeqq-footer {
