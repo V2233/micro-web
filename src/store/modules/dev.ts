@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import type { DevState } from './types/type'
-import { group_list,friend_list } from './default/sandbox'
+import { group_list, friend_list } from './default/sandbox'
 
 let useDevStore = defineStore('Dev', {
   state: (): DevState => {
@@ -23,8 +23,6 @@ let useDevStore = defineStore('Dev', {
       curAdapter: 'onebot11',
       /** onebot 数据库 */
       onebot11: {
-        /** 消息队列 */
-        msgQueue: [],
         /** 群聊列表 */
         group_list: group_list,
         /** 好友列表 */
@@ -37,10 +35,17 @@ let useDevStore = defineStore('Dev', {
         cur_group_id: 397798018,
         /** 当前所在私聊场景对方id，和cur_group_id之间必有一个为0 */
         cur_private_id: 0,
-        /** 当前操作者账号 */
-        cur_master_id: 2330660495,
         /** 当前机器人id */
-        cur_self_id: 1593519730
+        cur_bot_id: 1593519730,
+        /** 当前自己的资料 */
+        cur_self_info: {
+          user_id: 2330660495,
+          nickname: 'v',
+          sex: 'female',
+          age: 18,
+          area: '',
+          thumbs: 0
+        }
       }
     }
   },

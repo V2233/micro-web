@@ -75,9 +75,9 @@
         <el-icon><ArrowRight /></el-icon>
     </div>
     <div class="card-list-divider"></div>
-    <div class="card-list-item" @click="$emit('setName',{type: 'self_card', data: (curGroup as groupInfoType)?.member_list?.find((member:any) => member.user_id == devStore.onebot11.cur_master_id)?.card})">
+    <div class="card-list-item" @click="$emit('setName',{type: 'self_card', data: (curGroup as groupInfoType)?.member_list?.find((member:any) => member.user_id == devStore[devStore.curAdapter].cur_self_info.user_id)?.card})">
         <span>我的本群昵称</span>
-        <span class="card-desc">{{ (curGroup as groupInfoType)?.member_list?.find((member:any) => member.user_id == devStore.onebot11.cur_master_id)?.card }}</span>
+        <span class="card-desc">{{ (curGroup as groupInfoType)?.member_list?.find((member:any) => member.user_id == devStore[devStore.curAdapter].cur_self_info.user_id)?.card }}</span>
         <el-icon><ArrowRight /></el-icon>
     </div>
   </QQCard>
@@ -97,7 +97,8 @@
     </div>
   </QQCard>
   <QQCard>
-    <div class="dismiss-group">解散群聊</div>
+    <div class="dismiss-group" v-if="role == 'owner'" @click="$emit('setName',{type: 'dismiss_group',data: ''})">解散群聊</div>
+    <div class="dismiss-group" v-else @click="$emit('setName',{type: 'exit_group',data: ''})">退出群聊</div>
   </QQCard>
 </template>
 
@@ -121,11 +122,12 @@ const props = defineProps({
     nickname: {type: String, default: '未知'},
     group_name: {type: String, default: '群聊沙箱'},
     card: {type: String, default: '未知'},
+    role: {type: String, default: ''},
 })
 
 /** 获取当前群聊数据 */
 const curGroup = computed(()=>{
-    return devStore.onebot11.group_list.find((group:any) => group.group_id == devStore.onebot11.cur_group_id) || {}
+    return devStore[devStore.curAdapter].group_list.find((group:any) => group.group_id == devStore[devStore.curAdapter].cur_group_id) || {}
 })
 
 </script>
@@ -209,7 +211,6 @@ const curGroup = computed(()=>{
                 width: 100%;
                 text-align: center;
                 font-size: 10px;
-                // border: 2px solid red;
             }
         }
     }
@@ -220,6 +221,9 @@ const curGroup = computed(()=>{
     justify-content: center;
     align-items: center;
     color: red;
+}
+.dismiss-group:hover {
+    cursor: pointer;
 }
 
 </style>

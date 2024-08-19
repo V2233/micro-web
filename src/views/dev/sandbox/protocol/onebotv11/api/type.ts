@@ -1,25 +1,28 @@
-import type {msgQueueItemType} from '../event/type'
+import type {groupMsgQueueItemType,privateMsgQueueItemType} from '../event/type'
 
 export interface groupInfoType {
     group_id: number,
     group_name: string,
     max_member_count: number,
     member_count: number,
-    msg_queue?: Array<msgQueueItemType> | [],
-    member_list?: groupMemberInfoType[]
+    msg_queue: groupMsgQueueItemType[] | [],
+    member_list: groupMemberInfoType[]
 }
 
 export interface friendInfoType {
     nickname: string,
     remark: string,
-    user_id: number
+    user_id: number,
+    msg_queue: privateMsgQueueItemType[] | [],
+    thumbs?: number
 }
 
 export interface strangerInfoType {
     nickname: string,
     user_id: number,
     sex: string,
-    age: number
+    age: number,
+    thumbs?: number
 }
 
 export interface groupMemberInfoType {
@@ -37,7 +40,8 @@ export interface groupMemberInfoType {
     unfriendly:	boolean,
     title: string,
     title_expire_time: number,
-    card_changeable: boolean
+    card_changeable: boolean,
+    thumbs?: number
 }
 
 export interface groupSpecialTitleType {

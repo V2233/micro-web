@@ -12,7 +12,18 @@
                     :class="[curTabbarIcon == 'messages'?'msglist__tabbar__top__icon__selected':'']" 
                     @click="clickTabbarIcon('messages')"
                 >
-                    <svg-icon name="message" width="40px" height="40px" color="black"/>
+                    <svg-icon name="message" width="80px" height="80px" color="black"/>
+                    <el-badge 
+                        v-if="messagesLength > 0"
+                        :value="messagesLength" 
+                        :max="99" 
+                        :style="{
+                            position: 'absolute',
+                            top: '10px',
+                            right: '-10px',
+                            transform: 'scale(0.8)'
+                        }"
+                    ></el-badge>
                 </div>
                 <div class="msglist__tabbar__top__icon" 
                     :class="[curTabbarIcon == 'contacts'?'msglist__tabbar__top__icon__selected':'']"
@@ -93,6 +104,7 @@ const props = defineProps({
     avatar: { type: String, required: true },
     title: { type: String, required: true },
     searchText: { type: String, default: ''},
+    messagesLength: { type: Number, default: 0}
     // state: { type: String, default: '离线' },
 })
 

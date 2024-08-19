@@ -1,4 +1,3 @@
-import { group_list } from './../../../../../../store/modules/default/sandbox';
 interface actionType {
     echo: string,
     action: string,
@@ -97,6 +96,24 @@ export class Res {
 
     }
 
+    get curMsgQueue() {
+        if(devStore.onebot11.cur_message_type == 'group') {
+            let curGroup = devStore.onebot11.group_list.find((group)=>group.group_id == devStore.onebot11.cur_group_id)
+            if(curGroup) return curGroup.msg_queue
+        } else {
+            let curPrivate = devStore.onebot11.friend_list.find((friend)=>friend.user_id == devStore.onebot11.cur_private_id)
+            if(curPrivate) return curPrivate.msg_queue
+        }
+    }
+
+    get curGroup() {
+        return devStore.onebot11.group_list.find((group)=>group.group_id == devStore.onebot11.cur_group_id) as groupInfoType
+    }
+
+    get curGroupIndex() {
+        return devStore.onebot11.group_list.findIndex((group)=>group.group_id == devStore.onebot11.cur_group_id)
+    }
+
     send_private_msg(params:any) {
         return 
     }
@@ -131,8 +148,26 @@ export class Res {
     /** 点赞 */
     send_like(params:any) {
         const { user_id, times } = params
-
-        return 
+        if(devStore.onebot11.cur_message_type == 'group') {
+            let groupIndex = devStore.onebot11.group_list.findIndex((group)=>group.group_id == devStore.onebot11.cur_group_id)
+            let memberInfoIndex = this.curGroup.member_list.findIndex(member => member.user_id == user_id)
+            if(memberInfoIndex != -1 && this.curGroupIndex != -1) {
+                if(!devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex].thumbs) {
+                    devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex].thumbs = 0
+                }
+                devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex].thumbs += Number(times)
+            }
+        } else {
+            let memberInfoIndex = devStore.onebot11.friend_list.findIndex(member => member.user_id == user_id)
+            if(memberInfoIndex != -1) {
+                if(!devStore.onebot11.friend_list[memberInfoIndex].thumbs) {
+                    devStore.onebot11.friend_list[memberInfoIndex].thumbs = 0
+                }
+                devStore.onebot11.friend_list[memberInfoIndex].thumbs += Number(times)
+            }
+        }
+        
+        return 'ok'
     }
 
     set_group_kick(params:any) {
@@ -195,7 +230,14 @@ export class Res {
     }
 
     get_friend_list(params:any) {
-        return devStore.onebot11.friend_list
+        let friends = devStore.onebot11.friend_list.map(friend => {
+            return {
+                nickname: friend.nickname,
+                remark: friend.remark,
+                user_id: friend.user_id,
+            }
+        })
+        return friends
     }
 
     get_group_info(params:any) {

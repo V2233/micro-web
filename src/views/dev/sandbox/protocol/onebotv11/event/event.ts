@@ -9,15 +9,13 @@
 
 import type { MessageElem, NodeElem } from '../message/message.elem'
 
-import type { groupMsgType,privateMsgType } from './type'
+import type { groupMsgType,privateMsgType,groupMsgQueueItemType,privateMsgQueueItemType } from './type'
 
 import useDevStore from '@/store/modules/dev'; 
 const devStore = useDevStore()
 
 
 export default new class Events {
-
-    self_id = 114514
 
     /**
      * 基本字段
@@ -29,7 +27,7 @@ export default new class Events {
             /** (int64)	事件发生的时间戳 */
             time: Math.round(Date.now() / 1000), 
             /** (int64)	收到事件的机器人 QQ 号 */
-            self_id: devStore.onebot11.cur_self_id,
+            self_id: devStore[devStore.curAdapter].cur_bot_id,
             /** 事件类型 */
             post_type: post_type, 
         }
@@ -105,7 +103,7 @@ export default new class Events {
      * @param data.font 字体
      * @returns 
      */
-    private_message(data:privateMsgType) {
+    private_message(data:privateMsgType):privateMsgQueueItemType {
         return {
             ...this.baseProp('message'),
             /** 消息类型 */
@@ -163,7 +161,7 @@ export default new class Events {
      * @param data.flag 匿名用户 flag，在调用禁言 API 时需要传入
      * @returns 
      */
-    group_message(data:groupMsgType) {
+    group_message(data:groupMsgType):groupMsgQueueItemType {
         return {
             ...this.baseProp('message'),
             /** 消息类型 */

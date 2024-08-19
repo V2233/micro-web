@@ -29,7 +29,8 @@ export const group_list:groupInfoType[] = [
                 unfriendly: false,
                 title: '机器人',
                 title_expire_time: 987654321,
-                card_changeable: true
+                card_changeable: true,
+                thumbs: 0
             },
             {
                 group_id: 397798018,
@@ -46,7 +47,8 @@ export const group_list:groupInfoType[] = [
                 unfriendly: false,
                 title: '',
                 title_expire_time: 987654321,
-                card_changeable: true
+                card_changeable: true,
+                thumbs: 0
             },
             {
                 group_id: 397798018,
@@ -63,7 +65,8 @@ export const group_list:groupInfoType[] = [
                 unfriendly: false,
                 title: '',
                 title_expire_time: 987654321,
-                card_changeable: true
+                card_changeable: true,
+                thumbs: 0
             }
         ]
     },
@@ -90,7 +93,8 @@ export const group_list:groupInfoType[] = [
                 unfriendly: false,
                 title: '机器人',
                 title_expire_time: 987654321,
-                card_changeable: true
+                card_changeable: true,
+                thumbs: 0
             },
             {
                 group_id: 617703908,
@@ -107,7 +111,8 @@ export const group_list:groupInfoType[] = [
                 unfriendly: false,
                 title: '',
                 title_expire_time: 987654321,
-                card_changeable: true
+                card_changeable: true,
+                thumbs: 0
             }
         ]
     }
@@ -118,11 +123,15 @@ export const friend_list = [
     {
         nickname: "v崽",
         remark: "",
-        user_id: 1593519730
+        user_id: 1593519730,
+        msg_queue: [],
+        thumbs: 0
     },
     {
         nickname: "v崽1",
         remark: "",
-        user_id: 1853952159
+        user_id: 1853952159,
+        msg_queue: [],
+        thumbs: 0
     },
 ]

@@ -47,17 +47,18 @@
                     v-model:visible = "isAtListVisible"
                 >   
                     <template #reference>
-                        <textarea class="fakeqq-footer__input-text" 
-                            contenteditable="true" 
+                        <el-input class="fakeqq-footer__input-text" 
+                            type="textarea"
                             v-model="inputValue" 
+                            :disabled="input_disabled"
                             @input="exposeInnerText" 
                             @focus="$emit('footerBtn','none')"
                         >
-                        </textarea>
+                        </el-input>
                     </template>
                     <slot name="atlist"></slot>
                 </el-popover>
-                <button class="fakeqq-footer__input-btn" type="reset" @click="$emit('sendInput',{type: 'text', data: {text: inputValue}})">发送</button>
+                <button class="fakeqq-footer__input-btn" type="reset" @click="($emit('sendInput',{type: 'text', data: {text: inputValue}}),inputValue = '')">发送</button>
             </form>
             <div class="fakeqq-footer__btn">
                 <svg-icon name="voice" @click="$emit('footerBtn','audio')"/>
@@ -211,6 +212,8 @@ const props = defineProps({
     msgs_length: {type: Number, default: 0},
     /** 是否展示工具栏试图 */
     footerview_visible: {type: Boolean, default: false},
+    /** 是否禁用输入框 */
+    input_disabled: {type: Boolean, default: false},
 })
 
 /** 监听窗口高度变化 */

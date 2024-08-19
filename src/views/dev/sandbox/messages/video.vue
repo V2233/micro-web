@@ -7,7 +7,11 @@
             </div>
         </AvatarMenu>
         <div class="fakeqq-message__content">
-            <div class="fakeqq-message__name">{{ name }}</div>
+            <div class="fakeqq-message__name" v-if="role !== ''">
+                <span v-if="onright" :class="memberTitleClass">{{ role_title }}</span>
+                {{ name }}
+                <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
+            </div>
             <msg-menu @msg-operation="$emit('msg-operation', $event)">
                 <div class="fakeqq-video">
                     <video controls ref="videoElement"
@@ -28,8 +32,8 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
 import MsgMenu from './msg-operate.vue'
-
 import AvatarMenu from './avatar-operate.vue'
 
 const $emit = defineEmits(['msg-operation', 'avatar-operation'])
@@ -37,8 +41,23 @@ const $emit = defineEmits(['msg-operation', 'avatar-operation'])
 const props = defineProps({
     name: { type: String, required: true },
     avatar: String,
+    role: { type: String, default: 'admin' },
+    role_title: { type: String, default: 'LV1' },
     src: { type: String, required: true },
     maxWidth: { type: String, default: '400px' },
     onright: Boolean,
+})
+
+const memberTitleClass = computed(()=>{
+    switch(props.role) {
+        case 'owner':
+            return 'fakeqq-message__title__owner'
+        case 'admin':
+            return 'fakeqq-message__title__admin'
+        case 'member':
+            return 'fakeqq-message__title__member'
+        default: 
+            return ''
+    }
 })
 </script>

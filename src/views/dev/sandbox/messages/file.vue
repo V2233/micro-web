@@ -7,7 +7,7 @@
             </div>
         </AvatarMenu>
         <div class="fakeqq-message__content" :onclick="click">
-            <div class="fakeqq-message__name">
+            <div class="fakeqq-message__name" v-if="role !== ''">
                 <span v-if="onright" :class="memberTitleClass">{{ role_title }}</span>
                 {{ name }}
                 <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>

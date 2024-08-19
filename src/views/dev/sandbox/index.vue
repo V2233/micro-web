@@ -1,7 +1,8 @@
 <template>
   <Msglist class="message-list" 
-      :avatar="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${devStore.onebot11.cur_master_id??userStore.masterQQ}`"
+      :avatar="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${devStore[devStore.curAdapter].cur_self_info.user_id??userStore.masterQQ}`"
       :title="userStore.username"
+      :messages-length="msgsSumCount"
       state="在线"
       @click-tabbar="clickTabbar"
   >
@@ -23,13 +24,14 @@
       <!-- 群消息列表 -->
       <div v-if="curTabbarBtn == 'messages'" 
         class="message-room-list" 
-        :class="[(devStore.onebot11.cur_message_type == 'group' && devStore.onebot11.cur_group_id == row.group_id)?'message-room-list-selected':'']"
-        v-for="(row,index) in devStore.onebot11.group_list" 
+        :class="[(devStore[devStore.curAdapter].cur_message_type == 'group' && devStore[devStore.curAdapter].cur_group_id == row.group_id)?'message-room-list-selected':'']"
+        v-for="(row,index) in devStore[devStore.curAdapter].group_list" 
         :key="index" 
         @click="(
           devStore.qqScene = 1,
-          devStore.onebot11.cur_group_id = row.group_id,
-          devStore.onebot11.cur_message_type = 'group'
+          devStore[devStore.curAdapter].cur_group_id = row.group_id,
+          devStore[devStore.curAdapter].cur_message_type = 'group',
+          input_disabled?chatWindowRef.inputValue = '不在该群聊，请加群后发送！':chatWindowRef.inputValue = ''
         )"
       >
         <img class="message-room-avatar" :src="`https://p.qlogo.cn/gh/${row.group_id}/${row.group_id}/640`"/>
@@ -37,18 +39,19 @@
           <div class="message-room-info-top">
             <span style="font-size: 14px;">{{ row.group_name }}</span>
             <span style="font-size: 12px;">
-              {{ getFormatDate(new Date(devStore.onebot11.msgQueue[devStore.onebot11.msgQueue.length - 1]?.time * 1000),3) }}
+              {{ getFormatDate(new Date(row.msg_queue[row.msg_queue.length - 1]?.time * 1000),3) }}
             </span>
           </div>
           <div class="message-room-info-bottom">
             <div style="font-size: 12px; width: calc(100% - 30px); display: inline-block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-              {{ devStore.onebot11.msgQueue[devStore.onebot11.msgQueue.length - 1]?.sender?.card }}: 
-              {{ devStore.onebot11.msgQueue[devStore.onebot11.msgQueue.length - 1]?.raw_message }}
+              {{ row.msg_queue[row.msg_queue.length - 1]?.sender?.card }}
+              <span v-if="row.msg_queue.length > 0"></span>
+              {{ row.msg_queue[row.msg_queue.length - 1]?.raw_message }}
             </div>
             <el-badge  
               class="item"
-              v-if="devStore.onebot11.msgQueue.length > 0"
-              :value="devStore.onebot11.msgQueue.length" 
+              v-if="row.msg_queue.length > 0"
+              :value="row.msg_queue.length" 
               :max="99" >
             </el-badge>
           </div>
@@ -57,14 +60,15 @@
 
       <!-- 私聊消息列表 -->
       <div v-if="curTabbarBtn == 'messages'" 
-        v-for="(row,index) in devStore.onebot11.friend_list" 
+        v-for="(row,index) in devStore[devStore.curAdapter].friend_list" 
         :key="index"
         class="message-room-list" 
-        :class="[(devStore.onebot11.cur_message_type == 'private' && devStore.onebot11.cur_private_id == row.user_id)?'message-room-list-selected':'']"
+        :class="[(devStore[devStore.curAdapter].cur_message_type == 'private' && devStore[devStore.curAdapter].cur_private_id == row.user_id)?'message-room-list-selected':'']"
         @click="(
           devStore.qqScene = 1,
-          devStore.onebot11.cur_private_id = row.user_id,
-          devStore.onebot11.cur_message_type = 'private'
+          devStore[devStore.curAdapter].cur_private_id = row.user_id,
+          devStore[devStore.curAdapter].cur_message_type = 'private',
+          chatWindowRef.inputValue = ''
         )"
       >
         <img class="message-room-avatar" :src="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${row.user_id}`"/>
@@ -72,18 +76,19 @@
           <div class="message-room-info-top">
             <span style="font-size: 14px;">{{ row.nickname }}</span>
             <span style="font-size: 12px;">
-              {{ getFormatDate(new Date(devStore.onebot11.msgQueue[devStore.onebot11.msgQueue.length - 1]?.time * 1000),3) }}
+              {{ getFormatDate(new Date(row.msg_queue[row.msg_queue.length - 1]?.time * 1000),3) }}
             </span>
           </div>
           <div class="message-room-info-bottom">
             <div style="font-size: 12px; width: calc(100% - 30px); display: inline-block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-              {{ devStore.onebot11.msgQueue[devStore.onebot11.msgQueue.length - 1]?.sender?.nickname }}: 
-              {{ devStore.onebot11.msgQueue[devStore.onebot11.msgQueue.length - 1]?.raw_message }}
+              {{ row.msg_queue[row.msg_queue.length - 1]?.sender?.nickname }}
+              <span v-if="row.msg_queue.length > 0"></span>
+              {{ row.msg_queue[row.msg_queue.length - 1]?.raw_message }}
             </div>
             <el-badge  
               class="item"
-              v-if="devStore.onebot11.msgQueue.length > 0"
-              :value="devStore.onebot11.msgQueue.length" 
+              v-if="row.msg_queue.length > 0"
+              :value="row.msg_queue.length" 
               :max="99" >
             </el-badge>
           </div>
@@ -121,7 +126,7 @@
               </div>
             </el-collapse-item>
             <el-collapse-item title="我的好友" name="2">
-              <div class="message-room-list" v-for="(row,index) in devStore.onebot11.friend_list" :key="index" @click="devStore.qqScene = 1">
+              <div class="message-room-list" v-for="(row,index) in devStore[devStore.curAdapter].friend_list" :key="index" @click="devStore.qqScene = 1">
                 <img class="message-room-avatar" :src="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${row.user_id}`"/>
                 <div class="message-room-info">
                   <div class="message-room-info-top">
@@ -149,18 +154,19 @@
 
     <template #main>
       <div class="msglist-main-logo" v-if="devStore.qqScene == 0">
-        Yunzai-Sandbox
+        Sandbox
       </div>
       <!-- <Chatroom class="chatroom" /> -->
       <QQWindow class="chatroom" v-if="devStore.qqScene == 1" 
         ref="chatWindowRef"
-        :title="(curGroup as groupInfoType)?.group_name" 
-        :count="(curGroup as groupInfoType)?.member_list?.length" 
-        :msgs_length="devStore.onebot11.msgQueue.length"
+        :title="(devStore[devStore.curAdapter].cur_message_type == 'group')?((curGroup as groupInfoType)?.group_name):(curPrivate.nickname)" 
+        :count="(devStore[devStore.curAdapter].cur_message_type == 'group')?(curGroup as groupInfoType)?.member_list?.length:''" 
+        :msgs_length="curMsgQueue.length"
         :header_visible="chatHeaderVisible"
         :footer_type="footer_type"
         :footerview_visible = "footerview_visible"
-        @connect-ws="Ws.connect(devStore.onebot11.cur_self_id)"
+        :input_disabled="input_disabled"
+        @connect-ws="Ws.connect(devStore[devStore.curAdapter].cur_bot_id)"
         @send-input="sendMessage($event)"
         @go-setting="handleDrawerSetting"
         @multi-check="handleMultiMsgs"
@@ -192,18 +198,18 @@
             :click="downloadFile"
           /> -->
 
-          <div v-for="(msg,id) in devStore.onebot11.msgQueue" :key="id" style="display: flex; width: 100%;">
-            <div v-if="isMultiCheckMode == true && !msg.toast_time" class="chatroom-multicheck-box">
+          <div v-for="(msg,id) in curMsgQueue as any" :key="id" style="display: flex; width: 100%;">
+            <div v-if="isMultiCheckMode == true && !msg.toast" class="chatroom-multicheck-box">
               <el-icon class="chatroom-multicheck-icon-checked" v-if="multicheckIndex[id]" color="#0099FF" size="24" @click="handleMultiCheck(id)"><CircleCheckFilled /></el-icon>
               <el-icon class="chatroom-multicheck-icon-unchecked" v-if="!multicheckIndex[id]" color="#C7C7C7" size="24" @click="handleMultiCheck(id)"><Remove /></el-icon>
             </div>
             <!-- 机器人消息 -->
-            <div v-if="(msg?.message && msg?.message?.length > 0) || msg.messages?.length > 0" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']" style="width: 100%; ">
+            <div v-if="((msg?.message && msg?.message?.length > 0) || msg.messages?.length > 0) && !msg.toast" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']" style="width: 100%; ">
               <NormalMessage
                 v-if="msg.message.some((s:MessageElem)=> s.type == 'text' || msg.message.length > 1)"
                 :avatar="msg.sender?.avatar"
-                :name="msg.sender?.card??msg.sender?.nickname" 
-                :role="msg.sender?.role"
+                :name="msg.sender?.card?(msg.sender?.card):msg.sender?.nickname" 
+                :role="(msg.sender?.role)?(msg.sender?.role):''"
                 :role_title="`${msg.sender?.level} ${(msg.sender?.title)?(msg.sender?.title):roleMap[msg.sender?.role]}`"
                 :onright="msg.isSelf"
                 @msg-operation="handleMsgOperation($event,msg,id)"
@@ -249,67 +255,74 @@
               <ImageMessage
                 v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'image')"
                 :avatar="msg.sender?.avatar"
-                :name="msg.sender?.card??msg.sender?.nickname" 
-                :role="msg.sender?.role"
-                role_title="LV1"
+                :name="msg.sender?.card?(msg.sender?.card):msg.sender?.nickname" 
+                :role="(msg.sender?.role)?(msg.sender?.role):''"
+                :role_title="`${msg.sender?.level} ${(msg.sender?.title)?(msg.sender?.title):roleMap[msg.sender?.role]}`"
                 :src="msg.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
                 :src-list="[msg.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
                 :initial-index="0"
                 max-width="300px"
                 :onright="msg.isSelf"
                 @msg-operation="handleMsgOperation($event,msg,id)"
+                @avatar-operation="handleAvatarOperation($event,msg,id)"
               />
               <ImageMessage
                 v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'face')"
                 :avatar="msg.sender?.avatar"
-                :name="msg.sender?.card??msg.sender?.nickname" 
-                :role="msg.sender?.role"
-                role_title="LV1"
+                :name="msg.sender?.card?(msg.sender?.card):msg.sender?.nickname" 
+                :role="(msg.sender?.role)?(msg.sender?.role):''"
+                :role_title="`${msg.sender?.level} ${(msg.sender?.title)?(msg.sender?.title):roleMap[msg.sender?.role]}`"
                 :src="`/qfaces/s${msg.message[0].data.id}.gif`"
                 max-width="80px"
                 :onright="msg.isSelf"
                 @msg-operation="handleMsgOperation($event,msg,id)"
+                @avatar-operation="handleAvatarOperation($event,msg,id)"
               />
               <VoiceMessage
                 v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'record')"
                 :avatar="msg.sender?.avatar"
-                :name="msg.sender?.card??msg.sender?.nickname" 
-                :role="msg.sender?.role"
-                role_title="LV1"
+                :name="msg.sender?.card?(msg.sender?.card):msg.sender?.nickname" 
+                :role="(msg.sender?.role)?(msg.sender?.role):''"
+                :role_title="`${msg.sender?.level} ${(msg.sender?.title)?(msg.sender?.title):roleMap[msg.sender?.role]}`"
                 :src="msg.message[0].data.file.replace(/^base64:\/\//,'data:audio/mp3;base64,')"
                 :duration="15"
                 :onright="msg.isSelf"
                 @msg-operation="handleMsgOperation($event,msg,id)"
+                @avatar-operation="handleAvatarOperation($event,msg,id)"
               />
               <VideoMessage
                 v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'video')"
                 :avatar="msg.sender?.avatar"
-                :name="msg.sender?.card??msg.sender?.nickname" 
-                :role="msg.sender?.role"
-                role_title="LV1"
+                :name="msg.sender?.card?(msg.sender?.card):msg.sender?.nickname" 
+                :role="(msg.sender?.role)?(msg.sender?.role):''"
+                :role_title="`${msg.sender?.level} ${(msg.sender?.title)?(msg.sender?.title):roleMap[msg.sender?.role]}`"
                 :src="msg.message[0].data.file.replace(/^base64:\/\//,'data:video/mp4;base64,')"
                 max-width="300px"
                 :onright="msg.isSelf"
                 @msg-operation="handleMsgOperation($event,msg,id)"
+                @avatar-operation="handleAvatarOperation($event,msg,id)"
               />
               <ForwardMessage
                 v-if="msg.messages && msg.messages?.length > 0 && msg.messages?.some((s:MessageElem) => s.type == 'node')"
                 class="chatroom-forward"
-                :name="msg.sender?.card??msg.sender?.nickname"
+                :name="msg.sender?.card?(msg.sender?.card):msg.sender?.nickname"
                 :avatar="msg.sender?.avatar"
-                :role="msg.sender?.role"
+                :role="(msg.sender?.role)?(msg.sender?.role):''"
+                :role_title="`${msg.sender?.level} ${(msg.sender?.title)?(msg.sender?.title):roleMap[msg.sender?.role]}`"
                 title="转发"
                 :contents="makeForwardPreview(msg.messages)"
-                counts="10"
+                :counts="makeForwardPreview(msg.messages).length"
                 :onright="msg.isSelf"
                 @click="(devStore.qqScene = 2,curForwardMessages = msg)"
                 @msg-operation="handleMsgOperation($event,msg,id)"
+                @avatar-operation="handleAvatarOperation($event,msg,id)"
               />
             </div>
-            <!-- 合并转发 -->
-            <div v-if="msg.isDeleted || msg.toast_time" style="width: 100%;" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']">
-              <ToastMessage v-if="msg.isDeleted">{{ userStore.username }} 撤回了一条消息</ToastMessage>
-              <ToastMessage v-if="msg.toast_time">{{ msg.toast_time }}</ToastMessage>
+            <!-- toast消息 -->
+            <div v-if="msg.toast" style="width: 100%;" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']">
+              <ToastMessage v-if="msg.toast.isDeleted">{{ userStore.username }} 撤回了一条消息</ToastMessage>
+              <ToastMessage v-if="msg.toast.notice_time">{{ msg.toast.notice_time }}</ToastMessage>
+              <ToastMessage v-if="msg.toast.poke">{{ msg.toast.poke }}</ToastMessage>
             </div>
             <!-- 自己的消息 -->
             <!-- <div v-if="msg.isSelf == true && msg.message && msg.message?.length > 0" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']" style="width: 100%;">
@@ -368,7 +381,7 @@
         </template>
         <template #drawer>
           <!-- 抽屉顶部header -->
-          <div class="fakeqq-header" style="background-image: #ffffff;">
+          <div class="fakeqq-header" style="background-color: #FFFFFF;">
             <el-icon class="fakeqq-header__bth" size="24" @click="handleDrawerBack"><ArrowLeft /></el-icon>
               <span class="fakeqq-header__title">
                   {{ curDrawerData.title }}
@@ -388,7 +401,11 @@
               </span>
           </div>
           <!-- 抽屉资料主体 -->
-          <GroupSetting v-if="curDrawerData.scene == 0" @set-name="handleSettingItem"/>
+          <GroupSetting 
+            v-if="curDrawerData.scene == 0 && devStore[devStore.curAdapter].cur_message_type == 'group'" 
+            :role="(curGroup.member_list.find((member)=>member.user_id == devStore[devStore.curAdapter].cur_self_info.user_id))?.role || ''"
+            @set-name="handleSettingItem"
+          />
           <div v-if="curDrawerData.scene == 1">
             <QQcard>
               <el-input v-model="curSettingInputValue" />
@@ -497,7 +514,7 @@
           </div>
         </template>
         <!-- at触发时弹出列表 -->
-        <template #atlist>
+        <template #atlist v-if="devStore[devStore.curAdapter].cur_message_type == 'group'">
           <div class="fakeqq-footer__members__list">
             <div class="fakeqq-footer__members__list__item" 
               v-for="(member, memberId) in (curGroup as groupInfoType)?.member_list" 
@@ -657,6 +674,7 @@ import type { UploadProps } from 'element-plus'
 
 import faceData from '@/assets/qfaces/data.json'
 import { getFormatDate } from '@/utils/time'
+
 // API
 import useDevStore from '@/store/modules/dev';
 import useUserStore from '@/store/modules/user'
@@ -665,10 +683,11 @@ import type { BotInfoListType, BotInfoResponseType } from '@/api/dev/plugin/type
 import { ref, reactive, onMounted, computed, watch } from 'vue'
 
 import type { MessageElem,NodeElem } from './protocol/onebotv11/message/message.elem'
-import type { queueItemType } from './protocol/onebotv11/event/type'
-import type { groupInfoType,groupMemberInfoType } from './protocol/onebotv11/api/type'
+import type { groupMsgQueueItemType,msgQueueItemType,privateMsgQueueItemType, queueItemType } from './protocol/onebotv11/event/type'
+import type { groupInfoType,groupMemberInfoType,friendInfoType } from './protocol/onebotv11/api/type'
 import type { drawerDataType } from './types/drawer'
 
+import msgQueueController from './protocol/onebotv11/queue/msgQueue'
 import Events from './protocol/onebotv11/event/event'
 import Onebot from './protocol/ws'
 
@@ -756,7 +775,7 @@ const chatDrawerHeaderVisible = ref(false)
 const footer_type = ref<'Input' | 'MultiCheck' | 'none'>('Input')
 
 /** 个人头像 */
-const selfAvatar = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${devStore.onebot11.cur_master_id}`
+const selfAvatar = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${devStore[devStore.curAdapter].cur_self_info.user_id}`
 
 /** 角色映射表 */
 const roleMap:{
@@ -779,8 +798,6 @@ const curFooterBtn = ref<'face' | 'file' | 'audio' | 'none'>('none')
 /** 自动记录抽屉场景变化 */
 watch(()=>curDrawerData.scene,(oldValue,newValue)=>{
   curDrawerData.last_scene = newValue
-  // console.log(curDrawerData.last_scene)
-  // console.log(newValue)
 })
 
 /**
@@ -831,10 +848,11 @@ const sendMessage = (seg:MessageElem) => {
 
     message.push(seg)
 
-    let myMsg = Events.group_message({
+    if(msgQueueController.curQueueType == 'group') {
+      let groupMsg = Events.group_message({
         message_id: Math.round(Date.now() / 1000),
         group_id: (curGroup.value as groupInfoType)?.group_id,
-        user_id: devStore.onebot11.cur_master_id,
+        user_id: devStore[devStore.curAdapter].cur_self_info.user_id,
         nickname: (curGroupSelfInfo.value as groupMemberInfoType)?.nickname,
         message: message,
         raw_message: Events.makeCQ(message),
@@ -842,18 +860,40 @@ const sendMessage = (seg:MessageElem) => {
         card: (curGroupSelfInfo.value as groupMemberInfoType)?.card,
         level: (curGroupSelfInfo.value as groupMemberInfoType)?.level,
         title: (curGroupSelfInfo.value as groupMemberInfoType)?.title,
-    })
+      })
 
-    if(devStore.onebot11.msgQueue.length > 0) {
-      const timeDif = Date.now() - devStore.onebot11.msgQueue[devStore.onebot11.msgQueue.length - 1].time * 1000
-      if(timeDif > 10000) devStore.onebot11.msgQueue.push({...myMsg, message: [],isSelf: true, toast_time: getFormatDate(new Date(),3)})
+      const tempQueue = msgQueueController.curGroup?.msg_queue
+
+      if(tempQueue?.length && tempQueue?.length > 0) {
+        const timeDif = Date.now() - tempQueue[tempQueue.length - 1].time * 1000
+        if(timeDif > 10000) msgQueueController.groupQueue_push({...groupMsg, message: [],isSelf: true, toast: {notice_time: getFormatDate(new Date(),3)}})
+      }
+
+      msgQueueController.groupQueue_push(Object.assign(groupMsg,{isSelf: true}))
+      Ws.value.bot?.send(JSON.stringify(groupMsg))
+      console.log(groupMsg)
     }
 
-    devStore.onebot11.msgQueue.push(Object.assign(myMsg,{isSelf: true}))
+    if(msgQueueController.curQueueType == 'private') {
+      let privateMsg = Events.private_message({
+        message_id: Math.round(Date.now() / 1000),
+        user_id: devStore[devStore.curAdapter].cur_self_info.user_id,
+        nickname: (curGroupSelfInfo.value as groupMemberInfoType)?.nickname,
+        message: message,
+        raw_message: Events.makeCQ(message),
+      })
 
-    console.log('发送消息；')
-    console.log(myMsg)
-    Ws.value.bot?.send(JSON.stringify(myMsg))
+      const tempQueue = msgQueueController.curPrivate?.msg_queue
+
+      if(tempQueue?.length && tempQueue?.length > 0) {
+        const timeDif = Date.now() - tempQueue[tempQueue.length - 1].time * 1000
+        if(timeDif > 10000) msgQueueController.groupQueue_push({...privateMsg, message: [],isSelf: true, toast: {notice_time: getFormatDate(new Date(),3)}})
+      }
+
+      msgQueueController.privateQueue_push(Object.assign(privateMsg,{isSelf: true}))
+      Ws.value.bot?.send(JSON.stringify(privateMsg))
+      console.log(privateMsg)
+    }
 
     /** 关闭工具栏 */
     if(footerview_visible.value) {
@@ -862,10 +902,6 @@ const sendMessage = (seg:MessageElem) => {
     }
 }
 
-/** 发送通知事件@todo */
-const sendNotice = (seg:MessageElem) => {
-
-}
 
 /** 模拟下载文件 */
 const downloadFile = () => {
@@ -930,8 +966,8 @@ const makeScheme = (seg:MessageElem) => {
 
 /** 查找引用消息@deprecated */
 const quotePreview = (id:string) => {
-  const quoteMsg = devStore.onebot11.msgQueue.find((msg)=>msg.message_id == id)
-  console.log(quoteMsg.message)
+  const quoteMsg = curMsgQueue.value.find((msg)=>String(msg.message_id) == id)
+  console.log(quoteMsg?.message)
   return quoteMsg || {}
 }
 
@@ -953,10 +989,14 @@ const handleMsgOperation = async(e:{type:string},msg:any,id:number) => {
   // console.log(e)
   switch(e.type) {
     case 'delete':
-      devStore.onebot11.msgQueue.splice(id,1)
+      if(msgQueueController.curQueueType == 'group') {
+        msgQueueController.groupQueue_splice(id,1)
+      } else {
+        msgQueueController.privateQueue_splice(id,1)
+      }
       break;
     case 'withdraw':
-      msg.isDeleted = true
+      msg.toast = {isDeleted: true}
       if(msg.message) msg.message = []
       break;
     case 'copy':
@@ -969,9 +1009,54 @@ const handleMsgOperation = async(e:{type:string},msg:any,id:number) => {
   }
 }
 
+/** 发送通知事件@todo */
+const sendNotice = (type: string, $event: any) => {
+  let myMsg = Events.group_message({
+    message_id: Math.round(Date.now() / 1000),
+    group_id: (curGroup.value as groupInfoType)?.group_id,
+    user_id: devStore[devStore.curAdapter].cur_self_info.user_id,
+    nickname: (curGroupSelfInfo.value as groupMemberInfoType)?.nickname,
+    message: [],
+    raw_message: Events.makeCQ([]),
+    role: (curGroupSelfInfo.value as groupMemberInfoType)?.role,
+    card: (curGroupSelfInfo.value as groupMemberInfoType)?.card,
+    level: (curGroupSelfInfo.value as groupMemberInfoType)?.level,
+    title: (curGroupSelfInfo.value as groupMemberInfoType)?.title,
+  })
+
+  let notice: any
+  const group = curGroup.value as groupInfoType
+
+  switch(type) {
+    case 'notify_poke':
+      notice = Events.notify_poke(group.group_id, devStore[devStore.curAdapter].cur_self_info.user_id, $event.user_id);
+      // $event.toast = {poke: `你戳了戳${$event.sender.card}的屁股并说好Q弹~`}
+      let pokeMsg = {...myMsg,isSelf: true, toast: {poke: `你戳了戳${$event.sender.card}的屁股并说好Q弹~`}}
+      if(msgQueueController.curQueueType == 'group') {
+        msgQueueController.groupQueue_push(pokeMsg)
+      } else {
+        msgQueueController.privateQueue_push(pokeMsg)
+      }
+      break;
+    default: 
+      return
+  }
+  Ws.value.bot?.send(JSON.stringify(notice))
+}
+
 /** 处理头像点击操作 */
-const handleAvatarOperation = (e:any, msg:any, id:number) => {
-  console.log(e,msg,id)
+const handleAvatarOperation = (e:any, msg:groupMsgQueueItemType, id:number) => {
+  switch(e.type) {
+    case 'poke':
+      sendNotice('notify_poke',msg);
+      break;
+    case 'at':
+      chatWindowRef.value.inputValue += `@${msg.sender.card} `
+      break
+    default:
+      return
+  }
+  
 }
 
 /** 多选逻辑 */
@@ -1013,7 +1098,11 @@ const handleMultiMsgs = (type:string) => {
       // 确保从高索引删除到低索引
       const indexs = Object.keys(multicheckIndex.value).map(Number).sort((a,b) => b - a)
       for(let i of indexs) {
-        devStore.onebot11.msgQueue.splice(i,1)
+        if(msgQueueController.curQueueType == 'group') {
+          msgQueueController.groupQueue_splice(i,1)
+        } else {
+          msgQueueController.privateQueue_splice(i,1)
+        }
       }
       closeMultiMsgs()
       break;
@@ -1064,6 +1153,18 @@ const handleSettingItem = (e:{type:string, data: unknown}) => {
       curDrawerData.body.member_data = e.data as groupMemberInfoType
       curDrawerData.scene = 2
       break;
+    case 'dismiss_group':
+      devStore[devStore.curAdapter].group_list.splice(curGroupIndex.value,1)
+      ElMessage.success('已解散该群聊！')
+      devStore[devStore.curAdapter].cur_group_id = devStore[devStore.curAdapter].group_list[0].group_id
+      break;
+    case 'exit_group':
+      let memberIndex = devStore[devStore.curAdapter].group_list[curGroupIndex.value].member_list.findIndex((member) => member.user_id == devStore[devStore.curAdapter].cur_self_info.user_id)
+      if(memberIndex !== -1) {
+        devStore[devStore.curAdapter].group_list[curGroupIndex.value].member_list.splice(memberIndex,1)
+        ElMessage.success('已退出该群聊！')
+      }
+      break
     case 'bot_welcome':
       curDrawerData.title = '设置入群欢迎'
       curSettingInputValue.value = e.data as string
@@ -1111,15 +1212,15 @@ const handleSettingItem = (e:{type:string, data: unknown}) => {
 
 /** 保存设置数据 */
 const handleSaveSettingItem = () => {
-  const curGroupIndex = devStore.onebot11.group_list.findIndex((group:groupInfoType) => group.group_id == devStore.onebot11.cur_group_id)
+  const curGroupIndex = devStore[devStore.curAdapter].group_list.findIndex((group:groupInfoType) => group.group_id == devStore[devStore.curAdapter].cur_group_id)
   if(curGroupIndex == -1) {
     ElMessage.warning('未能找到当前群聊数据，请刷新网页重试！')
     return
   }
-  const curSelfIndex = devStore.onebot11.group_list[curGroupIndex].member_list?.findIndex((member:groupMemberInfoType) => member.user_id == devStore.onebot11.cur_master_id)
+  const curSelfIndex = devStore[devStore.curAdapter].group_list[curGroupIndex].member_list?.findIndex((member:groupMemberInfoType) => member.user_id == devStore[devStore.curAdapter].cur_self_info.user_id)
   switch(curDrawerData.type) {
     case 'group_name':
-      devStore.onebot11.group_list[curGroupIndex].group_name = curSettingInputValue.value as string
+      devStore[devStore.curAdapter].group_list[curGroupIndex].group_name = curSettingInputValue.value as string
       curDrawerData.title = '群聊设置'
       curDrawerData.scene = 0
       break;
@@ -1129,8 +1230,8 @@ const handleSaveSettingItem = () => {
         ElMessage.warning('未能找到自己所在当前群聊数据，请刷新网页重试！')
         return
       }
-      if(devStore.onebot11.group_list[curGroupIndex].member_list) {
-        devStore.onebot11.group_list[curGroupIndex].member_list[curSelfIndex as number].card = curSettingInputValue.value as string
+      if(devStore[devStore.curAdapter].group_list[curGroupIndex].member_list) {
+        devStore[devStore.curAdapter].group_list[curGroupIndex].member_list[curSelfIndex as number].card = curSettingInputValue.value as string
       }
       curDrawerData.title = '群聊设置'
       curDrawerData.scene = 0
@@ -1142,43 +1243,46 @@ const handleSaveSettingItem = () => {
       break;
 
     case 'private_sex':
-      if(devStore.onebot11.group_list[curGroupIndex].member_list) {
-        devStore.onebot11.group_list[curGroupIndex].member_list[curSelfIndex as number].sex = curSettingInputValue.value as string
+      if(devStore[devStore.curAdapter].group_list[curGroupIndex].member_list) {
+        devStore[devStore.curAdapter].group_list[curGroupIndex].member_list[curSelfIndex as number].sex = curSettingInputValue.value as ('male' | 'female' | 'unknown')
       }
+      devStore[devStore.curAdapter].cur_self_info.sex = curSettingInputValue.value as ('male' | 'female' | 'unknown')
       curDrawerData.title = '资料卡'
       curDrawerData.scene = 2
       break;
     case 'private_age':
-      if(devStore.onebot11.group_list[curGroupIndex].member_list) {
-        devStore.onebot11.group_list[curGroupIndex].member_list[curSelfIndex as number].age = curSettingInputValue.value as number
+      if(devStore[devStore.curAdapter].group_list[curGroupIndex].member_list) {
+        devStore[devStore.curAdapter].group_list[curGroupIndex].member_list[curSelfIndex as number].age = curSettingInputValue.value as number
       }
+      devStore[devStore.curAdapter].cur_self_info.age = curSettingInputValue.value as number
       curDrawerData.title = '资料卡'
       curDrawerData.scene = 2
       break;
     case 'private_area':
-      if(devStore.onebot11.group_list[curGroupIndex].member_list) {
-        devStore.onebot11.group_list[curGroupIndex].member_list[curSelfIndex as number].area = curSettingInputValue.value as string
+      if(devStore[devStore.curAdapter].group_list[curGroupIndex].member_list) {
+        devStore[devStore.curAdapter].group_list[curGroupIndex].member_list[curSelfIndex as number].area = curSettingInputValue.value as string
       }
+      devStore[devStore.curAdapter].cur_self_info.area = curSettingInputValue.value as string
       curDrawerData.title = '资料卡'
       curDrawerData.scene = 2
       break;
     case 'group_level':
-      if(devStore.onebot11.group_list[curGroupIndex].member_list) {
-        devStore.onebot11.group_list[curGroupIndex].member_list[curSelfIndex as number].level = curSettingInputValue.value as string
+      if(devStore[devStore.curAdapter].group_list[curGroupIndex].member_list) {
+        devStore[devStore.curAdapter].group_list[curGroupIndex].member_list[curSelfIndex as number].level = curSettingInputValue.value as string
       }
       curDrawerData.title = '资料卡'
       curDrawerData.scene = 2
       break;
     case 'group_title':
-      if(devStore.onebot11.group_list[curGroupIndex].member_list) {
-        devStore.onebot11.group_list[curGroupIndex].member_list[curSelfIndex as number].title = curSettingInputValue.value as string
+      if(devStore[devStore.curAdapter].group_list[curGroupIndex].member_list) {
+        devStore[devStore.curAdapter].group_list[curGroupIndex].member_list[curSelfIndex as number].title = curSettingInputValue.value as string
       }
       curDrawerData.title = '资料卡'
       curDrawerData.scene = 2
       break;
     case 'group_role':
-      if(devStore.onebot11.group_list[curGroupIndex].member_list) {
-        devStore.onebot11.group_list[curGroupIndex].member_list[curSelfIndex as number].role = curSettingInputValue.value as any
+      if(devStore[devStore.curAdapter].group_list[curGroupIndex].member_list) {
+        devStore[devStore.curAdapter].group_list[curGroupIndex].member_list[curSelfIndex as number].role = curSettingInputValue.value as any
       }
       curDrawerData.title = '资料卡'
       curDrawerData.scene = 2
@@ -1208,40 +1312,52 @@ const handleDrawerBack = () => {
   }
 }
 
+/** 获取当前消息队列 */
+const curMsgQueue = computed(()=>{
+  return devStore[devStore.curAdapter].cur_message_type == 'group'?((curGroup.value as groupInfoType).msg_queue):(curPrivate.value.msg_queue)
+  // return msgQueueController.curQueue
+})
+
 /** 获取当前群聊数据 */
 const curGroup = computed(()=>{
-    return devStore.onebot11.group_list.find((group:groupInfoType) => group.group_id == devStore.onebot11.cur_group_id) || {}
+    return (devStore[devStore.curAdapter].group_list.find((group:groupInfoType) => group.group_id == devStore[devStore.curAdapter].cur_group_id) || {}) as groupInfoType
+})
+
+/** 获取当前群聊对象索引 */
+const curGroupIndex = computed(()=>{
+    return devStore[devStore.curAdapter].group_list.findIndex((group:groupInfoType) => group.group_id == devStore[devStore.curAdapter].cur_group_id)
 })
 
 /** 获取当前私聊数据 */
 const curPrivate = computed(()=>{
-    return devStore.onebot11.friend_list.find((group:groupInfoType) => group.group_id == devStore.onebot11.cur_group_id) || {}
+    return (devStore[devStore.curAdapter].friend_list.find((friend) => friend.user_id == devStore[devStore.curAdapter].cur_private_id) || {}) as friendInfoType
+})
+
+/** 获取当前私聊对象索引 */
+const curPrivateIndex = computed(()=>{
+    return devStore[devStore.curAdapter].friend_list.findIndex((friend) => friend.user_id == devStore[devStore.curAdapter].cur_private_id)
 })
 
 /** 获取当前操作者所在群聊的资料 */
 const curGroupSelfInfo = computed(()=>{
-    return ((curGroup.value as groupInfoType)?.member_list as groupMemberInfoType[])?.find((member:groupMemberInfoType) => member.user_id == devStore.onebot11.cur_master_id) || {}
+    return (((curGroup.value as groupInfoType)?.member_list as groupMemberInfoType[])?.find((member:groupMemberInfoType) => member.user_id == devStore[devStore.curAdapter].cur_self_info.user_id) || {}) as groupMemberInfoType
 })
 
-/** 聊天窗口顶部header配置 */
-const curChatHeaderData = computed(()=>{
-  let title = ''
-  if(curDrawerData.scene = 0) title = `${(curGroup.value as groupInfoType)?.group_name}(${(curGroup.value as groupInfoType)?.member_list?.length})`
-  if(curDrawerData.scene = 1) title = '群聊设置'
-  if(curDrawerData.scene = 1) title = '群聊设置'
-  return {
-    title: title 
-  }
-})
+/** 统计当前消息总数 */
+const msgsSumCount = computed(()=>{
+  return devStore[devStore.curAdapter].group_list.reduce((sum, group) => sum + (group.msg_queue as groupMsgQueueItemType[]).length,0) + 
+    devStore[devStore.curAdapter].friend_list.reduce((sum, friend) => sum + (friend.msg_queue as privateMsgQueueItemType[]).length,0)
+}) 
+
 
 /** 获取引用消息对象 */
 const quoteMsgs = computed(()=>{
   let quoteObj:{[key:string]:queueItemType} = {}
-  devStore.onebot11.msgQueue.forEach((msg)=>{
+  curMsgQueue.value.forEach((msg)=>{
     if(msg.message && msg.message?.length > 0) {
       msg.message.forEach((seg:MessageElem)=>{
         if(seg.type == 'reply') {
-          quoteObj[seg.data.id] = devStore.onebot11.msgQueue.find((msg)=> msg.message_id == seg.data.id)
+          quoteObj[seg.data.id] = (curMsgQueue.value.find((msg)=> String(msg.message_id) == seg.data.id)) as queueItemType
         }
       })
     }
@@ -1249,9 +1365,9 @@ const quoteMsgs = computed(()=>{
   return quoteObj
 })
 
-/** 判断当前是群聊还是私聊 */
+/** 判断当前是群聊还是私聊@preciated */
 const curMessageType = computed(()=>{
-  const { cur_group_id, cur_private_id } = devStore.onebot11
+  const { cur_group_id, cur_private_id } = devStore[devStore.curAdapter]
   if(cur_group_id && !cur_private_id) {
     return 'group'
   } else if(!cur_group_id && cur_private_id) {
@@ -1261,6 +1377,15 @@ const curMessageType = computed(()=>{
   }
 })
 
+/** 判断是否不在群聊 */
+const input_disabled = computed(()=>{
+  if(msgQueueController.curQueueType == 'group') {
+    if(curGroup.value.member_list.findIndex((member)=>member.user_id == devStore[devStore.curAdapter].cur_self_info.user_id) == -1) {
+      return true
+    }
+  }
+  return false
+})
 
 /** -----------------------------文件操作--------------------------- */
 

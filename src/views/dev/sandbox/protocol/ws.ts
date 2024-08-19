@@ -1,6 +1,8 @@
-import  useDevStore from '@/store/modules/dev'; 
+import useDevStore from '@/store/modules/dev'; 
 import Events from '../protocol/onebotv11/event/event'
+import msgQueueController from './onebotv11/queue/msgQueue'
 import { Res } from './onebotv11/api/api2'
+// import type { groupMsgQueueItemType,privateMsgQueueItemType } from './onebotv11/event/type';
 
 const devStore = useDevStore()
 
@@ -21,7 +23,7 @@ export default class Onebot {
         this.bot.addEventListener('open', (e) => {
             this.bot?.send(JSON.stringify({
                 "time":Math.round(Date.now() / 1000),
-                "self_id":devStore.onebot11.cur_self_id,
+                "self_id":devStore[devStore.curAdapter].cur_bot_id,
                 "post_type":"meta_event",
                 "meta_event_type":"lifecycle",
                 "sub_type":"connect"
@@ -39,49 +41,61 @@ export default class Onebot {
                     const pre = Events.group_message({
                         message_id: Math.round(Date.now() / 1000),
                         group_id: json.params.group_id,
-                        user_id: devStore.onebot11.cur_self_id,
-                        nickname: 'v崽',
+                        user_id: devStore[devStore.curAdapter].cur_bot_id,
+                        nickname: msgQueueController.curBot?.nickname as string,
                         message: json.params.message,
                         raw_message: Events.makeCQ(json.params.message),
                         sex: 'female'
                     })
-                    devStore.onebot11.msgQueue.push(pre)
+                    msgQueueController.groupQueue_push(pre)
+                    // let curGroupIndex = devStore.onebot11.group_list.findIndex((group)=>group.group_id == devStore.onebot11.cur_group_id)
+                    // devStore.onebot11.group_list[curGroupIndex].msg_queue && (devStore.onebot11.group_list[curGroupIndex].msg_queue as unknown as groupMsgQueueItemType[]).push(pre)
+                    // devStore.onebot11.msgQueue.push(pre)
                 }
                 if(json.action == 'send_private_msg' || (json.action == 'send_msg' && (json.params?.message_type == 'private' || !json.params?.group_id))) {
                     const pre = Events.private_message({
                         message_id: Math.round(Date.now() / 1000),
-                        user_id: devStore.onebot11.cur_self_id,
-                        nickname: 'v崽',
+                        user_id: devStore[devStore.curAdapter].cur_bot_id,
+                        nickname: msgQueueController.curBot?.nickname as string,
                         message: json.params.message,
                         raw_message: Events.makeCQ(json.params.message),
                         sex: 'female'
                     })
-                    devStore.onebot11.msgQueue.push(pre)
+                    msgQueueController.privateQueue_push(pre)
+                    // let curPrivateIndex = devStore.onebot11.friend_list.findIndex((friend)=>friend.user_id == devStore.onebot11.cur_private_id)
+                    // devStore.onebot11.friend_list[curPrivateIndex].msg_queue && (devStore.onebot11.friend_list[curPrivateIndex].msg_queue as unknown as privateMsgQueueItemType[]).push(pre)
+                    // devStore.onebot11.msgQueue.push(pre)
                 }
                 if(json.action == 'send_group_forward_msg') {
                     const pre = Events.group_message({
                         message_id: Math.round(Date.now() / 1000),
                         group_id: json.params.group_id,
-                        user_id: devStore.onebot11.cur_self_id,
-                        nickname: 'v崽',
+                        user_id: devStore[devStore.curAdapter].cur_bot_id,
+                        nickname: msgQueueController.curBot?.nickname as string,
                         message: [],
                         messages: json.params.messages,
                         raw_message: Events.makeCQ(json.params.message),
                         sex: 'female'
                     })
-                    devStore.onebot11.msgQueue.push(pre)
+                    msgQueueController.groupQueue_push(pre)
+                    // let curGroupIndex = devStore.onebot11.group_list.findIndex((group)=>group.group_id == devStore.onebot11.cur_group_id)
+                    // devStore.onebot11.group_list[curGroupIndex].msg_queue && (devStore.onebot11.group_list[curGroupIndex].msg_queue as unknown as groupMsgQueueItemType[]).push(pre)
+                    // devStore.onebot11.msgQueue.push(pre)
                 }
                 if(json.action == 'send_private_forward_msg') {
                     const pre = Events.private_message({
                         message_id: Math.round(Date.now() / 1000),
-                        user_id: devStore.onebot11.cur_self_id,
-                        nickname: 'v崽',
+                        user_id: devStore[devStore.curAdapter].cur_bot_id,
+                        nickname: msgQueueController.curBot?.nickname as string,
                         message: [],
                         messages: json.params.messages,
                         raw_message: Events.makeCQ(json.params.message),
                         sex: 'female'
                     })
-                    devStore.onebot11.msgQueue.push(pre)
+                    msgQueueController.privateQueue_push(pre)
+                    // let curPrivateIndex = devStore.onebot11.friend_list.findIndex((friend)=>friend.user_id == devStore.onebot11.cur_private_id)
+                    // devStore.onebot11.friend_list[curPrivateIndex].msg_queue && (devStore.onebot11.friend_list[curPrivateIndex].msg_queue as unknown as privateMsgQueueItemType[]).push(pre)
+                    // devStore.onebot11.msgQueue.push(pre)
                 }
             }
             // api解析动作并响应
