@@ -4,7 +4,7 @@
         <div class="fakeqq-header" v-show="header_visible">
             <el-icon class="fakeqq-header__bth" size="24" @click="footer_type == 'none'?devStore.qqScene = 1:devStore.qqScene = 0"><ArrowLeft /></el-icon>
             <span class="fakeqq-header__title">
-                <svg-icon name="ear" class="fakeqq-header__bth" color="#000000"/>
+                <svg-icon name="ear" class="fakeqq-header__bth" />
                 {{ title }}{{ count ? '(' + count + ')' : '' }}
             </span>
             <svg-icon name="menu" width="24px" height="24px" class="fakeqq-header__bth" color="#000000" @click="goSetting" />
@@ -38,27 +38,32 @@
         </div>
         <!-- 输入框 -->
         <div class="fakeqq-footer" v-show="footer_type == 'Input'">
+            <!-- 唤出at列表 -->
+            <el-popover
+                placement="top-start"
+                :width="300"
+                trigger="click"
+                v-model:visible = "isAtListVisible"
+            >   
+                <template #reference>
+                    <div style="position: absolute; top:0; left: 15px; width: 1px; height: 1px;"></div>
+                </template>
+                <slot name="atlist"></slot>
+            </el-popover>
+            
             <form class="fakeqq-footer__input">
-                <!-- 唤出at列表 -->
-                <el-popover
-                    placement="top-start"
-                    :width="300"
-                    trigger="contextmenu"
-                    v-model:visible = "isAtListVisible"
-                >   
-                    <template #reference>
-                        <el-input class="fakeqq-footer__input-text" 
-                            type="textarea"
-                            v-model="inputValue" 
-                            :disabled="input_disabled"
-                            @input="exposeInnerText" 
-                            @focus="$emit('footerBtn','none')"
-                        >
-                        </el-input>
-                    </template>
-                    <slot name="atlist"></slot>
-                </el-popover>
-                <button class="fakeqq-footer__input-btn" type="reset" @click="($emit('sendInput',{type: 'text', data: {text: inputValue}}),inputValue = '')">发送</button>
+                <el-input 
+                    style="width: 100%; height: 100%;"
+                    type="textarea"
+                    v-model="inputValue" 
+                    autofocus
+                    :disabled="input_disabled"
+                    :autosize="{ minRows: 1, maxRows: 3 }"
+                    @input="exposeInnerText" 
+                    @focus="$emit('footerBtn','none')"
+                >
+                </el-input>
+                <button class="fakeqq-footer__input-btn" type="reset" @click="handleSendInputValue">发送</button>
             </form>
             <div class="fakeqq-footer__btn">
                 <svg-icon name="voice" @click="$emit('footerBtn','audio')"/>
@@ -166,12 +171,15 @@
 import data from "emoji-mart-vue-fast/data/all.json";
 // Import default CSS
 import "emoji-mart-vue-fast/css/emoji-mart.css";
+import { ElNotification } from 'element-plus'
 //@ts-ignore
 import { Picker, EmojiIndex } from "emoji-mart-vue-fast/src";
 import { watch, ref, nextTick, onBeforeUnmount, onMounted } from 'vue'
 
 import useDevStore from '@/store/modules/dev';
 import { reqPluginsLoader } from '@/api/dev/sandbox/index'
+
+import { fromCqcode2 } from '../protocol/common/cq'
 
 const devStore = useDevStore()
 const pkgs = ref<any[]>([])
@@ -231,6 +239,8 @@ const exposeInnerText = () => {
   const curSepCount = (inputValue.value.match(/@/g)) || []
   if (curSepCount.length == (sepCount + 1)) {
     isAtListVisible.value = true
+  } else {
+    isAtListVisible.value = false
   }
   sepCount = curSepCount.length
 }
@@ -286,6 +296,39 @@ const handleInput = (type:string, i:any) => {
             isRegsVisible.value = false
             inputValue.value += i.native
     }
+}
+
+/** 处理文本特殊含义 */
+const handleSendInputValue = () => {
+    // let memberCard = ''
+    // let match = inputValue.value.match(/@([^@\s]+)\s/);  
+    // if (match) {  
+    //     memberCard = match[1]; // match[1] 是昵称部分  
+    //     console.log(memberCard);  
+    // }
+    // if(devStore[devStore.curAdapter].cur_message_type == 'group') {
+    //     let curGroup = devStore[devStore.curAdapter].group_list.find((group)=>group.group_id == devStore[devStore.curAdapter].cur_group_id)
+    //     if(curGroup) {
+    //         let AtMember = curGroup.member_list.find((member)=>memberCard.includes(member.card))
+    //         if(AtMember) {
+    //             $emit('sendInput',[{type: 'at', data: {qq: AtMember.user_id}},{type: 'text', data: {text: inputValue.value.replace(`@${memberCard} `,'')}}])
+    //             inputValue.value = ''
+    //             return
+    //         }
+    //     }
+    // }
+
+    try {
+        $emit('sendInput', fromCqcode2(inputValue.value))
+    } catch(err:any) {
+        ElNotification({
+            title: 'Error',
+            message: err.message,
+            type: 'error',
+            duration: 3000,
+        })
+    }
+    inputValue.value = ''
 }
 
 defineExpose({inputValue, isDrawerOpen})

@@ -68,53 +68,65 @@
 </script> 
 
 <style scoped lang="scss">
+      
+  #nav {
+      width: 100%;
+      position: relative;
+      border: none;
+      border-radius: 5px;
+      display: flex;
+      list-style: none;
+      background: #f5f5f5;
+      // box-shadow: 20px 40px 40px #00000033;
+      padding: 5px;
+  }
 
-    #nav {
-        position: relative;
-        border: none;
-        border-radius: 5px;
-        display: flex;
-        list-style: none;
-        background: #f5f5f5;
-        // box-shadow: 20px 40px 40px #00000033;
-        padding: 5px;
-    }
+  #nav li {
+    // border: 2px solid red;
+    width: calc(100% / 2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    #nav li a {
-        position: relative;
-        padding: 4px 48px;
-        font: 500 16px '优设标题黑';
-        border: none;
-        outline: none;
-        color: rgb(70, 100, 180);
-        display: inline-block;
-        text-decoration: none;
-        z-index: 3;
-    }
+  #nav li a {
+      
+      position: relative;
+      // padding: 4px 48px;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      font: 500 16px '优设标题黑';
+      border: none;
+      outline: none;
+      color: rgb(70, 100, 180);
+      display: inline-block;
+      text-decoration: none;
+      z-index: 3;
+  }
 
-    .slide1,
-    .slide2 {
-        position: absolute;
-        display: inline-block;
-        height: 30px;
-        border-radius: 5px;
-        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1.05);
-    }
+  .slide1,
+  .slide2 {
+    // border: 2px solid red;
+      position: absolute;
+      display: inline-block;
+      height: 30px;
+      border-radius: 5px;
+      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1.05);
+  }
 
-    .slide1 {
-        background-color: rgb(255, 255, 255);
-        z-index: 2;
-    }
+  .slide1 {
+      background-color: rgb(255, 255, 255);
+      z-index: 2;
+  }
 
-    .slide2 {
-        opacity: 0;
-        // background-color: rgba(170, 190, 255, .5);
-        background-color: #d8f1ff;
-        z-index: 1;
-        box-shadow: 0 0 10px #ffffffaa inset;
-    }
+  .slide2 {
+      opacity: 0;
+      background-color: #d8f1ff;
+      z-index: 1;
+      box-shadow: 0 0 10px #ffffffaa inset;
+  }
 
-    .squeeze {
-        transform: scale(0.9);
-    }
+  .squeeze {
+      transform: scale(0.9);
+  }
 </style>

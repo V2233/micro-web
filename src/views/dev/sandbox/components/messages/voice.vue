@@ -1,8 +1,8 @@
 <template>
     <div class="fakeqq-message" :class="[onright ? 'right-chat' : 'left-chat']">
         <AvatarMenu :onright="onright" @avatar-operation="$emit('avatar-operation',$event)">
-            <div v-if="avatar" :style="{ 'background-image': `url(${avatar})` }" class="fakeqq-message__avatar"></div>
-            <div v-else class="fakeqq-message__avatar">
+            <div v-if="avatar" :style="{ 'background-image': `url(${avatar})` }" class="fakeqq-message__avatar" @click="$emit('avatar-click','record')"></div>
+            <div v-else class="fakeqq-message__avatar" @click="$emit('avatar-click','record')">
                 <span class="fakeqq-message__text-avatar">{{ name[0] }}</span>
             </div>
         </AvatarMenu>
@@ -39,7 +39,7 @@ import { computed, ref } from 'vue'
 import MsgMenu from './msg-operate.vue'
 import AvatarMenu from './avatar-operate.vue'
 
-const $emit = defineEmits(['msg-operation','avatar-operation'])
+const $emit = defineEmits(['msg-operation','avatar-operation','avatar-click'])
 
 const audio = ref<HTMLAudioElement>()
 const voiceLine = ref()

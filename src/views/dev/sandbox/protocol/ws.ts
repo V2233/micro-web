@@ -74,7 +74,7 @@ export default class Onebot {
                         nickname: msgQueueController.curBot?.nickname as string,
                         message: [],
                         messages: json.params.messages,
-                        raw_message: Events.makeCQ(json.params.message),
+                        raw_message: Events.makeCQ(json.params.messages),
                         sex: 'female'
                     })
                     msgQueueController.groupQueue_push(pre)
@@ -89,7 +89,7 @@ export default class Onebot {
                         nickname: msgQueueController.curBot?.nickname as string,
                         message: [],
                         messages: json.params.messages,
-                        raw_message: Events.makeCQ(json.params.message),
+                        raw_message: Events.makeCQ(json.params.messages),
                         sex: 'female'
                     })
                     msgQueueController.privateQueue_push(pre)

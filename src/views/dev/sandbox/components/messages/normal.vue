@@ -1,19 +1,25 @@
 <template>
     <div class="fakeqq-message" :class="[onright ? 'right-chat' : 'left-chat']">
+        <!-- 头像 -->
         <AvatarMenu :onright="onright" @avatar-operation="$emit('avatar-operation',$event)">
-            <div v-if="avatar" :style="{ 'background-image': `url(${avatar})` }" class="fakeqq-message__avatar"></div>
-            <div v-else class="fakeqq-message__avatar">
+            <div v-if="avatar" :style="{ 'background-image': `url(${avatar})` }" class="fakeqq-message__avatar" @click="$emit('avatar-click','normal')"></div>
+            <div v-else class="fakeqq-message__avatar" @click="$emit('avatar-click','normal')">
                 <span class="fakeqq-message__text-avatar">{{ name[0] }}</span>
             </div>
         </AvatarMenu>
+        <!-- 内容 -->
         <div class="fakeqq-message__content">
             <div class="fakeqq-message__name" v-if="role !== ''">
                 <span v-if="onright" :class="memberTitleClass">{{ role_title }}</span>
                 {{ name }}
                 <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
             </div>
+            <!-- 气泡 -->
             <msg-menu @msg-operation="$emit('msg-operation',$event)">
-                <el-image :src="src" :preview-src-list="srcList" :initial-index="0" :style="{ 'max-width': maxWidth, 'border-radius': '5px' }" />
+                <div class="fakeqq-message__bubble">
+                    <div class="fakeqq-message__bubble-arrow"></div>
+                    <slot></slot>
+                </div>
             </msg-menu>
         </div>
     </div>
@@ -24,18 +30,14 @@ import { computed } from 'vue'
 import MsgMenu from './msg-operate.vue'
 import AvatarMenu from './avatar-operate.vue'
 
-const $emit = defineEmits(['msg-operation','avatar-operation'])
+const $emit = defineEmits(['msg-operation','avatar-operation','avatar-click'])
 
 const props = defineProps({
     name: { type: String, required: true },
-    avatar: String,
     role: { type: String, default: 'admin' },
     role_title: { type: String, default: 'LV1' },
-    src: { type: String, required: true },
+    avatar: String,
     onright: Boolean,
-    maxWidth: { type: String, default: '250px' },
-    srcList: {type: Array, default: []},
-    initialIndex: {type: Number, default: 0}
 })
 
 const memberTitleClass = computed(()=>{
@@ -50,5 +52,6 @@ const memberTitleClass = computed(()=>{
             return ''
     }
 })
+
 
 </script>

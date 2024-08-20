@@ -128,10 +128,12 @@
     width: max-content;
     min-height: 1em;
     min-width: 1em;
+    max-width: 100%;
     line-height: 1.2em;
     border-radius: 10px;
     overflow-wrap: break-word;
     background-color: white;
+    flex-wrap: wrap;
 
     &>img {
         max-width: 300px;
@@ -181,6 +183,7 @@
 
 .fakeqq-footer {
     background-color: #f5f4f2;
+    position: relative;
 }
 
 .fakeqq-header__bth {
@@ -202,12 +205,14 @@
     flex: 1;
     overflow: overlay;
     position: relative;
+    max-width: 100%;
 }
 
 .fakeqq-footer__input {
     display: flex;
     // min-height: 50px;
     margin-top: 10px;
+    margin-left: 15px;
 }
 
 .fakeqq-footer__input-text {
@@ -236,8 +241,9 @@
 .fakeqq-footer__input-btn {
     width: 70px;
     height: 30px;
+    margin-top: auto;
     margin-left: 5px;
-    margin-right: 20px;
+    margin-right: 15px;
     color: white;
     font-size: 15px;
     line-height: 30px;
@@ -367,6 +373,7 @@
     padding-bottom: 5px;
     border-bottom: 30px solid #f7f7f7;
     overflow-wrap: break-word;
+    flex-wrap: wrap;
 }
 
 .fakeqq-forward__title {

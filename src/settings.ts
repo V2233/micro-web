@@ -1,5 +1,5 @@
 export default {
-  title: 'Micro-Dev',
+  title: 'Yunzai-Dev',
   // logo: '/logo.png',
   logo: '/terminal.png',
   logoHidden: false,

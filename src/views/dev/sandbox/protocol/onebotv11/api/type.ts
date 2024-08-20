@@ -6,7 +6,8 @@ export interface groupInfoType {
     max_member_count: number,
     member_count: number,
     msg_queue: groupMsgQueueItemType[] | [],
-    member_list: groupMemberInfoType[]
+    member_list: groupMemberInfoType[],
+    searched?:boolean
 }
 
 export interface friendInfoType {
@@ -14,7 +15,8 @@ export interface friendInfoType {
     remark: string,
     user_id: number,
     msg_queue: privateMsgQueueItemType[] | [],
-    thumbs?: number
+    thumbs?: number,
+    searched?:boolean
 }
 
 export interface strangerInfoType {

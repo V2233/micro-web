@@ -124,13 +124,7 @@ export class Res {
     }
     
     send_msg(params:any) {
-        let message_type = 'group'
-        if(params.message_type) message_type = params.message_type
-        else {
-            if(params.group_id) message_type = 'group'
-            else message_type = 'private'
-        }
-        return 
+
     }
         
     delete_msg(params:any) {
@@ -150,7 +144,7 @@ export class Res {
         const { user_id, times } = params
         if(devStore.onebot11.cur_message_type == 'group') {
             let groupIndex = devStore.onebot11.group_list.findIndex((group)=>group.group_id == devStore.onebot11.cur_group_id)
-            let memberInfoIndex = this.curGroup.member_list.findIndex(member => member.user_id == user_id)
+            let memberInfoIndex = devStore.onebot11.group_list[groupIndex].member_list.findIndex(member => member.user_id == user_id)
             if(memberInfoIndex != -1 && this.curGroupIndex != -1) {
                 if(!devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex].thumbs) {
                     devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex].thumbs = 0
@@ -220,7 +214,7 @@ export class Res {
 
     get_login_info(params:any) {
         return {
-            user_id: devStore.onebot11.cur_self_id,
+            user_id: devStore.onebot11.cur_bot_id,
             nickname: 'v崽'
         }
     }

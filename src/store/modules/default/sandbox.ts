@@ -134,4 +134,11 @@ export const friend_list = [
         msg_queue: [],
         thumbs: 0
     },
+    {
+        user_id: 2330660495,
+        nickname: 'v',
+        remark: "",
+        msg_queue: [],
+        thumbs: 0
+    }
 ]

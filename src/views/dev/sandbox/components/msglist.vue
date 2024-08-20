@@ -48,8 +48,15 @@
             <div class="msglist__messages__search">
                 <div class="msglist__messages__search__frame">
                     <div class="msglist__messages__search__frame__left">
-                        <el-icon size="large" color="#9F9F9F"><Search /></el-icon>
-                        <input class="msglist__messages__search__frame__input" :value="searchText" placeholder="搜索"></input>
+                        <el-icon size="large" color="#9F9F9F" @click="$emit('searchText',searchText)"><Search /></el-icon>
+                        <input class="msglist__messages__search__frame__input" 
+                            v-model="searchText" 
+                            placeholder="搜索" 
+                            @keyup.enter="$emit('searchText',searchText)"
+                            @input="$emit('searchText',searchText)"
+                            @focus="$emit('searchFocused',true)"
+                            @blur="$emit('searchFocused',false)"
+                        ></input>
                     </div>
                     <el-popover
                         placement="top-end"
@@ -70,6 +77,10 @@
                             <div class="msglist__messages__menu__add__item">
                                 <svg-icon name="add-friend" width="16px" height="16px"></svg-icon>
                                 <span class="msglist__messages__menu__item__desc">加好友/群</span>
+                            </div>
+                            <div class="msglist__messages__menu__add__item">
+                                <svg-icon name="add-friend" width="16px" height="16px"></svg-icon>
+                                <span class="msglist__messages__menu__item__desc">创建好友</span>
                             </div>
                         </div>
                         
@@ -98,18 +109,21 @@
 <script lang="ts" setup>
 import { ref,onMounted,onBeforeUnmount } from 'vue'
 
-const $emit = defineEmits(['clickTabbar'])
+const $emit = defineEmits(['clickTabbar','searchText','searchFocused'])
 
 const props = defineProps({
     avatar: { type: String, required: true },
     title: { type: String, required: true },
-    searchText: { type: String, default: ''},
+    // searchText: { type: String, default: ''},
     messagesLength: { type: Number, default: 0}
     // state: { type: String, default: '离线' },
 })
 
 /** 添加操作栏 */
 const isAddMenuVisible = ref(false)
+
+/** 搜索栏值 */
+const searchText = ref('')
 
 /** 当前导航栏状态 */
 const curTabbarIcon = ref('messages')
@@ -254,7 +268,7 @@ onBeforeUnmount(()=>{
     }
     .msglist__messages {
         // border: 2px solid red;
-        min-width: 250px;
+        min-width: 260px;
         max-width: 500px;
         flex: 1;
         height: 100%;
@@ -312,7 +326,6 @@ onBeforeUnmount(()=>{
     .msglist__messages__main__resizer {
         position: relative;
         background-color: #E5E5E5;
-        // cursor: e-resize;
         height: 100%;
         width: 0.1px;
         margin: 0;
