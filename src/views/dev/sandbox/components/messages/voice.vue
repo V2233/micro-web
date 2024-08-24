@@ -89,7 +89,7 @@ const reset = () => {
 
 const onLoadedmetadata = () => {
     const audioElem = audio.value as HTMLAudioElement
-    duration.value = Math.round(audioElem.duration??114514)
+    duration.value = Math.round(audioElem.duration?audioElem.duration:114514)
     const m = Math.floor(audioElem.duration / 60)
     const s = Math.round(audioElem.duration % 60)
     formatedDuration.value = m > 0 ? `${m}'${s}"` : `${s}"`

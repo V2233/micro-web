@@ -49,6 +49,10 @@ router.beforeEach(async (to: any, from: any, next: any) => {
       })
     }
   }
+
+  if(!userStore.originAddress){
+    await userStore.getOriginAddress()
+  }
 })
 
 // 全局后置守卫

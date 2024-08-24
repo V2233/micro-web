@@ -34,7 +34,7 @@
                     </div>
                 </div>
                 <div class="group-members-item">
-                    <div class="group-members-item-avatar">
+                    <div class="group-members-item-avatar" @click="$emit('setName',{type: 'group_member_invite', data: {}})">
                         <el-icon><Plus /></el-icon>
                     </div>
                     <div class="group-members-item-nickname">
@@ -42,7 +42,7 @@
                     </div>
                 </div>
                 <div class="group-members-item">
-                    <div class="group-members-item-avatar">
+                    <div class="group-members-item-avatar" @click="$emit('setName',{type: 'group_member_decrease', data: {}})">
                         <el-icon><Minus /></el-icon>
                     </div>
                     <div class="group-members-item-nickname">
@@ -99,7 +99,10 @@
     </QQCard>
     <QQCard>
         <div class="dismiss-group" v-if="role == 'owner'" @click="$emit('setName',{type: 'dismiss_group',data: ''})">解散群聊</div>
-        <div class="dismiss-group" v-else @click="$emit('setName',{type: 'exit_group',data: ''})">退出群聊</div>
+        <div class="dismiss-group" v-if="role !== 'owner' && (curGroup as groupInfoType).member_list?.some(member=>member.user_id == devStore[devStore.curAdapter].cur_self_info.user_id)" @click="$emit('setName',{type: 'exit_group',data: ''})">退出群聊</div>
+        <div class="dismiss-group" v-if="!(curGroup as groupInfoType).member_list?.some(member=>member.user_id == devStore[devStore.curAdapter].cur_self_info.user_id)" 
+            @click="$emit('setName',{type: 'join_group',data: ''})"
+        >申请加群</div>
     </QQCard>
   </div>
   <div v-if="chat_type == 'private'">

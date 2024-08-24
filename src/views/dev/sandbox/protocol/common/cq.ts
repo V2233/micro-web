@@ -95,6 +95,11 @@ function fromCqcode(text = "") {
             case -2:  
                 throw new Error(`消息 CQ 码不匹配：${text}`);  
             case -3:  
+                if (!items[itemsSize]) {  
+                    items[itemsSize] = "";  
+                }  
+                items[itemsSize] += text[i];  
+                break; 
             case -4:  
                 items.push(text.substring(i));  
                 i = text.length;  

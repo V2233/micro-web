@@ -8,9 +8,12 @@
         </AvatarMenu>
         <div class="fakeqq-message__content">
             <div class="fakeqq-message__name" v-if="role !== ''">
-                <span v-if="onright" :class="memberTitleClass">{{ role_title }}</span>
+                <span v-if="role === 'bot'" class="fakeqq-message__member__card__bot__logo">
+                    <svg-icon name="robot" width="12px" height="12px" color="white"/>
+                </span>
+                <span v-if="onright && role !== 'bot'" :class="memberTitleClass">{{ role_title }}</span>
                 {{ name }}
-                <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
+                <span v-if="!onright && role !== 'bot'" :class="memberTitleClass">{{ role_title }}</span>
             </div>
             <msg-menu @msg-operation="$emit('msg-operation',$event)">
                 <el-image :src="src" :preview-src-list="srcList" :initial-index="0" :style="{ 'max-width': maxWidth, 'border-radius': '5px' }" />

@@ -1,4 +1,4 @@
-import { reqLogin, reqUserInfo, reqLogout } from '@/api/user'
+import { reqLogin, reqUserInfo, reqLogout, reqSaveServerAddress } from '@/api/user'
 import { defineStore } from 'pinia'
 import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from '@/utils/token'
 
@@ -16,6 +16,7 @@ import router from '@/router'
 // 深拷贝
 //@ts-ignore
 import cloneDeep from 'lodash/cloneDeep'
+import { get } from 'lodash'
 
 // 过滤展示的异步路由
 
@@ -42,6 +43,8 @@ let useUserStore = defineStore('User', {
       masterQQ: 0,
       //存储当前用户是否包含某一个按钮
       buttons: [],
+      /** 请求源，用于服务端提供链接 */
+      originAddress: ''
     }
   },
   actions: {
@@ -93,6 +96,17 @@ let useUserStore = defineStore('User', {
         return Promise.reject(new Error(result.message))
       }
     },
+    async getOriginAddress() {
+      this.originAddress = window.location.origin
+      const urlObj = new URL(this.originAddress)
+      const { hostname, port, protocol, origin} = urlObj
+      let res:any = await reqSaveServerAddress({hostname, port, protocol, origin})
+      if(res.code == 200){
+        return Promise.resolve('ok')
+      } else {
+        return Promise.reject(new Error(res.message))
+      }
+    }
   },
   getters: {},
 })

@@ -13,7 +13,7 @@
                 <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
             </div>
             <msg-menu @msg-operation="$emit('msg-operation',$event)">
-                <div class="fakeqq-message__bubble">
+                <div class="fakeqq-message__bubble" @click="$emit('msg-click',{})">
                     <div class="fakeqq-message__bubble-arrow"></div>
                     <div class="fakeqq-forward__title">{{ title }}的聊天记录</div>
                     <div class="fakeqq-forward__content">
@@ -34,7 +34,7 @@ import { computed } from 'vue'
 import MsgMenu from './msg-operate.vue'
 import AvatarMenu from './avatar-operate.vue'
 
-const $emit = defineEmits(['msg-operation','avatar-operation','avatar-click'])
+const $emit = defineEmits(['msg-operation', 'msg-click', 'avatar-operation','avatar-click'])
 
 const props = defineProps({
     name: { type: String, required: true },

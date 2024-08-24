@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import type { DevState } from './types/type'
 import { group_list, friend_list } from './default/sandbox'
+import useUserStore from './user'
+
+const userStore = useUserStore()
+
+const url = new URL(userStore.originAddress)
 
 let useDevStore = defineStore('Dev', {
   state: (): DevState => {
@@ -19,6 +24,8 @@ let useDevStore = defineStore('Dev', {
 
       /** 沙箱场景 */
       qqScene: 0,
+      /** 当前是否是竖屏 */
+      isPortrait: false,
       /** 当前适配器 */
       curAdapter: 'onebot11',
       /** onebot 数据库 */
@@ -39,12 +46,17 @@ let useDevStore = defineStore('Dev', {
         cur_bot_id: 1593519730,
         /** 当前自己的资料 */
         cur_self_info: {
-          user_id: 2330660495,
-          nickname: 'v',
+          user_id: Number(userStore.masterQQ) || 2330660495,
+          nickname: userStore.username,
           sex: 'female',
           age: 18,
           area: '',
           thumbs: 0
+        },
+        settings: {
+          ws_forward_address: `ws://${url.hostname}:${url.port}/onebot/v11/ws`,
+          heart_beat: false,
+          local_storage: false
         }
       }
     }

@@ -8,6 +8,7 @@ export interface DevState {
   curEditedMode: string
   curPluginId: string
   qqScene: number
+  isPortrait: boolean
   /** 避免ts报any类型，后续可拓展 */
   curAdapter:'onebot11'
   onebot11: {
@@ -33,6 +34,11 @@ export interface DevState {
       age: number,
       area: string,
       thumbs: number
+    },
+    settings: {
+      ws_forward_address: string,
+      heart_beat: boolean,
+      local_storage: boolean
     }
   }
 }
@@ -61,5 +67,6 @@ export interface UserState {
   username: string
   avatar: string
   masterQQ?: string | number
-  buttons: string[]
+  buttons: string[],
+  originAddress: string
 }

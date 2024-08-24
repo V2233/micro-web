@@ -11,11 +11,17 @@ import type { MessageElem, NodeElem } from '../message/message.elem'
 
 import type { groupMsgType,privateMsgType,groupMsgQueueItemType,privateMsgQueueItemType } from './type'
 
+import type { groupMemberInfoType } from '../api/type'
+
+import { fileTypeFromBuffer, type FileTypeResult } from 'file-type'
+
 import useDevStore from '@/store/modules/dev'; 
 const devStore = useDevStore()
 
 
 export default new class Events {
+
+    /** ---------------------------------元事件----------------------------------- */
 
     /**
      * 基本字段
@@ -85,6 +91,91 @@ export default new class Events {
             raw_message += `[CQ:${seg.type},${data.join(',')}]`
         });
         return raw_message
+    }
+
+    /**
+     * 分析文件数据类型
+     * @param data 
+     * @param opts 
+     * @returns 
+     */
+    async makeBuffer(data: any, opts: any = {}): Promise<Uint8Array | string | null> {  
+        // 如果 data 已经是 Uint8Array（或者类似二进制数据的类型），则直接返回  
+        if (data instanceof Uint8Array) return data;  
+      
+        // 处理 base64 字符串  
+        if (typeof data === 'string' && data.startsWith("base64://")) {  
+            const base64String = data.replace("base64://", "");  
+            return new Uint8Array(atob(base64String).split('').map(char => char.charCodeAt(0)));  
+        }  
+      
+        // 处理 URL  
+        if (typeof data === 'string' && data.match(/^https?:\/\//)) {  
+            if (opts.http) {  
+                return data;  
+            }  
+      
+            try {  
+                const response = await fetch(data, opts);  
+                if (!response.ok) {  
+                    throw new Error(`HTTP error! status: ${response.status}`);  
+                }  
+                const arrayBuffer = await response.arrayBuffer();  
+                return new Uint8Array(arrayBuffer);  
+            } catch (error) {  
+                console.error('Error fetching data:', error);  
+                return data; 
+            }  
+        }  
+      
+        return data;  
+    }
+
+    /**
+     * 分析文件mime
+     * @param data 
+     * @returns 
+     */
+    async parseFile(data: any): Promise<string | null> {  
+        const buffer = await this.makeBuffer(data);  
+      
+        // 检查 buffer 是否为 Uint8Array  
+        if (buffer instanceof Uint8Array) {  
+            // 使用 TextEncoder（如果数据是文本）或手动转换为 base64  
+            // const encoder = new TextEncoder();  
+      
+            // 转换为 base64  
+            // const base64String = btoa(String.fromCharCode.apply(null, buffer)); 
+            // const base64String = btoa(Array.from(buffer, String.fromCharCode).join(''));
+            let base64String = data
+            if(data.includes('base64://')) {
+                base64String = data.replace('base64://','')
+                let fileType = 'application/octet-stream'; // 未知二进制数据  
+                
+                fileType = (await fileTypeFromBuffer(buffer as Uint8Array))?.mime as string
+        
+                // 返回 base64 编码的字符串  
+                return `data:${fileType};base64,${base64String}`;  
+            } else {
+                return data
+            }
+        }  
+      
+        return data.replace('base64://',`data:application/octet-stream;base64,`); 
+    } 
+
+    /**
+     * 处理消息段
+     * @param message
+     * @returns 
+     */
+    handleMessage(message:MessageElem[]) {
+        return Promise.all(message.map(async(seg)=>{
+            if((seg as any).data.file) {
+                (seg as any).data.file = await this.parseFile((seg as any).data.file)
+            }
+            return seg
+        }))
     }
 
     /**
@@ -205,6 +296,90 @@ export default new class Events {
             }
         }
     }
+
+    /** ------------------------------------成员构造------------------------------- */
+
+    group_member(data:{
+        group_id: number,
+        user_id: number,
+        nickname: string,
+        card?: string,
+        sex?: string,
+        age?: number,
+        area?: string,
+        join_time?: number,
+        last_sent_time?:number,
+        level?: string,
+        role?: 'owner' | 'admin' | 'member' | 'bot',
+        unfriendly?:boolean,
+        title?: string,
+        title_expire_time?: number,
+        card_changeable?: boolean,
+        thumbs?: number,
+        avatar?: string
+    }) {
+        return {
+            group_id: data.group_id,
+            user_id: data.user_id,
+            nickname: data.nickname,
+            card: data.card || data.nickname,
+            sex: data.sex || 'unknown',
+            age: data.age || 1,
+            area: data.area || '',
+            join_time: data.join_time || Date.now(),
+            last_sent_time: data.last_sent_time || Date.now(),
+            level: data.level || 'lv1',
+            role: data.role || 'member',
+            unfriendly: data.unfriendly || false,
+            title: data.title || '',
+            title_expire_time: data.title_expire_time || Date.now() + 86400 * 3,
+            card_changeable: data.card_changeable || true,
+            thumbs: data.thumbs || 0,
+            avatar: data.avatar || `https://q1.qlogo.cn/g?b=qq&s=0&nk=${data.user_id}`
+        }
+    }
+
+    group_info(data:{
+        group_id: number,
+        group_name: string,
+        max_member_count?: number,
+        member_count?: number,
+        msg_queue?: groupMsgQueueItemType[] | [],
+        member_list?: groupMemberInfoType[],
+        searched?:boolean,
+        avatar?: string
+    }) {
+        return {
+            group_id: data.group_id,
+            group_name: data.group_name,
+            max_member_count: data.max_member_count || 500,
+            member_count: data.member_count || data.member_list?.length || 114514,
+            msg_queue: data.msg_queue || [],
+            member_list: data.member_list || [],
+            searched: data.searched || false,
+            avatar: data.avatar || `https://p.qlogo.cn/gh/${data.group_id}/${data.group_id}/640`
+        }
+    }
+
+    friend_info(data:{
+        nickname: string,
+        remark?: string,
+        user_id: number,
+        msg_queue?: privateMsgQueueItemType[] | [],
+        thumbs?: number,
+        searched?:boolean,
+        avatar?: string
+    }) {
+        return {
+            nickname: data.nickname,
+            user_id: data.user_id,
+            remark: data.remark || '',
+            msg_queue: data.msg_queue || [],
+            searched: data.searched || false,
+            avatar: data.avatar || `https://q1.qlogo.cn/g?b=qq&s=0&nk=${data.user_id}`
+        }
+    }
+
 
     /** -----------------------通知------------------------- */
 

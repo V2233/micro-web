@@ -1,8 +1,8 @@
 <template>
     <div class="fakeqq-msglist">
-        <div class="msglist__tabbar">
+        <div class="msglist__tabbar" v-if="!devStore.isPortrait">
             <!-- 导航栏头像 -->
-            <div class="msglist__tabbar__avatar">
+            <div class="msglist__tabbar__avatar" v-if="!devStore.isPortrait">
                 <img class="msglist__tabbar__avatar__img" :src="`${avatar}`"/>
                 <div class="msglist__tabbar__avatar__state" :style="{backgroundColor: `#2CEA8C`}"></div>
             </div>
@@ -43,9 +43,10 @@
                 </div>
             </div>
         </div>
+
         <!-- 列表栏 -->
-        <div class="msglist__messages" ref="messagesRef">
-            <div class="msglist__messages__search">
+        <div class="msglist__messages" ref="messagesRef" v-if="!devStore.isPortrait || (devStore.isPortrait && devStore.qqScene == 0)">
+            <div class="msglist__messages__search" v-if="searchHeaderVisible">
                 <div class="msglist__messages__search__frame">
                     <div class="msglist__messages__search__frame__left">
                         <el-icon size="large" color="#9F9F9F" @click="$emit('searchText',searchText)"><Search /></el-icon>
@@ -70,28 +71,60 @@
                             </div>
                         </template>
                         <div class="msglist__messages__menu__add">
-                            <div class="msglist__messages__menu__add__item">
+                            <div class="msglist__messages__menu__add__item" @click="$emit('clickAdd','create-group')">
                                 <svg-icon name="create-group" width="16px" height="16px"></svg-icon>
                                 <span class="msglist__messages__menu__item__desc">创建群聊</span>
                             </div>
-                            <div class="msglist__messages__menu__add__item">
-                                <svg-icon name="add-friend" width="16px" height="16px"></svg-icon>
-                                <span class="msglist__messages__menu__item__desc">加好友/群</span>
-                            </div>
-                            <div class="msglist__messages__menu__add__item">
+                            <div class="msglist__messages__menu__add__item" @click="$emit('clickAdd','create-friend')">
                                 <svg-icon name="add-friend" width="16px" height="16px"></svg-icon>
                                 <span class="msglist__messages__menu__item__desc">创建好友</span>
                             </div>
+                            <!-- <div class="msglist__messages__menu__add__item" @click="$emit('clickAdd','add-contact')">
+                                <svg-icon name="add-friend" width="16px" height="16px"></svg-icon>
+                                <span class="msglist__messages__menu__item__desc">加好友/群</span>
+                            </div> -->
                         </div>
                         
                     </el-popover>
                 </div>
             </div>
+
             <slot name="messages"></slot>
+
+            <!-- 竖屏时导航栏 -->
+            <div class="portrait__msglist__tabbar" v-if="devStore.isPortrait">
+                <div class="portrait__msglist__tabbar__icon" 
+                    :class="[curTabbarIcon == 'messages'?'portrait__msglist__tabbar__icon__selected':'']" 
+                    @click="clickTabbarIcon('messages')"
+                >
+                    <svg-icon name="message" width="40px" height="40px" color="black"/>
+                    <el-badge 
+                        v-if="messagesLength > 0"
+                        :value="messagesLength" 
+                        :max="99" 
+                        :style="{
+                            position: 'absolute',
+                            top: '10px',
+                            right: '-10px',
+                            transform: 'scale(0.8)'
+                        }"
+                    ></el-badge>
+                </div>
+                <div class="portrait__msglist__tabbar__icon" 
+                    :class="[curTabbarIcon == 'contacts'?'portrait__msglist__tabbar__icon__selected':'']"
+                    @click="clickTabbarIcon('contacts')">
+                    <svg-icon name="contacts" width="26px" height="26px" color="black"/>
+                </div>
+                <div class="portrait__msglist__tabbar__icon" 
+                    :class="[curTabbarIcon == 'settings'?'portrait__msglist__tabbar__icon__selected':'']"
+                    @click="clickTabbarIcon('settings')">
+                    <el-icon size="26"><Expand /></el-icon>
+                </div>
+            </div>
         </div>
 
         <!-- 分割线 -->
-        <div class="msglist__messages__main__resizer">
+        <div class="msglist__messages__main__resizer" v-if="!devStore.isPortrait">
             <div class="msglist__messages__main__resizer__extend" 
                 ref="dividerRef"
                 @mousedown="startDragDivider"
@@ -99,7 +132,7 @@
         </div>
 
         <!-- 主视图 -->
-        <div class="msglist-main" ref="mainRef">
+        <div class="msglist-main" ref="mainRef" v-if="!devStore.isPortrait || (devStore.isPortrait && devStore.qqScene !== 0)">
             <slot name="main"></slot>
         </div>
 
@@ -109,14 +142,18 @@
 <script lang="ts" setup>
 import { ref,onMounted,onBeforeUnmount } from 'vue'
 
-const $emit = defineEmits(['clickTabbar','searchText','searchFocused'])
+const $emit = defineEmits(['clickTabbar','clickAdd','searchText','searchFocused'])
+import useDevStore from '@/store/modules/dev';
+const devStore = useDevStore()
 
 const props = defineProps({
     avatar: { type: String, required: true },
     title: { type: String, required: true },
     // searchText: { type: String, default: ''},
-    messagesLength: { type: Number, default: 0}
+    messagesLength: { type: Number, default: 0},
     // state: { type: String, default: '离线' },
+    searchHeaderVisible: { type: Boolean, default: true },
+
 })
 
 /** 添加操作栏 */
@@ -146,7 +183,6 @@ const maxX = ref(1280)
 
 /** 拖拽事件 */
 const handleDragDivider = function(e:any) {
-    // console.log(e)
     if(isDividerDragging.value) {
         const x = e.clientX
         const dividerWidth = dividerRef.value.offsetWidth;
@@ -164,8 +200,6 @@ const handleDragDivider = function(e:any) {
  */
 const startDragDivider = function() {
     isDividerDragging.value = true
-    // console.log(isDividerDragging.value)
-    // console.log(window.innerWidth)
     document.onmousemove = handleDragDivider
 }
 
@@ -175,13 +209,12 @@ const startDragDivider = function() {
  */
 const stopDragDivider = function() {
     isDividerDragging.value = false
-    // console.log(isDividerDragging.value)
     window.onmousemove = null
 }
 
-
 onMounted(()=>{
     window.addEventListener('mouseup', stopDragDivider);  
+    devStore.isPortrait = (window.innerWidth < window.innerHeight)
 })
 
 onBeforeUnmount(()=>{
@@ -190,7 +223,7 @@ onBeforeUnmount(()=>{
 </script>
 
 <style lang="scss" scoped>
-// @import './fakeqq.scss';
+
 .fakeqq-msglist {
     left: 0;
     top: 0;
@@ -198,6 +231,7 @@ onBeforeUnmount(()=>{
     position: absolute;
     height: calc(100vh - $base-tabbar-height);
     display: flex;
+    position: relative;
     .msglist__tabbar {
         position: relative;
         display: flex;
@@ -266,10 +300,13 @@ onBeforeUnmount(()=>{
         
         
     }
+
     .msglist__messages {
-        // border: 2px solid red;
+        display: flex;
+        flex-direction: column;
+        position: relative;
         min-width: 260px;
-        max-width: 500px;
+        // max-width: 500px;
         flex: 1;
         height: 100%;
         .msglist__messages__search {
@@ -319,6 +356,35 @@ onBeforeUnmount(()=>{
                     cursor: pointer;
                 }
 
+            }
+        }
+        .portrait__msglist__tabbar {
+            position: relative;
+            margin-top: auto; 
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: space-around;
+            background-color: #F3F2F7;
+            flex-direction: row; 
+            width: 100%; 
+            height: 54px; 
+            bottom: 0;
+
+            .portrait__msglist__tabbar__icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 8px; 
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+            }
+            .portrait__msglist__tabbar__icon:hover {
+                background-color: #DCDCDC;
+            }
+            .portrait__msglist__tabbar__icon__selected {
+                background-color: #DCDCDC;
             }
         }
     }
@@ -372,7 +438,7 @@ onBeforeUnmount(()=>{
 }
 
 .msglist__messages__menu__add {
-    // border: 2px solid red;
+
     .msglist__messages__menu__add__item {
         height: 30px;
         display: flex;
@@ -392,9 +458,11 @@ onBeforeUnmount(()=>{
 .el-popover.el-popper {
     padding: 5px !important;
 }
-// @media (orientation: portrait) {
-//   .layout_main {
-//     padding: 6px !important;
-//   }
-// }
+
+@media (orientation: portrait) {
+    .msglist__messages {
+        width: 100%;
+        max-width: 100vw;
+    }
+}
 </style>

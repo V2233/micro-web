@@ -7,7 +7,8 @@ export interface groupInfoType {
     member_count: number,
     msg_queue: groupMsgQueueItemType[] | [],
     member_list: groupMemberInfoType[],
-    searched?:boolean
+    searched?:boolean,
+    avatar?: string
 }
 
 export interface friendInfoType {
@@ -16,7 +17,8 @@ export interface friendInfoType {
     user_id: number,
     msg_queue: privateMsgQueueItemType[] | [],
     thumbs?: number,
-    searched?:boolean
+    searched?:boolean,
+    avatar?: string
 }
 
 export interface strangerInfoType {
@@ -43,7 +45,8 @@ export interface groupMemberInfoType {
     title: string,
     title_expire_time: number,
     card_changeable: boolean,
-    thumbs?: number
+    thumbs?: number,
+    avatar?: string
 }
 
 export interface groupSpecialTitleType {

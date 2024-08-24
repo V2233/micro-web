@@ -3,14 +3,16 @@
       :avatar="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${devStore[devStore.curAdapter].cur_self_info.user_id??userStore.masterQQ}`"
       :title="userStore.username"
       :messages-length="msgsSumCount"
+      :search-header-visible="searchHeaderVisible"
       state="在线"
       @click-tabbar="clickTabbar"
       @search-text="handleSearchContacts"
       @search-focused="isSearchBarFocused = $event"
+      @click-add="handleContactsAdd"
   >
     <template #messages>
       <!-- 消息列表 -->
-      <div v-if="curTabbarBtn == 'messages'">
+      <div v-if="curTabbarBtn == 'messages' && curHomeScene == 'tabbar'">
         <!-- 群消息列表 -->
         <div v-show="(isSearchBarFocused && row.searched) || !isSearchBarFocused"
           class="message-room-list" 
@@ -37,7 +39,9 @@
                 class="item"
                 v-if="row.msg_queue.length > 0"
                 :value="row.msg_queue.length" 
-                :max="99" >
+                :max="99" 
+                style="transform: scale(0.9);"
+              >
               </el-badge>
             </div>
           </div>
@@ -69,14 +73,16 @@
                 class="item"
                 v-if="row.msg_queue.length > 0"
                 :value="row.msg_queue.length" 
-                :max="99" >
+                :max="99" 
+                style="transform: scale(0.9);"
+              >
               </el-badge>
             </div>
           </div>
         </div>
       </div>
       <!-- 联系人列表 -->
-      <div v-if="curTabbarBtn == 'contacts'" class="contacts-list">
+      <div v-if="curTabbarBtn == 'contacts' && curHomeScene == 'tabbar'" class="contacts-list">
         <el-button class="contacts-friends-manager-btn">
           <el-icon><Avatar /></el-icon>好友管理器
         </el-button>
@@ -109,6 +115,7 @@
               </div>
             </el-collapse-item>
             <el-collapse-item title="我的好友" name="2">
+              <!-- 好友列表 -->
               <div class="message-room-list" v-for="(row,index) in devStore[devStore.curAdapter].friend_list" :key="index" @click="devStore.qqScene = 1">
                 <img class="message-room-avatar" :src="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${row.user_id}`"/>
                 <div class="message-room-info">
@@ -163,26 +170,94 @@
       </div>
 
       <!-- 设置 -->
-      <div v-if="curTabbarBtn == 'settings'" class="contacts-list" style="height: 100%; background-color: #F2F2F2; border: 0.1px solid #F2F2F2;">
+      <div v-if="curTabbarBtn == 'settings' && curHomeScene == 'tabbar'" class="contacts-list" style="height: 100%; background-color: #F2F2F2; border: 0.1px solid #F2F2F2;">
         <QQcard>
           <div class="card-list-item-flex">
             <span style="font-size: 13px;">缓存本地消息</span>
             <span class="card-desc">
-              <el-switch v-model="qqSettings.isMsgsSaved" class="ml-2" size="small"/>
+              <el-switch v-model="devStore[devStore.curAdapter].settings.local_storage" class="ml-2" size="small"/>
             </span>
-            <!-- <el-icon><ArrowRight /></el-icon> -->
+          </div>
+          <div class="card-list-divider"></div>
+          <div class="card-list-item-flex">
+            <span style="font-size: 13px;">启用心跳</span>
+            <span class="card-desc">
+              <el-switch v-model="devStore[devStore.curAdapter].settings.heart_beat" class="ml-2" size="small"/>
+            </span>
           </div>
           <div class="card-list-divider"></div>
           <div class="card-list-item-flex">
             <span style="font-size: 13px;">连接地址</span>
-            <span class="card-desc">
-              <el-input v-model="qqSettings.ip" size="small"/>
+            <span class="card-desc" style="width: calc(100% - 70px);" >
+              <el-input v-model="devStore[devStore.curAdapter].settings.ws_forward_address" size="small"/>
             </span>
-            <!-- <el-icon><ArrowRight /></el-icon> -->
           </div>
         </QQcard>
       </div>
 
+      <!-- ----------------以下是消息栏创建管理群聊板块------------------ -->
+      <!-- 创建群 -->
+      <div v-if="curHomeScene == 'group-create'" style="background-color: #F5F4F2; height: 100%; position: relative;">
+        <div class="fakeqq-header" style="background-color: #FFFFFF;">
+          <el-icon class="fakeqq-header__bth" size="24" @click="handleHomeBack"><ArrowLeft /></el-icon>
+        </div>
+
+        <div class="fakeqq-title-group-add" style="font-weight: 600px; margin: 20px; ">群名称和群头像</div>
+
+        <QQcard>
+          <div class="card-list-item-flex">
+            <span style="width: 100px;">群名称</span>
+            <el-input v-model="curNewGroupInfo.group_name" placeholder="填写群名称 (2-32个字)"></el-input>
+          </div>
+        </QQcard>
+
+        <QQcard>
+          <div class="card-list-item-flex">
+            <span style="width: 100px;">群头像</span>
+            <el-input v-model="curNewGroupInfo.group_avatar" placeholder="填写QQ群号可自动使用该群头像"></el-input>
+          </div>
+        </QQcard>
+
+        <div class="chatroom-drawer-footer">
+          <div class="chatroom-drawer-footer__invite__btn">
+            <el-button type="primary" :disabled="!curNewGroupInfo.group_name" @click="handleSettingItem({type: 'add_group', data: curNewGroupInfo})">
+              <span>立即创建</span>
+            </el-button>
+          </div>
+        </div>
+
+      </div>
+      <!-- 创建好友 -->
+      <div v-if="curHomeScene == 'friend-create'" style="background-color: #F5F4F2; height: 100%; position: relative;">
+        <div class="fakeqq-header" style="background-color: #FFFFFF;">
+          <el-icon class="fakeqq-header__bth" size="24" @click="handleHomeBack"><ArrowLeft /></el-icon>
+        </div>
+
+        <div class="fakeqq-title-group-add" style="font-weight: 600px; margin: 20px; ">好友昵称和头像</div>
+
+        <QQcard>
+          <div class="card-list-item-flex">
+            <span style="width: 100px;">好友昵称</span>
+            <el-input v-model="curNewGroupInfo.group_name" placeholder="填写好友昵称"></el-input>
+          </div>
+        </QQcard>
+
+        <QQcard>
+          <div class="card-list-item-flex">
+            <span style="width: 100px;">好友头像</span>
+            <el-input v-model="curNewGroupInfo.group_avatar" placeholder="填写真实QQ号可自动使用该头像"></el-input>
+          </div>
+        </QQcard>
+
+        <div class="chatroom-drawer-footer">
+          <div class="chatroom-drawer-footer__invite__btn">
+            <el-button type="primary" :disabled="!curNewGroupInfo.group_name" @click="handleSettingItem({type: 'add_friend', data: curNewGroupInfo})">
+              <span>立即创建</span>
+            </el-button>
+          </div>
+        </div>
+
+      </div>
     </template>
 
     <template #main>
@@ -201,19 +276,13 @@
         :input_disabled="input_disabled"
         @connect-ws="Ws.connect(devStore[devStore.curAdapter].cur_bot_id)"
         @send-input="sendMessage($event)"
-        @go-setting="handleDrawerSetting"
+        @go-setting="handleDrawerOpenOrClose"
         @multi-check="handleMultiMsgs"
-        @footer-btn="(curFooterBtn = $event,console.log($event),($event == 'none'?footerview_visible = false:footerview_visible = true))"
+        @footer-btn="(curFooterBtn = $event,($event == 'none'?footerview_visible = false:footerview_visible = true))"
       >
         
         <template #chat>
           <!-- <ToastMessage>2022/5/17 星期二 上午 10:58:39</ToastMessage>
-          <NormalMessage name="某痕" avatar="http://q.qlogo.cn/headimg_dl?dst_uin=1365197927&spec=100">
-            <QuoteMessage name="Evyde HF" time="2022/5/17 星期二 上午 10:58:39">[聊天记录]</QuoteMessage>
-            这个是<br />
-            我的真寻<br />
-            本来是用的sagiri
-          </NormalMessage>
           <FileMessage
             name="Sagiri"
             avatar="http://q.qlogo.cn/headimg_dl?dst_uin=762802224&spec=100"
@@ -231,7 +300,7 @@
             <!-- 机器人消息 -->
             <div v-if="((msg?.message && msg?.message?.length > 0) || msg.messages?.length > 0) && !msg.toast" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']" style="width: 100%; ">
               <NormalMessage
-                v-if="msg.message.some((s:MessageElem)=> s.type == 'text' || msg.message.length > 1)"
+                v-if="msg.message.some((s:MessageElem)=> s.type == 'text' || s.type == 'at' || s.type == 'button' || s.type == 'keyboard' || s.type == 'markdown' || msg.message.length > 1)"
                 :avatar="msg.sender?.avatar"
                 :name="msg.sender?.card?(msg.sender?.card):msg.sender?.nickname" 
                 :role="(msg.sender?.role)?(msg.sender?.role):''"
@@ -241,19 +310,19 @@
                 @avatar-operation="handleAvatarOperation($event,msg,id)"
                 @avatar-click="handleAvatarClick(msg)"
               >
-                <div v-for="(seg,segId) in msg.message">
+                <span v-for="(seg,segId) in msg.message" >
                   <QuoteMessage
                     v-if="seg.type == 'reply'"
                     :name="quoteMsgs[seg.data.id]?.sender.card??quoteMsgs[seg.data.id].sender.nickname" 
-                    :time="getFormatDate(new Date(quoteMsgs[seg.data.id].time * 1000),2)"
+                    :time="getFormatDate(new Date(quoteMsgs[seg.data.id].time),2)"
                   >
                     <div v-for="(quote, quoteId) in quoteMsgs[seg.data.id].message" :key="quoteId">
                       
                       <div v-if="quote.type == 'text'">{{ quote.data.text }}</div>
                       <el-image
                         v-else-if="quote.type == 'image'"
-                        :src="(quote.data.file as string).replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-                        :preview-src-list="[(quote.data.file as string).replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
+                        :src="(quote.data.file as string)"
+                        :preview-src-list="[(quote.data.file as string)]"
                         :initial-index="0"
                         style="width: 150px;"
                       />
@@ -267,18 +336,29 @@
                     style="white-space: pre-wrap; word-wrap: break-word; font-family: inherit;"
                   >{{ seg.data.text }}</pre>
                   <el-image
-                    v-if="seg.type == 'image' && msg.message?.length > 1"
-                    :src="seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-                    :preview-src-list="[seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
+                    v-if="seg.type == 'image'"
+                    :src="seg.data.file"
+                    :preview-src-list="[seg.data.file]"
                     :initial-index="0"
                     style="width: 200px;"
                   />
                   <img 
-                    v-if="seg.type == 'face' && msg.message?.length > 1"
+                    v-if="seg.type == 'face'"
                     :src="`/qfaces/s${seg.data.id}.gif`"
                     style="width: 24px;"
                   />
-                </div>
+                  <MarkdownMessage 
+                    v-if="seg.type == 'markdown'"
+                    :md-content="seg.data.content.content || '空消息'" 
+                    style="width: 300px;"
+                  />
+                  <ButtonMessage 
+                    v-if="seg.type == 'button' || seg.type == 'keyboard'" 
+                    v-model:btn-content="seg.data.content"
+                    style="width: 300px;"
+                    @btn-data="handleClickBtnMsg"
+                  />
+                </span>
               </NormalMessage>
               <ImageMessage
                 v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'image')"
@@ -286,13 +366,14 @@
                 :name="msg.sender?.card?(msg.sender?.card):msg.sender?.nickname" 
                 :role="(msg.sender?.role)?(msg.sender?.role):''"
                 :role_title="`${msg.sender?.level} ${(msg.sender?.title)?(msg.sender?.title):roleMap[msg.sender?.role]}`"
-                :src="msg.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-                :src-list="[msg.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
+                :src="msg.message[0].data.file"
+                :src-list="[msg.message[0].data?.file]"
                 :initial-index="0"
                 max-width="300px"
                 :onright="msg.isSelf"
                 @msg-operation="handleMsgOperation($event,msg,id)"
                 @avatar-operation="handleAvatarOperation($event,msg,id)"
+                @avatar-click="handleAvatarClick(msg)"
               />
               <ImageMessage
                 v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'face')"
@@ -305,6 +386,7 @@
                 :onright="msg.isSelf"
                 @msg-operation="handleMsgOperation($event,msg,id)"
                 @avatar-operation="handleAvatarOperation($event,msg,id)"
+                @avatar-click="handleAvatarClick(msg)"
               />
               <VoiceMessage
                 v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'record')"
@@ -312,11 +394,12 @@
                 :name="msg.sender?.card?(msg.sender?.card):msg.sender?.nickname" 
                 :role="(msg.sender?.role)?(msg.sender?.role):''"
                 :role_title="`${msg.sender?.level} ${(msg.sender?.title)?(msg.sender?.title):roleMap[msg.sender?.role]}`"
-                :src="msg.message[0].data.file.replace(/^base64:\/\//,'data:audio/mp3;base64,')"
+                :src="msg.message[0].data.file"
                 :duration="15"
                 :onright="msg.isSelf"
                 @msg-operation="handleMsgOperation($event,msg,id)"
                 @avatar-operation="handleAvatarOperation($event,msg,id)"
+                @avatar-click="handleAvatarClick(msg)"
               />
               <VideoMessage
                 v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'video')"
@@ -324,11 +407,12 @@
                 :name="msg.sender?.card?(msg.sender?.card):msg.sender?.nickname" 
                 :role="(msg.sender?.role)?(msg.sender?.role):''"
                 :role_title="`${msg.sender?.level} ${(msg.sender?.title)?(msg.sender?.title):roleMap[msg.sender?.role]}`"
-                :src="msg.message[0].data.file.replace(/^base64:\/\//,'data:video/mp4;base64,')"
+                :src="msg.message[0].data.file"
                 max-width="300px"
                 :onright="msg.isSelf"
                 @msg-operation="handleMsgOperation($event,msg,id)"
                 @avatar-operation="handleAvatarOperation($event,msg,id)"
+                @avatar-click="handleAvatarClick(msg)"
               />
               <ForwardMessage
                 v-if="msg.messages && msg.messages?.length > 0 && msg.messages?.some((s:MessageElem) => s.type == 'node')"
@@ -341,9 +425,10 @@
                 :contents="makeForwardPreview(msg.messages)"
                 :counts="makeForwardPreview(msg.messages).length"
                 :onright="msg.isSelf"
-                @click="(devStore.qqScene = 2,curForwardMessages = msg)"
+                @msg-click="(devStore.qqScene = 2,curForwardMessages = msg)"
                 @msg-operation="handleMsgOperation($event,msg,id)"
                 @avatar-operation="handleAvatarOperation($event,msg,id)"
+                @avatar-click="handleAvatarClick(msg)"
               />
             </div>
             <!-- toast消息 -->
@@ -351,60 +436,8 @@
               <ToastMessage v-if="msg.toast.isDeleted">{{ msg.sender?.card?(msg.sender?.card):msg.sender?.nickname }} 撤回了一条消息</ToastMessage>
               <ToastMessage v-if="msg.toast.notice_time">{{ msg.toast.notice_time }}</ToastMessage>
               <ToastMessage v-if="msg.toast.poke">{{ msg.toast.poke }}</ToastMessage>
+              <ToastMessage v-if="msg.toast.text">{{ msg.toast.text }}</ToastMessage>
             </div>
-            <!-- 自己的消息 -->
-            <!-- <div v-if="msg.isSelf == true && msg.message && msg.message?.length > 0" :class="[multicheckIndex[id] ? 'chatroom-msg-checked' : '']" style="width: 100%;">
-              <NormalMessage
-                v-if="msg.message.some((s:MessageElem)=> s.type == 'text' || msg.message.length > 1)"
-                :avatar="msg.sender?.avatar"
-                :name="msg.sender?.card??msg.sender?.nickname"
-                role="owner"
-                role_title="LV1"
-                onright
-                @msg-operation="handleMsgOperation($event,msg,id)"
-              >
-                <div v-for="(seg,segId) in msg.message">
-                  <span v-if="seg.type == 'text'">{{ seg.data.text }}</span>
-                  <el-image 
-                    v-if="seg.type == 'image' && msg.message.length > 1"
-                    :src="seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-                    :preview-src-list="[seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
-                    :initial-index="0"
-                    style="width: 200px;"
-                  />
-                  <img 
-                    v-if="seg.type == 'face' && msg.message.length > 1"
-                    :src="`/qfaces/s${seg.data.id}.gif`"
-                    style="width: 24px;"
-                  />
-                </div>
-              </NormalMessage>
-              <ImageMessage
-                v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'image')"
-                :avatar="msg.sender?.avatar"
-                :name="msg.sender?.card??msg.sender?.nickname" 
-                role="owner"
-                role_title="LV1"
-                :src="msg.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-                :src-list="[msg.message[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
-                :initial-index="0"
-                max-width="300px"
-                onright
-                @msg-operation="handleMsgOperation($event,msg,id)"
-              />
-              <ImageMessage
-                v-if="msg.message.length == 1 && msg.message.some((s:MessageElem) => s.type == 'face')"
-                :avatar="msg.sender?.avatar"
-                :name="msg.sender?.card??msg.sender?.nickname" 
-                role="owner"
-                role_title="LV1"
-                :src="`/qfaces/s${msg.message[0]?.data?.id}.gif`"
-                max-width="80px"
-                onright
-                @msg-operation="handleMsgOperation($event,msg,id)"
-              />
-              
-            </div> -->
           </div>
         </template>
         <template #drawer>
@@ -426,6 +459,12 @@
                 style="cursor: pointer;"
               >
                 完成
+              </span>
+              <!-- 占个位 -->
+              <span class="fakeqq-header__bth" 
+                v-if="curDrawerData.scene == 3 || curDrawerData.scene == 4 || curDrawerData.scene == 5" 
+                style="cursor: pointer;"
+              >
               </span>
           </div>
           <!-- 点击右上角菜单进入设置卡 -->
@@ -614,6 +653,82 @@
               </QQcard>
             </div>
           </div>
+          <!-- 群成员邀请列表 -->
+          <div v-if="curDrawerData.scene == 3">
+            <div class="message-room-list" v-for="(row,index) in devStore[devStore.curAdapter].friend_list" 
+              :key="index" 
+            >
+              <div class="chatroom-multicheck-box" style="width: 50px;">
+                <el-icon class="chatroom-multicheck-icon-checked" v-if="multicheckIndex[index]" color="#0099FF" size="24" @click="handleCheckFriend(index)"><CircleCheckFilled /></el-icon>
+                <el-icon class="chatroom-multicheck-icon-unchecked" v-if="!multicheckIndex[index]" color="#C7C7C7" size="24" @click="handleCheckFriend(index)"><Remove /></el-icon>
+              </div>
+              <img class="message-room-avatar" :src="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${row.user_id}`"/>
+              <div class="message-room-info">
+                <div class="message-room-info-top" style="height: 100%; display: flex; align-items: center;">
+                  <span style="font-size: 14px;">{{ row.nickname }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="chatroom-drawer-footer">
+              <div class="chatroom-drawer-footer__invite__btn">
+                <el-button type="primary" :disabled="isCheckedMembers.length == Object.keys(multicheckIndex).length" @click="handleSettingItem({type: 'add-group-member', data: {}})">立即邀请
+                  <span v-if="isCheckedMembers.length < Object.keys(multicheckIndex).length">{{'(' + (Object.keys(multicheckIndex).length - isCheckedMembers.length) + ')' }}</span>
+                </el-button>
+              </div>
+            </div>
+          </div>
+          <!-- 群成员移除列表 -->
+          <div v-if="curDrawerData.scene == 4">
+            <div class="message-room-list" v-for="(row,index) in curGroup.member_list" 
+              :key="index" 
+            >
+              <div class="chatroom-multicheck-box" style="width: 50px;">
+                <el-icon class="chatroom-multicheck-icon-checked" v-if="multicheckIndex[index]" color="#0099FF" size="24" @click="handleCheckGroupMember(index)"><CircleCheckFilled /></el-icon>
+                <el-icon class="chatroom-multicheck-icon-unchecked" v-if="!multicheckIndex[index]" color="#C7C7C7" size="24" @click="handleCheckGroupMember(index)"><Remove /></el-icon>
+              </div>
+              <img class="message-room-avatar" :src="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${row.user_id}`"/>
+              <div class="message-room-info">
+                <div class="message-room-info-top" style="height: 100%; display: flex; align-items: center;">
+                  <span style="font-size: 14px;">{{ row.nickname }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="chatroom-drawer-footer">
+              <div class="chatroom-drawer-footer__invite__btn">
+                <el-button type="primary" :disabled="Object.keys(multicheckIndex).length == 0" @click="handleSettingItem({type: 'remove-group-member', data: {}})">移除
+                  <span v-if="Object.keys(multicheckIndex).length > 0">{{'(' + Object.keys(multicheckIndex).length + ')' }}</span>
+                </el-button>
+              </div>
+            </div>
+          </div>
+          <!-- 群/好友选择列表 -->
+          <div v-if="curDrawerData.scene == 5">
+            <div class="message-room-list" v-for="(row,index) in devStore[devStore.curAdapter].friend_list" 
+              :key="index" 
+              @click="handleSendMultiMsgs(row)"
+            >
+              <img class="message-room-avatar" :src="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${row.user_id}`"/>
+              <div class="message-room-info">
+                <div class="message-room-info-top" style="height: 100%; display: flex; align-items: center;">
+                  <span style="font-size: 14px;">{{ row.nickname }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="message-room-list" 
+              v-for="(row,index) in devStore[devStore.curAdapter].group_list" 
+              :key="index" 
+              @click="handleSendMultiMsgs(row)"
+            >
+              <img class="message-room-avatar" :src="`https://p.qlogo.cn/gh/${row.group_id}/${row.group_id}/640`"/>
+              <div class="message-room-info">
+                <div class="message-room-info-top" style="height: 100%; display: flex; align-items: center;">
+                  <span class="message-room-info-top-content">{{ row.group_name }}</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </template>
         <!-- at触发时弹出列表 -->
         <template #atlist v-if="devStore[devStore.curAdapter].cur_message_type == 'group'">
@@ -641,7 +756,7 @@
             <div class="face-box">
               <el-image class="face-image" v-for="face in faceData" :key="face.QSid"
                 :src="`/qfaces-static/s${face.QSid}.png`"
-                @click="sendMessage({type: 'face', data: {id: face.QSid}})" />
+                @click="chatWindowRef.inputValue += `[CQ:face,id=${face.QSid}]`" />
             </div>
           </div>
           <!-- 文件上传 -->
@@ -684,7 +799,7 @@
                 role="member"
                 role_title="LV1"
               >
-                <div v-for="(seg,segId) in node.data?.content">
+                <span v-for="(seg,segId) in node.data?.content">
                   <span v-if="seg.type == 'at'" style="color: blue;">
                     @{{ seg.data.qq }}
                   </span>
@@ -693,8 +808,8 @@
                   >{{ seg.data.text }}</pre>
                   <el-image 
                     v-if="seg.type == 'image' && node.data?.content.length > 1"
-                    :src="seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-                    :preview-src-list="[seg.data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
+                    :src="seg.data.file"
+                    :preview-src-list="[seg.data.file]"
                     :initial-index="0"
                     style="width: 200px;"
                   />
@@ -703,7 +818,7 @@
                     :src="`/qfaces/s${seg.data.id}.gif`"
                     style="width: 24px;"
                   />
-                </div>
+                </span>
               </NormalMessage>
               <ImageMessage
                 v-if="node.data.content.length == 1 && node.data.content.some((s:MessageElem) => s.type == 'image')"
@@ -711,8 +826,8 @@
                 :name="node.data?.name" 
                 role="member"
                 role_title="LV1"
-                :src="node.data.content[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')"
-                :src-list="[node.data.content[0].data.file.replace(/^base64:\/\//,'data:image/jpeg;base64,')]"
+                :src="node.data.content[0].data.file"
+                :src-list="[node.data.content[0].data.file]"
                 :initial-index="0"
                 max-width="300px"
               />
@@ -731,7 +846,7 @@
                 :name="node.data?.name" 
                 role="member"
                 role_title="LV1"
-                :src="node.data.content[0].data.file.replace(/^base64:\/\//,'data:audio/mp3;base64,')"
+                :src="node.data.content[0].data.file"
                 :duration="15"
               />
               <VideoMessage
@@ -740,7 +855,7 @@
                 :name="node.data?.name" 
                 role="member"
                 role_title="LV1"
-                :src="node.data.content[0].data.file.replace(/^base64:\/\//,'data:video/mp4;base64,')"
+                :src="node.data.content[0].data.file"
                 max-width="300px"
               />
             </div>
@@ -762,6 +877,9 @@ import QuoteMessage from './components/messages/quote.vue'
 import ForwardMessage from './components/messages/forward.vue'
 import VoiceMessage from './components/messages/voice.vue'
 import VideoMessage from './components/messages/video.vue'
+import MarkdownMessage from './components/messages/markdown.vue'
+import ButtonMessage from './components/messages/button.vue'
+
 import FileMessage from './components/messages/file.vue'
 
 // QQ-messagesList
@@ -785,7 +903,7 @@ import useDevStore from '@/store/modules/dev';
 import useUserStore from '@/store/modules/user'
 import { reqBotInfo } from '@/api/dev/plugin'
 import type { BotInfoListType, BotInfoResponseType } from '@/api/dev/plugin/type'
-import { ref, reactive, onMounted, computed, watch } from 'vue'
+import { ref, reactive, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue'
 
 import type { MessageElem,NodeElem } from './protocol/onebotv11/message/message.elem'
 import type { groupMsgQueueItemType,msgQueueItemType,privateMsgQueueItemType, queueItemType } from './protocol/onebotv11/event/type'
@@ -795,7 +913,6 @@ import type { drawerDataType } from './types/drawer'
 import msgQueueController from './protocol/onebotv11/queue/msgQueue'
 import Events from './protocol/onebotv11/event/event'
 import Onebot from './protocol/ws'
-import { nextTick } from 'vue'
 
 const Ws = ref(new Onebot())
 
@@ -805,6 +922,12 @@ const devStore = useDevStore()
 
 /** 获取聊天框实例 */
 const chatWindowRef = ref()
+
+/** 当前的沙盒导航页 */
+const curHomeScene = ref('tabbar')
+
+/** 搜索栏是否可见 */
+const searchHeaderVisible = ref(true)
 
 /** bot信息列表 */
 const botInfoList = ref<BotInfoListType>([])
@@ -826,6 +949,12 @@ const isSearchBarFocused = ref(false)
 
 /** 搜索到的 */
 const searchedList = ref([])
+
+/** 正在创建的群聊数据 */
+const curNewGroupInfo = reactive({
+  group_name: '',
+  group_avatar: ''
+})
 
 
 /** 当前抽屉内容 */
@@ -885,6 +1014,12 @@ const multicheckIndex = ref<any>({})
 /** 是否为多选模式 */
 const isMultiCheckMode = ref(false)
 
+/** 标记转发类型是单独转发还是合并 */
+const curForwardMode = ref<'forward' | 'multiforward'>('forward') 
+
+/** 邀请成员时已存在的成员 */
+const isCheckedMembers = ref<number[]>([])
+
 /** 聊天室的header是否可见 */
 const chatHeaderVisible = ref(true)
 
@@ -915,49 +1050,61 @@ const footerview_visible = ref(false)
 /** 当前正在弹出的底部工具栏类型 */
 const curFooterBtn = ref<'face' | 'file' | 'audio' | 'none'>('none')
 
-/** 沙盒设置 */
-const qqSettings = reactive({
-  isMsgsSaved: false,
-  ip: '127.0.0.1'
-})
-
 /** 自动记录抽屉场景变化 */
 watch(()=>curDrawerData.scene,(oldValue,newValue)=>{
   curDrawerData.last_scene = newValue
 })
 
+/** 监听群聊事件上报 */
+// watch(()=>curGroup.value.member_list,(oldValue,newValue)=>{
+//   const oldUserId = oldValue.map(item=>item.user_id)
+//   if(oldValue.length < newValue.length) {
+//     newValue.forEach(item=>{
+//       if(!oldUserId.includes(item.user_id)) {
+//         Ws.value.bot?.send(JSON.stringify(Events.group_increase(curGroup.value.group_id,item.user_id,devStore[devStore.curAdapter].cur_self_info.user_id,'invite')))
+//       }
+//     })
+//   }
+// })
+
 /**
  * 折叠面板折叠事件
  */
 const handleChange = (val: string[]) => {
-  console.log(val)
+  // console.log(val)
 }
 
 /** 处理联系人搜索 */
 const handleSearchContacts = (text:string) => {
   console.log(text)
   devStore[devStore.curAdapter].group_list.forEach((group,i) => {
-    // if(group.group_name.includes(text) || String(group.group_id).includes(text)) {
-    //   devStore[devStore.curAdapter].group_list[i].searched = true
-    // } else {
-    //   devStore[devStore.curAdapter].group_list[i].searched = false
-    // }
     if(text == '') {
       return group.searched = false
     }
     group.searched = (group.group_name.includes(text) || String(group.group_id).includes(text))
   })
   devStore[devStore.curAdapter].friend_list.forEach((friend,i) => {
-    // if(friend.nickname.includes(text) || String(friend.user_id).includes(text)) {
-    //   devStore[devStore.curAdapter].friend_list[i].searched = true
-    // } else {
-    //   devStore[devStore.curAdapter].friend_list[i].searched = false
-    // }
     if(text == '') {
       return friend.searched = false
     }
     friend.searched = (friend.nickname.includes(text) || String(friend.user_id).includes(text)); 
   })
+}
+
+/** 联系人添加按钮事件 */
+const handleContactsAdd = (e:string) => {
+  console.log(e)
+  switch(e) {
+    case 'create-group':
+      curHomeScene.value = 'group-create'
+      searchHeaderVisible.value = false
+      break;
+    case 'create-friend':
+      curHomeScene.value = 'friend-create'
+      searchHeaderVisible.value = false
+      break;
+    default:
+  }
 }
 
 /** 处理点击事件 */
@@ -1018,7 +1165,7 @@ const sendMessage = (seg:MessageElem | MessageElem[]) => {
 
     if(msgQueueController.curQueueType == 'group') {
       let groupMsg = Events.group_message({
-        message_id: Math.round(Date.now() / 1000),
+        message_id: Math.round(Date.now()),
         group_id: (curGroup.value as groupInfoType)?.group_id,
         user_id: devStore[devStore.curAdapter].cur_self_info.user_id,
         nickname: (curGroupSelfInfo.value as groupMemberInfoType)?.nickname,
@@ -1033,7 +1180,7 @@ const sendMessage = (seg:MessageElem | MessageElem[]) => {
       const tempQueue = msgQueueController.curGroup?.msg_queue
 
       if(tempQueue?.length && tempQueue?.length > 0) {
-        const timeDif = Date.now() - tempQueue[tempQueue.length - 1].time * 1000
+        const timeDif = Date.now() - tempQueue[tempQueue.length - 1].time
         if(timeDif > 10000) msgQueueController.groupQueue_push({...groupMsg, message: [],isSelf: true, toast: {notice_time: getFormatDate(new Date(),3)}})
       }
 
@@ -1044,7 +1191,7 @@ const sendMessage = (seg:MessageElem | MessageElem[]) => {
 
     if(msgQueueController.curQueueType == 'private') {
       let privateMsg = Events.private_message({
-        message_id: Math.round(Date.now() / 1000),
+        message_id: Math.round(Date.now()),
         user_id: devStore[devStore.curAdapter].cur_self_info.user_id,
         nickname: (curGroupSelfInfo.value as groupMemberInfoType)?.nickname,
         message: message,
@@ -1054,7 +1201,7 @@ const sendMessage = (seg:MessageElem | MessageElem[]) => {
       const tempQueue = msgQueueController.curPrivate?.msg_queue
 
       if(tempQueue?.length && tempQueue?.length > 0) {
-        const timeDif = Date.now() - tempQueue[tempQueue.length - 1].time * 1000
+        const timeDif = Date.now() - tempQueue[tempQueue.length - 1].time
         if(timeDif > 10000) msgQueueController.groupQueue_push({...privateMsg, message: [],isSelf: true, toast: {notice_time: getFormatDate(new Date(),3)}})
       }
 
@@ -1180,10 +1327,13 @@ const handleMsgOperation = async(e:{type:string},msg:queueItemType,id:number) =>
   }
 }
 
-/** 发送通知事件@todo */
+/** 
+ * 发送通知事件@todo
+ * 实际通知伴随动作发送，不再统一放到该方法
+ */
 const sendNotice = (type: string, $event: any) => {
   let myMsg = Events.group_message({
-    message_id: Math.round(Date.now() / 1000),
+    message_id: Math.round(Date.now()),
     group_id: (curGroup.value as groupInfoType)?.group_id,
     user_id: devStore[devStore.curAdapter].cur_self_info.user_id,
     nickname: (curGroupSelfInfo.value as groupMemberInfoType)?.nickname,
@@ -1208,6 +1358,9 @@ const sendNotice = (type: string, $event: any) => {
       } else {
         msgQueueController.privateQueue_push(pokeMsg)
       }
+      break;
+    case 'group_increase':
+
       break;
     default: 
       return
@@ -1249,6 +1402,35 @@ const handleAvatarOperation = (e:any, msg:groupMsgQueueItemType, id:number) => {
   }
 }
 
+/** 处理按钮消息点击事件 */
+const handleClickBtnMsg = (btn:any) => {
+  console.log(btn)
+  if(btn?.action?.enter == false) {
+    chatWindowRef.value.inputValue += btn.action.data
+  } else {
+    const message:MessageElem[] = [{type: 'text', data: { text: btn.action.data}}]
+    if(devStore[devStore.curAdapter].cur_message_type == 'group') {
+      let groupMsg = Events.group_message({
+        message_id: Math.round(Date.now()),
+        group_id: (curGroup.value as groupInfoType)?.group_id,
+        user_id: devStore[devStore.curAdapter].cur_self_info.user_id,
+        nickname: (curGroupSelfInfo.value as groupMemberInfoType)?.nickname,
+        message: message,
+        raw_message: Events.makeCQ(message),
+        role: (curGroupSelfInfo.value as groupMemberInfoType)?.role,
+        card: (curGroupSelfInfo.value as groupMemberInfoType)?.card,
+        level: (curGroupSelfInfo.value as groupMemberInfoType)?.level,
+        title: (curGroupSelfInfo.value as groupMemberInfoType)?.title,
+      })
+      msgQueueController.groupQueue_push({...groupMsg,isSelf: true})
+      Ws.value.bot?.send(JSON.stringify(groupMsg))
+    } else {
+      ElMessage.error('直接发送仅在群聊使用！')
+      return
+    }
+  }
+}
+
 /** 多选逻辑 */
 const handleMultiCheck = (index:number) => {
   if(multicheckIndex.value[index] === null || multicheckIndex.value[index] === undefined) {
@@ -1261,6 +1443,28 @@ const handleMultiCheck = (index:number) => {
     footer_type.value = 'MultiCheck'
   } else {
     footer_type.value = 'Input'
+  }
+}
+
+/** 选择好友 */
+const handleCheckFriend = (index:number) => {
+  if(isCheckedMembers.value.includes(devStore[devStore.curAdapter].friend_list[index].user_id)) {
+    ElMessage.error('该成员已在群聊中！')
+    return
+  }
+  if(multicheckIndex.value[index] === null || multicheckIndex.value[index] === undefined) {
+    multicheckIndex.value[index] = true
+  } else {
+    delete multicheckIndex.value[index]
+  }
+}
+
+/** 选择群成员 */
+const handleCheckGroupMember = (index:number) => {
+  if(multicheckIndex.value[index] === null || multicheckIndex.value[index] === undefined) {
+    multicheckIndex.value[index] = true
+  } else {
+    delete multicheckIndex.value[index]
   }
 }
 
@@ -1279,10 +1483,20 @@ const handleMultiMsgs = (type:string) => {
   console.log(multicheckIndex.value)
   switch(type) {
     case 'forward':
-      
+      curForwardMode.value = 'forward'
+      footer_type.value = 'Input'
+      isMultiCheckMode.value = false
+      curDrawerData.scene = 5
+      curDrawerData.title = '发送给'
+      chatWindowRef.value.isDrawerOpen = true
       break;
     case 'multiforward':
-
+      curForwardMode.value = 'multiforward'
+      footer_type.value = 'Input'
+      isMultiCheckMode.value = false
+      curDrawerData.scene = 5
+      curDrawerData.title = '发送给'
+      chatWindowRef.value.isDrawerOpen = true
       break;
     case 'delete':
       // 确保从高索引删除到低索引
@@ -1303,8 +1517,164 @@ const handleMultiMsgs = (type:string) => {
 
 }
 
+/** 处理多选消息后的转发@todo */
+const handleSendMultiMsgs = (target: groupInfoType | friendInfoType) => {
+  console.log(target)
+  const { cur_message_type } = devStore[devStore.curAdapter]
+  if('group_id' in target) {
+    
+    if(curForwardMode.value === 'multiforward') {
+
+      const nodeData:NodeElem[] = []
+      Object.keys(multicheckIndex.value).forEach((i)=>{
+
+        const queue = cur_message_type == 'group'?curGroup.value.msg_queue[Number(i)]:curPrivate.value.msg_queue[Number(i)]
+        nodeData.push({type: 'node', data: {
+          name: queue.sender?.nickname || devStore[devStore.curAdapter].cur_self_info.nickname,
+          uin: queue.sender?.user_id || devStore[devStore.curAdapter].cur_self_info.user_id,
+          content: queue.message
+        }})
+      })
+
+      curDrawerData.scene = 0
+      chatWindowRef.value.isDrawerOpen = false
+      multicheckIndex.value = {}
+      devStore[devStore.curAdapter].cur_group_id = target.group_id
+      devStore[devStore.curAdapter].cur_message_type = 'group'
+
+      const curGroupSelf = curGroupSelfInfo.value as groupMemberInfoType
+
+      console.log(curGroupSelf)
+
+      if(!curGroupSelf) {
+        ElMessage.error('你不在该群聊，无法转发！')
+        return
+      }
+
+      let myMsg = Events.group_message({
+        message_id: Math.round(Date.now()),
+        group_id: target.group_id,
+        user_id: curGroupSelf.user_id,
+        nickname: curGroupSelf?.nickname,
+        message: [],
+        messages: nodeData,
+        raw_message: Events.makeCQ([]),
+        role: curGroupSelf?.role,
+        card: curGroupSelf?.card,
+        level: curGroupSelf?.level,
+        title: curGroupSelf?.title,
+      })
+
+      msgQueueController.groupQueue_push({...myMsg, isSelf: true})
+      Ws.value.bot?.send(JSON.stringify(myMsg))
+
+    } else if(curForwardMode.value === 'forward') {
+      let queues:queueItemType[] = []
+      Object.keys(multicheckIndex.value).forEach((i)=>{
+        queues.push(cur_message_type == 'group'?curGroup.value.msg_queue[Number(i)]:curPrivate.value.msg_queue[Number(i)])
+      })
+
+      curDrawerData.scene = 0
+      chatWindowRef.value.isDrawerOpen = false
+      multicheckIndex.value = {}
+      devStore[devStore.curAdapter].cur_group_id = target.group_id
+      devStore[devStore.curAdapter].cur_message_type = 'group'
+
+      const curGroupSelf = curGroupSelfInfo.value as groupMemberInfoType
+
+      if(!curGroupSelf) {
+        ElMessage.error('你不在该群聊，无法转发！')
+        return
+      }
+
+      let myMsg = Events.group_message({
+        message_id: Math.round(Date.now()),
+        group_id: target.group_id,
+        user_id: curGroupSelf.user_id,
+        nickname: curGroupSelf?.nickname,
+        message: [],
+        raw_message: Events.makeCQ([]),
+        role: curGroupSelf?.role,
+        card: curGroupSelf?.card,
+        level: curGroupSelf?.level,
+        title: curGroupSelf?.title,
+      })
+
+      queues.forEach((queue)=>{
+        msgQueueController.groupQueue_push({...myMsg, isSelf: true, message: queue.message})
+        Ws.value.bot?.send(JSON.stringify({...myMsg, message: queue.message}))
+      })
+    }
+
+  } else {
+    if(curForwardMode.value === 'multiforward') {
+
+      const nodeData:NodeElem[] = []
+
+      Object.keys(multicheckIndex.value).forEach((i)=>{
+        const queue = cur_message_type == 'group'?curGroup.value.msg_queue[Number(i)]:curPrivate.value.msg_queue[Number(i)]
+        nodeData.push({type: 'node', data: {
+          name: queue.sender?.nickname || devStore[devStore.curAdapter].cur_self_info.nickname,
+          uin: queue.sender?.user_id || devStore[devStore.curAdapter].cur_self_info.user_id,
+          content: queue.message
+        }})
+      })
+
+      curDrawerData.scene = 0
+      chatWindowRef.value.isDrawerOpen = false
+      multicheckIndex.value = {}
+      devStore[devStore.curAdapter].cur_private_id = target.user_id
+      devStore[devStore.curAdapter].cur_message_type = 'private'
+
+      const curPrivateSelf = devStore[devStore.curAdapter].cur_self_info
+
+      console.log(curPrivateSelf)
+
+      let myMsg = Events.private_message({
+        message_id: Math.round(Date.now()),
+        user_id: curPrivateSelf.user_id,
+        nickname: curPrivateSelf.nickname,
+        message: [],
+        messages: nodeData,
+        raw_message: Events.makeCQ([]),
+      })
+
+      msgQueueController.privateQueue_push({...myMsg, isSelf: true})
+      Ws.value.bot?.send(JSON.stringify(myMsg))
+
+    } else if(curForwardMode.value === 'forward') {
+      let queues:queueItemType[] = []
+      Object.keys(multicheckIndex.value).forEach((i)=>{
+        queues.push(cur_message_type == 'group'?curGroup.value.msg_queue[Number(i)]:curPrivate.value.msg_queue[Number(i)])
+      })
+
+      curDrawerData.scene = 0
+      chatWindowRef.value.isDrawerOpen = false
+      multicheckIndex.value = {}
+      devStore[devStore.curAdapter].cur_private_id = target.user_id
+      devStore[devStore.curAdapter].cur_message_type = 'private'
+
+      const curPrivateSelf = devStore[devStore.curAdapter].cur_self_info
+
+      let myMsg = Events.private_message({
+        message_id: Math.round(Date.now()),
+        user_id: curPrivateSelf.user_id,
+        nickname: curPrivateSelf.nickname,
+        message: [],
+        raw_message: Events.makeCQ([]),
+      })
+
+      queues.forEach((queue)=>{
+        msgQueueController.privateQueue_push({...myMsg, isSelf: true, message: queue.message})
+        Ws.value.bot?.send(JSON.stringify({...myMsg, message: queue.message}))
+      })
+    }
+  }
+    
+}
+
 /** 打开设置抽屉的事件处理 */
-const handleDrawerSetting = (isOpen:boolean) => {
+const handleDrawerOpenOrClose = (isOpen:boolean) => {
   if(isOpen) {
     footer_type.value = 'none'
     chatHeaderVisible.value = false
@@ -1337,12 +1707,185 @@ const handleSettingItem = (e:{type:string, data: unknown}) => {
   console.log(e)
   
   switch(e.type) {
-    /** 群资料事件 */
+    /** 设置群聊名称 */
     case 'group_name':
       curDrawerData.title = '群聊名称'
       curSettingInputValue.value = e.data as string
       curDrawerData.scene = 1
       break;
+    /** 添加群聊 */
+    case 'add_group':
+      const temp_group_id = isNaN(Number(curNewGroupInfo.group_avatar))?(Number(Math.random().toFixed(9)) * Math.pow(10,9)):Number(curNewGroupInfo.group_avatar)
+      devStore[devStore.curAdapter].group_list.push(Events.group_info({
+        group_id: temp_group_id,
+        group_name: curNewGroupInfo.group_name
+      }))
+      devStore[devStore.curAdapter].cur_group_id = temp_group_id
+      devStore[devStore.curAdapter].cur_message_type = 'group'
+      curHomeScene.value = 'tabbar'
+      searchHeaderVisible.value = true
+      // 邀请群管家
+      devStore[devStore.curAdapter].group_list[devStore[devStore.curAdapter].group_list.length - 1].member_list.push(Events.group_member({
+        group_id: temp_group_id,
+        user_id: 2854196310,
+        nickname: 'Q群管家'
+      }))
+      // 邀请自己
+      const temp_self_info = devStore[devStore.curAdapter].cur_self_info
+      devStore[devStore.curAdapter].group_list[devStore[devStore.curAdapter].group_list.length - 1].member_list.push(Events.group_member({
+        group_id: temp_group_id,
+        user_id: temp_self_info.user_id,
+        nickname: temp_self_info.nickname,
+        sex: temp_self_info.sex,
+        age: temp_self_info.age,
+        role: 'owner'
+      }))
+      const message:MessageElem[] = [
+        {type: 'at', data: {qq: String(devStore[devStore.curAdapter].cur_self_info.user_id)}},
+        {type: 'text', data: {text: '创建群聊成功！\n分享群聊，邀请好友加入。'}}
+      ]
+      const QButlerMsg = Events.group_message({
+        message_id: Math.round(Date.now()),
+        group_id: temp_group_id,
+        user_id: 2854196310,
+        nickname: 'Q群管家',
+        message: message,
+        raw_message: Events.makeCQ(message),
+        role: 'bot',
+        card: 'Q群管家',
+        level: 'lv1',
+      })
+      msgQueueController.groupQueue_push({...QButlerMsg,message:[],toast:{text: `你邀请机器人 Q群管家 加入了群聊`}})
+      msgQueueController.groupQueue_push(QButlerMsg)
+      Ws.value.bot?.send(JSON.stringify(QButlerMsg))
+      break;
+    case 'add_friend':
+      const temp_user_id = isNaN(Number(curNewGroupInfo.group_avatar))?(Number(Math.random().toFixed(10)) * Math.pow(10,10)):Number(curNewGroupInfo.group_avatar)
+      devStore[devStore.curAdapter].friend_list.push(Events.friend_info({
+        user_id: temp_user_id,
+        nickname: curNewGroupInfo.group_name
+      }))
+      devStore[devStore.curAdapter].cur_private_id = temp_user_id
+      devStore[devStore.curAdapter].cur_message_type = 'private'
+      curHomeScene.value = 'tabbar'
+      searchHeaderVisible.value = true
+      break;
+    /** 邀请好友 */
+    case 'group_member_invite':
+      curDrawerData.title = '邀请新成员'
+      const groupMemberIds = curGroup.value.member_list.map((member)=>member.user_id)
+      isCheckedMembers.value = []
+      devStore[devStore.curAdapter].friend_list.forEach((friend,friendId)=>{
+        if(groupMemberIds.includes(friend.user_id)) {
+          multicheckIndex.value[friendId] = true
+          isCheckedMembers.value.push(friend.user_id)
+        }
+      })
+      curDrawerData.scene = 3
+      break;
+    case 'group_member_decrease':
+      curDrawerData.title = '选择成员'
+      curDrawerData.scene = 4
+      break;
+    case 'add-group-member':
+      // 新成员user_id
+      const newMembers:friendInfoType[] = []
+      Object.keys(multicheckIndex.value).forEach(i=>{
+        const friend = devStore[devStore.curAdapter].friend_list[Number(i)]
+        if(!isCheckedMembers.value.includes(friend.user_id)) {
+          devStore[devStore.curAdapter].group_list[curGroupIndex.value].member_list.push(Events.group_member({
+            group_id: curGroup.value.group_id,
+            user_id: friend.user_id,
+            nickname: friend.nickname
+          }))
+          newMembers.push(friend)
+        }
+      })
+      isCheckedMembers.value = []
+      multicheckIndex.value = {}
+      curDrawerData.scene = 0
+      chatWindowRef.value.isDrawerOpen = false
+      // Q群管家欢迎
+      const QBulter = curGroup.value.member_list.find(member=>member.user_id == 2854196310)
+      if(QBulter) {
+        newMembers.forEach((newMember) => {
+          const message:MessageElem[] = [
+            {type: 'at', data: {qq: String(newMember.user_id)}},
+            {type: 'text', data: {text: curDrawerData.body.bot_welcome}}
+          ]
+          const QButlerMsg = Events.group_message({
+            message_id: Math.round(Date.now()),
+            group_id: QBulter.group_id,
+            user_id: QBulter.user_id,
+            nickname: QBulter.nickname,
+            message: message,
+            raw_message: Events.makeCQ(message),
+            role: QBulter.role,
+            card: QBulter.card,
+            level: QBulter.level,
+          })
+          msgQueueController.groupQueue_push({...QButlerMsg,message:[],toast:{text: `你邀请 ${newMember.nickname} 加入了群聊`}})
+          msgQueueController.groupQueue_push(QButlerMsg)
+          Ws.value.bot?.send(JSON.stringify(QButlerMsg))
+          Ws.value.bot?.send(JSON.stringify(Events.group_increase(
+            curGroup.value.group_id,
+            newMember.user_id,
+            devStore[devStore.curAdapter].cur_self_info.user_id,
+            'invite'
+          )))
+        })
+      }
+      
+      break
+    /** 移除好友 */
+    case 'remove-group-member':
+      Object.keys(multicheckIndex.value).forEach(i=>{
+        // 先发消息再踢，不然索引没了
+        Ws.value.bot?.send(JSON.stringify(Events.group_decrease(
+          curGroup.value.group_id,
+          curGroup.value.member_list[Number(i)].user_id,
+          devStore[devStore.curAdapter].cur_self_info.user_id,
+          'kick'
+        )))
+        devStore[devStore.curAdapter].group_list[curGroupIndex.value].member_list.splice(Number(i),1)
+      })
+      multicheckIndex.value = {}
+      curDrawerData.scene = 0
+      chatWindowRef.value.isDrawerOpen = false
+      break;
+    /** 自己申请加群 */
+    case 'join_group':
+      devStore[devStore.curAdapter].group_list[curGroupIndex.value].member_list.push(Events.group_member({
+        group_id: curGroup.value.group_id,
+        user_id: devStore[devStore.curAdapter].cur_self_info.user_id,
+        nickname: devStore[devStore.curAdapter].cur_self_info.nickname
+      }))
+
+      const message2:MessageElem[] = [
+        {type: 'at', data: {qq: String(devStore[devStore.curAdapter].cur_self_info.user_id)}},
+        {type: 'text', data: {text: curDrawerData.body.bot_welcome}}
+      ]
+      const QButlerMsg2 = Events.group_message({
+        message_id: Math.round(Date.now()),
+        group_id: curGroup.value.group_id,
+        user_id: 2854196310,
+        nickname: 'Q群管家',
+        message: message2,
+        raw_message: Events.makeCQ(message2),
+        role: 'bot',
+        card: 'Q群管家',
+        level: 'lv1',
+      })
+      curDrawerData.scene = 0
+      chatWindowRef.value.isDrawerOpen = false
+      chatWindowRef.value.inputValue = ''
+      msgQueueController.groupQueue_push(QButlerMsg2)
+      Ws.value.bot?.send(JSON.stringify(Events.group_increase(
+        curGroup.value.group_id,
+        devStore[devStore.curAdapter].cur_self_info.user_id,
+        devStore[devStore.curAdapter].cur_self_info.user_id,
+        'approve'
+      )))
     case 'self_card':
       curDrawerData.title = '编辑群昵称'
       curSettingInputValue.value = e.data as string
@@ -1366,6 +1909,8 @@ const handleSettingItem = (e:{type:string, data: unknown}) => {
       devStore[devStore.curAdapter].group_list.splice(curGroupIndex.value,1)
       ElMessage.success('已解散该群聊！')
       devStore[devStore.curAdapter].cur_group_id = devStore[devStore.curAdapter].group_list[0].group_id
+      curDrawerData.scene = 0
+      chatWindowRef.value.isDrawerOpen = false
       break;
     case 'exit_group':
       let memberIndex = devStore[devStore.curAdapter].group_list[curGroupIndex.value].member_list.findIndex((member) => member.user_id == devStore[devStore.curAdapter].cur_self_info.user_id)
@@ -1521,19 +2066,41 @@ const handleSaveSettingItem = () => {
 
 /** 处理抽屉返回事件 */
 const handleDrawerBack = () => {
-  if(curDrawerData.scene == 0) {
-    chatWindowRef.value.isDrawerOpen = false
-  } else if(curDrawerData.scene == 1) {
-    if(curDrawerData.last_scene == 0) {
+
+  switch(curDrawerData.scene) {
+    case 0:
+      chatWindowRef.value.isDrawerOpen = false
+      break
+    case 1:
+      if(curDrawerData.last_scene == 0) {
+        curDrawerData.scene = 0
+        curDrawerData.title = '群聊设置'
+      } else if(curDrawerData.last_scene == 2) {
+        curDrawerData.scene = 2
+        curDrawerData.title = '资料卡'
+      }
+      break
+    case 2:
       curDrawerData.scene = 0
-      curDrawerData.title = '群聊设置'
-    } else if(curDrawerData.last_scene == 2) {
-      curDrawerData.scene = 2
-      curDrawerData.title = '资料卡'
-    }
-  } else if(curDrawerData.scene == 2) {
-    curDrawerData.scene = 0
+      break
+    case 3:
+      curDrawerData.scene = curDrawerData.last_scene
+      break
+    case 4:
+      curDrawerData.scene = curDrawerData.last_scene
+      break
+    default:
+      curDrawerData.scene = curDrawerData.last_scene
+      break
   }
+}
+
+/** 处理导航页点击返回事件 */
+const handleHomeBack = () => {
+  if(curHomeScene.value == 'group-create' || curHomeScene.value == 'friend-create') {
+    curHomeScene.value = 'tabbar'
+    searchHeaderVisible.value = true
+  } 
 }
 
 /** 合并群和私聊消息列表@deprecated */
@@ -1760,8 +2327,26 @@ const extraUploadData = reactive({
   uploadRef.value!.submit()
 }
 
+window.onresize = () => {
+  devStore.isPortrait = (window.innerWidth < window.innerHeight)
+  if(!devStore.isPortrait) {
+    devStore.qqScene = 0
+  }
+  if(devStore.isPortrait) {
+    devStore.qqScene = 1
+  }
+  console.log(devStore.isPortrait)
+  console.log(devStore.qqScene)
+}
+
 onMounted(() => {
   getBotInfo()
+  Ws.value.connect(devStore[devStore.curAdapter].cur_bot_id)
+})
+
+onBeforeUnmount(()=>{
+  window.onresize = null
+  Ws.value?.bot?.close()
 })
 </script>
 
@@ -1769,6 +2354,7 @@ onMounted(() => {
 
 .message-list {
   
+}
   .message-room-list {
     // border: 2px solid red;
     height: 60px;
@@ -1877,7 +2463,7 @@ onMounted(() => {
     background-color: #DFDFDF;
   }
 
-}
+
 
 .fakeqq-footer__members__list {
   .fakeqq-footer__members__list__item {
@@ -2042,6 +2628,22 @@ onMounted(() => {
       display: flex;
       justify-content: space-around;
     }
+  }
+}
+
+.chatroom-drawer-footer {
+  position: absolute; 
+  left: 0; 
+  bottom: 0; 
+  width: 100%; 
+  height: 60px; 
+  background-color: white;
+  display: flex;
+  align-items: center;
+  .chatroom-drawer-footer__invite__btn {
+    height: 30px; 
+    margin-left: auto; 
+    margin-right: 20px;
   }
 }
 

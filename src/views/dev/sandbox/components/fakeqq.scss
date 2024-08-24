@@ -47,6 +47,8 @@
 }
 
 .fakeqq-message__name {
+    display: flex;
+    align-items: center;
     margin-bottom: 5px;
     font-size: 12px;
     color: #8b8b8b;
@@ -56,7 +58,7 @@
     .fakeqq-message__title__admin {
         border-radius: 5px;
         margin: 0 2px;
-        padding: 0 5px;
+        padding: 2px 5px;
         font-size: 12px;
     }
 
@@ -74,10 +76,26 @@
         color: #BBBBBB;
         background-color: #E2E2E2; 
     }
+
+    .fakeqq-message__member__card__bot__logo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: fit-content;
+        margin-left: 5px;
+        margin-right: 5px;
+        background-color: #0A64FF;
+        border-radius: 3px;
+        padding: 1px;
+        font-size: 10px;
+        color: #FFFFFF;
+    }
 }
 
 .right-chat .fakeqq-message__name {
     text-align: right;
+    // border: 2px solid red;
+    align-self: flex-end;
 }
 
 .fakeqq-message__avatar {

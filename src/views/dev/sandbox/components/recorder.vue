@@ -21,6 +21,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted } from 'vue';  
 import { ElMessage } from 'element-plus';
+import { reqUploadFile } from '@/api/dev/sandbox'
 
 const $emit = defineEmits(['audioUrl'])
 
@@ -46,10 +47,16 @@ const startRecording = async () => {
       audioChunks.push(e.data);  
     };  
   
-    mediaRecorder.onstop = () => {  
+    mediaRecorder.onstop = async() => {  
       const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });  
       const audioUrl = URL.createObjectURL(audioBlob);
-      console.log(audioUrl)  
+      console.log(audioUrl) 
+      // const formData = new FormData();  
+      // formData.append('audio', audioBlob, 'audio.webm');
+      // let res:any = await reqUploadFile(formData)
+      // if(res.code == 200) {
+      //   console.log(res.data)
+      // } 
       $emit('audioUrl', {url: audioUrl});  
       audioChunks.length = 0; // 清空数据，准备下一次录音  
       isRecording.value = false;  

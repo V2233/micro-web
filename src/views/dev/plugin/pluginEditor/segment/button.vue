@@ -199,7 +199,7 @@ watch(() => props.btnContent, (newValue) => {
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .seg-btn-content.el-card {
     .el-card__body {
         padding: 5px;

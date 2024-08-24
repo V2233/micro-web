@@ -270,8 +270,9 @@ const goSetting = (closed?:boolean) => {
  * 获取插件信息
  */
 const getPluginsLoader = async() => {
+    // 缓存一下
+    if(pkgs.value?.length > 0) return
     let res:any = await reqPluginsLoader()
-    console.log(res)
     if(res.code == 200) {
         pkgs.value = res.data
     }
@@ -289,12 +290,13 @@ const handleInput = (type:string, i:any) => {
             isRegsVisible.value = false
             const [pkgId,jsId,regId] = (i as string).split('.').map(id => Number(id))
             const str = pkgs.value[pkgId]?.packPlugins[jsId]?.pluginFuns[regId]
-            const regex = /[\u4e00-\u9fa5a-zA-Z0-9]+/g;  
-            const reg = str.match(regex) ? str.match(regex).join('') : str;  
-            inputValue.value += reg
+            inputValue.value += str.replace(/【\d+】(:|：)/,'')
+            break;
         case "emoji":
             isRegsVisible.value = false
             inputValue.value += i.native
+            break;
+        default:
     }
 }
 
@@ -322,7 +324,7 @@ const handleSendInputValue = () => {
         $emit('sendInput', fromCqcode2(inputValue.value))
     } catch(err:any) {
         ElNotification({
-            title: 'Error',
+            title: '解析CQ码出错！',
             message: err.message,
             type: 'error',
             duration: 3000,
