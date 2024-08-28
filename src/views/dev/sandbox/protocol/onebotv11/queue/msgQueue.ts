@@ -15,6 +15,14 @@ export default new class msgQueueController {
         return devStore[devStore.curAdapter].friend_list.find((friend)=>friend.user_id == devStore[devStore.curAdapter].cur_bot_id)
     }
 
+    get isBotInCurScene() {
+        if(devStore[devStore.curAdapter].cur_message_type == 'group') {
+            return this.curGroup?.member_list.some(m=>m.user_id == devStore[devStore.curAdapter].cur_bot_id)
+        } else {
+            return this.curPrivate?.user_id == devStore[devStore.curAdapter].cur_bot_id
+        }
+    }
+
     /**
      * 获取当前群消息队列
      * @returns

@@ -8,7 +8,7 @@
 </template>  
   
 <script lang="ts" setup>  
-    import { ref, onMounted, computed } from 'vue';  
+    import { ref, onMounted } from 'vue';  
 
     const slide1 = ref();  
     const slide2 = ref();  
@@ -43,14 +43,29 @@
     const updateSlide = (slideRef:any, targetLi:any, isSlide2 = false) => {  
       if (!slideRef.value || !targetLi) return;  
   
-      const rect = targetLi.getBoundingClientRect();  
-      slideRef.value.style.opacity = '1';  
-      slideRef.value.style.left = `${rect.left - slideRef.value.parentElement.offsetLeft}px`; // 减去父元素的offsetLeft以确保正确定位  
-      slideRef.value.style.width = `${rect.width}px`;  
+      // const rect = targetLi.getBoundingClientRect();  
+      // slideRef.value.style.opacity = '1';  
+      // slideRef.value.style.left = `${rect.left - slideRef.value.parentElement.offsetLeft}px`; // 减去父元素的offsetLeft以确保正确定位  
+      // slideRef.value.style.width = `${rect.width}px`;  
   
+      // if (isSlide2) {  
+      //   slideRef.value.classList.add('squeeze');  
+      // }  
+
+      const navWidth = slideRef.value.parentElement.offsetWidth; // 获取导航栏的总宽度  
+      const index = Array.from(targetLi.parentElement.children).indexOf(targetLi); // 获取链接的索引  
+      const linkWidth = navWidth / 2; // 假设每个链接宽度相等，这里直接除以2  
+      
+      // 计算滑块的left属性  
+      const left = (index - 2) * linkWidth; // 索引乘以每个链接的宽度  
+      
+      slideRef.value.style.opacity = '1';  
+      slideRef.value.style.left = `${left + 5}px`;  
+      slideRef.value.style.width = `${linkWidth - 10}px`; // 设置滑块的宽度与链接相同  
+      
       if (isSlide2) {  
         slideRef.value.classList.add('squeeze');  
-      }  
+      }
     };  
 
     const $emit = defineEmits(['change'])
@@ -61,10 +76,6 @@
       updateSlide(slide1, activeLi);  
     });  
   
-    // 组件卸载时清理（可选）  
-    // onUnmounted(() => {  
-    //   // 如果需要，可以在这里添加清理代码  
-    // }); 
 </script> 
 
 <style scoped lang="scss">
@@ -77,7 +88,6 @@
       display: flex;
       list-style: none;
       background: #f5f5f5;
-      // box-shadow: 20px 40px 40px #00000033;
       padding: 5px;
   }
 

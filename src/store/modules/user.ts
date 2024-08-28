@@ -16,10 +16,8 @@ import router from '@/router'
 // 深拷贝
 //@ts-ignore
 import cloneDeep from 'lodash/cloneDeep'
-import { get } from 'lodash'
 
 // 过滤展示的异步路由
-
 function filterAsyncRoute(asyncRoute: any[], hiddenRoutes: string[]): any[] {
   return asyncRoute.filter((item: any) => {
     const itemName = (item.name || ''); // 将当前路由名称转换为小写  
@@ -44,7 +42,8 @@ let useUserStore = defineStore('User', {
       //存储当前用户是否包含某一个按钮
       buttons: [],
       /** 请求源，用于服务端提供链接 */
-      originAddress: ''
+      originAddress: '',
+      originPort: 23306,
     }
   },
   actions: {
@@ -102,6 +101,7 @@ let useUserStore = defineStore('User', {
       const { hostname, port, protocol, origin} = urlObj
       let res:any = await reqSaveServerAddress({hostname, port, protocol, origin})
       if(res.code == 200){
+        this.originPort = res.data.port
         return Promise.resolve('ok')
       } else {
         return Promise.reject(new Error(res.message))

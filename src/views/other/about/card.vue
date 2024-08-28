@@ -1,37 +1,26 @@
 <template>
     <div class="main">
         <div class="card">
-            <div class="fl">
-                <div class="fullscreen">
-                    <svg viewBox="0 0 30 30" class="fullscreen_svg">
-                        <path
-                            d="M3.563-.004a3.573 3.573 0 0 0-3.527 4.09l-.004-.02v28.141c0 1.973 1.602 3.57 3.57 3.57s3.57-1.598 3.57-3.57V12.218v.004l22.461 22.461a3.571 3.571 0 0 0 6.093-2.527c0-.988-.398-1.879-1.047-2.523L12.218 7.172h19.989c1.973 0 3.57-1.602 3.57-3.57s-1.598-3.57-3.57-3.57H4.035a3.008 3.008 0 0 0-.473-.035zM96.333 0l-.398.035.02-.004h-28.16a3.569 3.569 0 0 0-3.57 3.57 3.569 3.569 0 0 0 3.57 3.57h19.989L65.323 29.632a3.555 3.555 0 0 0-1.047 2.523 3.571 3.571 0 0 0 6.093 2.527L92.83 12.221v19.985a3.569 3.569 0 0 0 3.57 3.57 3.569 3.569 0 0 0 3.57-3.57V4.034v.004a3.569 3.569 0 0 0-3.539-4.043l-.105.004zM3.548 64.23A3.573 3.573 0 0 0 .029 67.8v28.626-.004l.016.305-.004-.016.004.059v-.012l.039.289-.004-.023.023.121-.004-.023c.074.348.191.656.34.938l-.008-.02.055.098-.008-.02.148.242-.008-.012.055.082-.008-.012c.199.285.43.531.688.742l.008.008.031.027.004.004c.582.461 1.32.742 2.121.762h.004l.078.004h28.61a3.569 3.569 0 0 0 3.57-3.57 3.569 3.569 0 0 0-3.57-3.57H12.224l22.461-22.461a3.569 3.569 0 0 0-2.492-6.125l-.105.004h.008a3.562 3.562 0 0 0-2.453 1.074L7.182 87.778V67.793a3.571 3.571 0 0 0-3.57-3.57h-.055.004zm92.805 0a3.573 3.573 0 0 0-3.519 3.57v19.993-.004L70.373 65.328a3.553 3.553 0 0 0-2.559-1.082h-.004a3.573 3.573 0 0 0-3.566 3.57c0 1.004.414 1.91 1.082 2.555l22.461 22.461H67.802a3.57 3.57 0 1 0 0 7.14h28.606c.375 0 .742-.059 1.082-.168l-.023.008.027-.012-.02.008.352-.129-.023.008.039-.02-.02.008.32-.156-.02.008.023-.016-.008.008c.184-.102.34-.207.488-.32l-.008.008.137-.113-.008.004.223-.211.008-.008c.156-.164.301-.34.422-.535l.008-.016-.008.016.008-.02.164-.285.008-.02-.008.016.008-.02c.098-.188.184-.406.246-.633l.008-.023-.004.008.008-.023a3.44 3.44 0 0 0 .121-.852v-.004l.004-.078V67.804a3.569 3.569 0 0 0-3.57-3.57h-.055.004z">
-                        </path>
-                    </svg>
-                </div>
-            </div>
             <div class="card_content">
                 <label class="switch_738">
                     <input type="checkbox" class="chk_738">
                     {{ content }}
                 </label>
-
             </div>
-            <div class="card_back"></div>
+            
         </div>
+        <div class="card_back"></div>
         <div class="data">
             <div class="img">
                 <img :src="avatar" style="width: 100%; height: 100%;" />
             </div>
             <div class="text">
                 <div class="text_m">{{ author }}</div>
-                <div class="text_s">author</div>
             </div>
         </div>
         <div class="btns">
-
             <div class="likes">
-                <a :href="contact.github" target="_blank">
+                <a :href="github" target="_blank">
                     <svg t="1720796346257" class="icon" viewBox="0 0 1024 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="4241" width="20" height="20">
                         <path
@@ -42,7 +31,7 @@
             </div>
 
             <div class="comments">
-                <a :href="contact.gitee" target="_blank">
+                <a :href="gitee" target="_blank">
                     <svg t="1720797592466" class="icon" viewBox="0 0 1024 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="5544" id="mx_n_1720797592467" width="18" height="18">
                         <path
@@ -53,7 +42,7 @@
             </div>
 
             <div class="views">
-                <a :href="contact.qq" target="_blank">
+                <a :href="qq" target="_blank">
                     <svg t="1720800651016" class="icon" viewBox="0 0 1024 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="6767" width="20" height="20">
                         <path
@@ -68,13 +57,23 @@
 
 <script lang="ts" setup>
 
-defineProps(['avatar', 'author', 'content', 'contact'])
+// defineProps(['avatar', 'author', 'content', 'contact'])
+defineProps({
+    avatar: {type: String, required: true},
+    author: {type: String, required: true},
+    content: {type: String, required: true},
+    qq: {type: String, default: ''},
+    github: {type: String, default: ''},
+    gitee: {type: String, default: ''},
+})
 
 </script>
 
-<style>
+<style scoped>
 .main {
     position: relative;
+    margin: 16px;
+    /* border: 2px solid blue; */
 }
 
 .card {
@@ -83,61 +82,27 @@ defineProps(['avatar', 'author', 'content', 'contact'])
     background-color: #252525;
     border-radius: 7px;
     cursor: pointer;
-}
-
-.fl {
-    display: flex;
-    justify-content: flex-end;
-    opacity: 0;
-    transition: .2s ease-in-out;
-}
-
-.fl:hover .fullscreen {
-    scale: 1.2;
-}
-
-.fl:hover .fullscreen_svg {
-    fill: white;
-}
-
-.fullscreen {
-    width: 1.5em;
-    height: 1.5em;
-    border-radius: 5px;
-    background-color: #727890;
-    margin: 1em;
-    margin-right: 0.5em;
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: .2s ease-in-out;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
-}
-
-.fullscreen_svg {
-    width: 10px;
-    height: 10px;
-    fill: rgb(177, 176, 176);
-    transition: .2s ease-in-out;
 }
 
 .card_back {
-    position: relative;
-    width: 15em;
-    height: 13em;
+    position: absolute;
+    width: 240px;
+    height: 210px;
+    top: 20px;
+    left: 10px;
     background-color: rgba(30, 31, 38, 0.575);
     border-radius: 7px;
-    margin-top: -5em;
-    margin-left: 0.7em;
     transition: .2s ease-in-out;
     z-index: -1;
 }
 
 .main:hover .card_back {
-    margin-top: -6.25em;
-    margin-left: 0em;
-    scale: 1.1;
-    height: 15.25em;
+    width: 260px;
+    top: -10px;
+    left: -10px;
+    height: 270px;
     cursor: pointer;
 }
 
@@ -302,7 +267,7 @@ defineProps(['avatar', 'author', 'content', 'contact'])
     align-items: center;
     justify-content: flex-start;
     padding: 0px 10px;
-    margin-top: -15px;
+    /* margin-top: -15px; */
     line-height: 1.2rem;
 }
 

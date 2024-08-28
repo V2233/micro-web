@@ -1,4 +1,6 @@
 import { reqServerPort } from '@/api/user/index'
+import useUserStore from '@/store/modules/user'; 
+const userStore = useUserStore()
 
 export default class Ws {
   ws: WebSocket | null
@@ -23,10 +25,9 @@ export default class Ws {
   }
 
   async openWs(ip = '', cb:Function | null = null) {
-    if (!this.address.privateAddress && !this.address.publicAddress) {
-      await this.getServerPort()
-    }
-    this.ws = new WebSocket((ip ? ip : this.address.publicAddress) + this.url)
+    
+    const originUrl = new URL(userStore.originAddress)
+    this.ws = new WebSocket((ip ? ip : `ws://${originUrl.hostname}:${userStore.originPort?userStore.originPort:originUrl.port}`) + this.url)
     this.ws.addEventListener('open', (e) => {
       console.log('ws连接成功！' + e.target)
       cb && cb()
@@ -47,8 +48,10 @@ export default class Ws {
 
     this.ws.addEventListener('error', async (e) => {
       console.log('ws出错！' + JSON.stringify(e))
+      if (!this.address.privateAddress && !this.address.publicAddress) {
+        await this.getServerPort()
+      }
       await this.openWs(this.address.privateAddress)
-
     })
   }
 

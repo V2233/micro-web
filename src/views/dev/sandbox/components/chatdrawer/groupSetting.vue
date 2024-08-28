@@ -26,11 +26,11 @@
                 <div class="group-members-item" 
                     v-for="(member,memberId) in (curGroup as groupInfoType)?.member_list" 
                     :key="memberId" 
-                    @click="$emit('setName',{type: 'member_id',data: member})"
+                    @click="$emit('setName',{type: 'member_info',data: member})"
                 >
                     <img class="group-members-item-avatar" :src="`https://q1.qlogo.cn/g?b=qq&s=0&nk=${member.user_id}`">
                     <div class="group-members-item-nickname">
-                        {{ member.nickname }}
+                        {{ member.card?member.card:member.nickname }}
                     </div>
                 </div>
                 <div class="group-members-item">

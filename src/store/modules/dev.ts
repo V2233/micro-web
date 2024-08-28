@@ -1,11 +1,10 @@
+import { reqBotInfo } from '@/api/dev/plugin'
+import type { BotInfoResponseType } from '@/api/dev/plugin/type'
 import { defineStore } from 'pinia'
 import type { DevState } from './types/type'
 import { group_list, friend_list } from './default/sandbox'
 import useUserStore from './user'
-
 const userStore = useUserStore()
-
-const url = new URL(userStore.originAddress)
 
 let useDevStore = defineStore('Dev', {
   state: (): DevState => {
@@ -21,6 +20,9 @@ let useDevStore = defineStore('Dev', {
       scene: 0,
       /** 当前插件编辑模式(add or update) */
       curEditedMode: 'add',
+
+      /** 机器人信息 */
+      botsInfo: [],
 
       /** 沙箱场景 */
       qqScene: 0,
@@ -43,7 +45,7 @@ let useDevStore = defineStore('Dev', {
         /** 当前所在私聊场景对方id，和cur_group_id之间必有一个为0 */
         cur_private_id: 0,
         /** 当前机器人id */
-        cur_bot_id: 1593519730,
+        cur_bot_id: 2854196306,
         /** 当前自己的资料 */
         cur_self_info: {
           user_id: Number(userStore.masterQQ) || 2330660495,
@@ -54,14 +56,24 @@ let useDevStore = defineStore('Dev', {
           thumbs: 0
         },
         settings: {
-          ws_forward_address: `ws://${url.hostname}:${url.port}/onebot/v11/ws`,
+          ws_forward_address: '',
           heart_beat: false,
           local_storage: false
         }
       }
     }
   },
-  actions: {},
+  actions: {
+    async getBotsInfo() {
+      let res:BotInfoResponseType = await reqBotInfo()
+      if(res.code == 200) {
+        this.botsInfo = res.data
+        return Promise.resolve('ok')
+      } else {
+        return Promise.reject(new Error(res.message))
+      }
+    }
+  },
   getters: {},
 })
 

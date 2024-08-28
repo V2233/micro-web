@@ -2,7 +2,7 @@
     <div class="bg-main" ref="termboxRef">
       <div class="setting-bar">
         
-        <el-popover placement="bottom" title="编辑器设置" :width="300" trigger="hover">
+        <el-popover placement="bottom" title="终端设置" :width="300" trigger="hover">
           <!-- 终端设置 -->
           <el-form>
             <el-form-item label="高度(行)">

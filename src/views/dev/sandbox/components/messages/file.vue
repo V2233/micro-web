@@ -13,20 +13,18 @@
                 <span v-if="!onright" :class="memberTitleClass">{{ role_title }}</span>
             </div>
             <msg-menu @msg-operation="$emit('msg-operation',$event)">
-                <a ref="fileRef" target="_blank" style="text-decoration: none; color: #000">
-                    <div class="fakeqq-message__bubble" style="cursor: pointer">
-                        <div class="fakeqq-message__bubble-arrow"></div>
-                        <div class="fakeqq-file__content">
-                            <div class="fakeqq-file__info">
-                                <div class="fakeqq-file__name">{{ filename }}</div>
-                                <div class="fakeqq-file__size">{{ filesize }}</div>
-                            </div>
-                            <div class="fakeqq-file__icon">
-                                <img :src="fileicon" />
-                            </div>
+                <div class="fakeqq-message__bubble" @click="$emit('msg-click',{})" style="cursor: pointer">
+                    <div class="fakeqq-message__bubble-arrow"></div>
+                    <div class="fakeqq-file__content">
+                        <div class="fakeqq-file__info">
+                            <div class="fakeqq-file__name">{{ filename }}</div>
+                            <div class="fakeqq-file__size">{{ filesize }}</div>
+                        </div>
+                        <div class="fakeqq-file__icon">
+                            <img :src="fileicon" />
                         </div>
                     </div>
-                </a>
+                </div>
             </msg-menu>
         </div>
     </div>
@@ -37,7 +35,7 @@ import { onMounted,ref,computed } from 'vue'
 import MsgMenu from './msg-operate.vue'
 import AvatarMenu from './avatar-operate.vue'
 
-const $emit = defineEmits(['msg-operation','avatar-operation','avatar-click'])
+const $emit = defineEmits(['msg-operation','msg-click','avatar-operation','avatar-click'])
 
 const fileRef = ref()
 
@@ -94,11 +92,11 @@ const memberTitleClass = computed(()=>{
     }
 })
 
-onMounted(() => {
-    if (props.href) {
-      const file = fileRef.value as HTMLAnchorElement
-      file.href = props.href
-    }
-})
+// onMounted(() => {
+//     if (props.href) {
+//       const file = fileRef.value as HTMLAnchorElement
+//       file.href = props.href
+//     }
+// })
 
 </script>

@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import type { groupInfoType,friendInfoType } from '@/views/dev/sandbox/protocol/onebotv11/api/type'
+import type { BotInfoType } from '@/api/dev/plugin/type'
 
 export interface DevState {
   curPath: string
@@ -9,6 +10,7 @@ export interface DevState {
   curPluginId: string
   qqScene: number
   isPortrait: boolean
+  botsInfo: BotInfoType[]
   /** 避免ts报any类型，后续可拓展 */
   curAdapter:'onebot11'
   onebot11: {
@@ -68,5 +70,6 @@ export interface UserState {
   avatar: string
   masterQQ?: string | number
   buttons: string[],
-  originAddress: string
+  originAddress: string,
+  originPort: number
 }

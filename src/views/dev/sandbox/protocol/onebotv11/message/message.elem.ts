@@ -45,8 +45,8 @@ export interface RecordElem {
     data: {
         /**
          * @type {string} 本地文件路径，例如`"/tmp/1.mp3"`
-         * @type {Buffer} 图片`Buffer`
-         * @type {Readable} 可读的图片数据流
+         * @type {Buffer} `Buffer`
+         * @type {Readable} 可读的数据流
          */
         file: string | Buffer | import("stream").Readable;
         /** 只在通过网络 URL 发送时有效，表示是否使用已缓存的文件，默认 1 */
@@ -69,8 +69,8 @@ export interface VideoElem {
     data: {
         /**
          * @type {string} 本地文件路径，例如`"/tmp/1.mp4"`
-         * @type {Buffer} 图片`Buffer`
-         * @type {Readable} 可读的图片数据流
+         * @type {Buffer} `Buffer`
+         * @type {Readable} 可读的数据流
          */
         file: string | Buffer | import("stream").Readable;
         /** 只在通过网络 URL 发送时有效，表示是否使用已缓存的文件，默认 1 */
@@ -82,6 +82,31 @@ export interface VideoElem {
         /** 视频url地址，接收时有效 */
         url?: string;
         
+    }
+}
+
+/** 通用文件 */
+export interface FileElem {
+    type: "file";
+    data: {
+        /**
+         * @type {string} 本地图片文件路径，例如`"/tmp/1.jpg"`
+         * @type {Buffer} `Buffer`
+         * @type {Readable} 可读的数据流
+         */
+        file: string | Buffer | import("stream").Readable;
+        /** 只在通过网络 URL 发送时有效，表示是否使用已缓存的文件，默认 1 */
+        cache?: 0 | 1;
+        /** 只在通过网络 URL 发送时有效，表示是否通过代理下载文件（需通过环境变量或配置文件配置代理），默认 1 */
+        proxy?: 0 | 1;
+        /** 流的超时时间，默认60(秒) */
+        timeout?: number;
+        /** url地址，接收时有效 */
+        url?: string;
+        /** 文件名 */
+        name?: string;
+        /** 文件大小 */
+        size?: number
     }
 }
 
@@ -154,7 +179,7 @@ export interface ShareElem {
 export interface ContactElem {
     type: "contact",
     data: {
-        url: "qq" | "group",
+        type: "qq" | "group",
         /** 被推荐人的 QQ 或 群 号 */
         id: string
     }
@@ -286,4 +311,4 @@ export interface ButtonElem {
     };
 }
 
-export type MessageElem = TextElem | FaceElem | ImageElem | AtElem | ReplyElem | RecordElem | VideoElem | JsonElem | XmlElem | PokeElem | LocationElem | ShareElem | FaceElem | NodeElem | ShakeElem | MusicElem | RpsElem | DiceElem | MarkdownElem | ButtonElem;
+export type MessageElem = TextElem | FaceElem | ImageElem | AtElem | ReplyElem | RecordElem | VideoElem | FileElem | JsonElem | XmlElem | PokeElem | LocationElem | ShareElem | FaceElem | NodeElem | ShakeElem | MusicElem | RpsElem | DiceElem | MarkdownElem | ButtonElem | ContactElem;

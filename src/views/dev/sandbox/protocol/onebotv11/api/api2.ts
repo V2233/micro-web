@@ -1,4 +1,3 @@
-import { en } from 'element-plus/es/locale';
 import { queueItemType } from '../event/type';
 interface actionType {
     echo: string,
@@ -10,7 +9,9 @@ type retcodeType = 0 | 10001 | 10002 | 10003 | 10004 | 10005 | 10006 | 10007 | 1
 
 import type { groupInfoType,groupMemberInfoType } from './type'
 import  useDevStore from '@/store/modules/dev'; 
+import useUserStore from '@/store/modules/user'; 
 const devStore = useDevStore()
+const userStore = useUserStore()
 
 export class Res {
     self_id: number
@@ -47,6 +48,8 @@ export class Res {
         if(!data.action) return
 
         const actionMap:{[key:string]:any} = {
+            send_group_forward_msg: this.send_group_forward_msg,
+            send_private_forward_msg: this.send_private_forward_msg,
             send_private_msg: this.send_private_msg,
             send_group_msg: this.send_group_msg,
             send_msg: this.send_msg,
@@ -99,21 +102,21 @@ export class Res {
     }
 
     get curMsgQueue() {
-        if(devStore.onebot11.cur_message_type == 'group') {
-            let curGroup = devStore.onebot11.group_list.find((group)=>group.group_id == devStore.onebot11.cur_group_id)
+        if(devStore[devStore.curAdapter].cur_message_type == 'group') {
+            let curGroup = devStore[devStore.curAdapter].group_list.find((group)=>group.group_id == devStore[devStore.curAdapter].cur_group_id)
             if(curGroup) return curGroup.msg_queue
         } else {
-            let curPrivate = devStore.onebot11.friend_list.find((friend)=>friend.user_id == devStore.onebot11.cur_private_id)
+            let curPrivate = devStore[devStore.curAdapter].friend_list.find((friend)=>friend.user_id == devStore[devStore.curAdapter].cur_private_id)
             if(curPrivate) return curPrivate.msg_queue
         }
     }
 
     get curGroup() {
-        return devStore.onebot11.group_list.find((group)=>group.group_id == devStore.onebot11.cur_group_id) as groupInfoType
+        return devStore[devStore.curAdapter].group_list.find((group)=>group.group_id == devStore[devStore.curAdapter].cur_group_id) as groupInfoType
     }
 
     get curGroupIndex() {
-        return devStore.onebot11.group_list.findIndex((group)=>group.group_id == devStore.onebot11.cur_group_id)
+        return devStore[devStore.curAdapter].group_list.findIndex((group)=>group.group_id == devStore[devStore.curAdapter].cur_group_id)
     }
 
     send_private_msg(params:any) {
@@ -127,6 +130,14 @@ export class Res {
     send_msg(params:any) {
         return
     }
+
+    send_group_forward_msg(params:any) {
+        return
+    }
+
+    send_private_forward_msg(params:any) {
+        return
+    }
         
     /**
      * 撤回消息
@@ -138,20 +149,18 @@ export class Res {
         let found = false;
         devStore[devStore.curAdapter].group_list.forEach((group)=>{
             group.msg_queue.forEach(queue=>{
-                if(queue.message_id) {
+                if(queue.message_id == message_id) {
                     (queue as any).toast = {isDeleted: true}
                     found = true
                 }
-                
             })
         })
         devStore[devStore.curAdapter].friend_list.forEach((friend)=>{
             friend.msg_queue.forEach(queue=>{
-                if(queue.message_id) {
+                if(queue.message_id == message_id) {
                     (queue as any).toast = {isDeleted: true}
                     found = true
                 }
-                
             })
         })
         return found?'ok':'message_id not found!'
@@ -205,88 +214,119 @@ export class Res {
         let res
         queues.forEach((msg)=>{
             if(msg.message_id == id) {
-                const { time, message_type, message_id, sender, message} = msg
-                res = message
+                const { message, messages} = msg
+                res = messages?messages:message
             }
         })
         return res
     }
 
-    /** 点赞 */
+    /**
+     * 点赞
+     * @param params 
+     * @returns 
+     */
     send_like(params:any) {
         const { user_id, times } = params
-        if(devStore.onebot11.cur_message_type == 'group') {
-            let groupIndex = devStore.onebot11.group_list.findIndex((group)=>group.group_id == devStore.onebot11.cur_group_id)
-            let memberInfoIndex = devStore.onebot11.group_list[groupIndex].member_list.findIndex(member => member.user_id == user_id)
-            if(memberInfoIndex != -1 && this.curGroupIndex != -1) {
-                if(!devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex].thumbs) {
-                    devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex].thumbs = 0
+        if(devStore[devStore.curAdapter].cur_message_type == 'group') {
+            let groupIndex = devStore[devStore.curAdapter].group_list.findIndex((group)=>group.group_id == devStore[devStore.curAdapter].cur_group_id)
+            let memberInfoIndex = devStore[devStore.curAdapter].group_list[groupIndex].member_list.findIndex(member => member.user_id == user_id)
+            if(memberInfoIndex != -1 && groupIndex != -1) {
+                if(devStore[devStore.curAdapter].group_list[groupIndex].member_list[memberInfoIndex].thumbs === undefined) {
+                    devStore[devStore.curAdapter].group_list[groupIndex].member_list[memberInfoIndex].thumbs = 0
                 }
-                devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex].thumbs += Number(times)
+                //@ts-ignore
+                devStore[devStore.curAdapter].group_list[groupIndex].member_list[memberInfoIndex].thumbs += Number(times)
             }
         } else {
-            let memberInfoIndex = devStore.onebot11.friend_list.findIndex(member => member.user_id == user_id)
+            let memberInfoIndex = devStore[devStore.curAdapter].friend_list.findIndex(member => member.user_id == user_id)
             if(memberInfoIndex != -1) {
-                if(!devStore.onebot11.friend_list[memberInfoIndex].thumbs) {
-                    devStore.onebot11.friend_list[memberInfoIndex].thumbs = 0
+                if(devStore[devStore.curAdapter].friend_list[memberInfoIndex].thumbs === undefined) {
+                    devStore[devStore.curAdapter].friend_list[memberInfoIndex].thumbs = 0
                 }
-                devStore.onebot11.friend_list[memberInfoIndex].thumbs += Number(times)
+                //@ts-ignore
+                devStore[devStore.curAdapter].friend_list[memberInfoIndex].thumbs += Number(times)
             }
         }
         
         return 'ok'
     }
 
+    /**
+     * 移除群聊
+     * @param params 
+     * @returns 
+     */
     set_group_kick(params:any) {
         const { group_id, user_id, reject_add_request } = params
-        let groupIndex = devStore.onebot11.group_list.findIndex((group)=>group.group_id == group_id)
-        let memberInfoIndex = devStore.onebot11.group_list[groupIndex].member_list.findIndex(member => member.user_id == user_id)
+        let groupIndex = devStore[devStore.curAdapter].group_list.findIndex((group)=>group.group_id == group_id)
+        let memberInfoIndex = devStore[devStore.curAdapter].group_list[groupIndex].member_list.findIndex(member => member.user_id == user_id)
         if(memberInfoIndex !== -1) {
-            devStore.onebot11.group_list[groupIndex].member_list.splice(memberInfoIndex,1)
+            devStore[devStore.curAdapter].group_list[groupIndex].member_list.splice(memberInfoIndex,1)
         }
 
         return 'ok'
     }
 
+    /**
+     * 群禁言
+     * @param params 
+     * @returns 
+     */
     set_group_ban(params:any) {
         const { group_id, user_id, duration } = params
-        let groupIndex = devStore.onebot11.group_list.findIndex((group)=>group.group_id == group_id)
-        let memberInfoIndex = devStore.onebot11.group_list[groupIndex].member_list.findIndex(member => member.user_id == user_id)
+        let groupIndex = devStore[devStore.curAdapter].group_list.findIndex((group)=>group.group_id == group_id)
+        let memberInfoIndex = devStore[devStore.curAdapter].group_list[groupIndex].member_list.findIndex(member => member.user_id == user_id)
         if(memberInfoIndex != -1 && this.curGroupIndex != -1) {
-            (devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex] as any).ban = duration
-            setTimeout(()=> delete (devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex] as any).ban,duration)
+            (devStore[devStore.curAdapter].group_list[groupIndex].member_list[memberInfoIndex] as any).ban = duration
+            setTimeout(()=> delete (devStore[devStore.curAdapter].group_list[groupIndex].member_list[memberInfoIndex] as any).ban,duration)
         }
         return 'ok'
     }
 
+    /**
+     * 匿名用户禁言
+     * @param params 
+     * @returns 
+     */
     set_group_anonymous_ban(params:any) {
 
         return 'ok'
     }
 
+    /**
+     * 全体群禁言
+     * @param params 
+     * @returns 
+     */
     set_group_whole_ban(params:any) {
         const { group_id,enable } = params 
-        let groupIndex = devStore.onebot11.group_list.findIndex((group)=>group.group_id == group_id)
+        let groupIndex = devStore[devStore.curAdapter].group_list.findIndex((group)=>group.group_id == group_id)
         if(groupIndex !== -1) {
             if(enable) {
-                (devStore.onebot11.group_list[groupIndex] as any).ban == true
+                (devStore[devStore.curAdapter].group_list[groupIndex] as any).ban == true
             } else {
-                (devStore.onebot11.group_list[groupIndex] as any).ban == false
+                (devStore[devStore.curAdapter].group_list[groupIndex] as any).ban == false
             }
             return 'ok'
         }
         return 'error'
     }
 
+    /**
+     * 设置群管
+     * @param params 
+     * @returns 
+     */
     set_group_admin(params:any) {
         const { group_id, user_id,enable } = params 
-        let groupIndex = devStore.onebot11.group_list.findIndex((group)=>group.group_id == group_id)
-        let memberInfoIndex = devStore.onebot11.group_list[groupIndex].member_list.findIndex(member => member.user_id == user_id)
+        let groupIndex = devStore[devStore.curAdapter].group_list.findIndex((group)=>group.group_id == group_id)
+        let memberInfoIndex = devStore[devStore.curAdapter].group_list[groupIndex].member_list.findIndex(member => member.user_id == user_id)
         if(memberInfoIndex !== -1) {
             if(enable) {
-                devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex].role = 'admin'
+                devStore[devStore.curAdapter].group_list[groupIndex].member_list[memberInfoIndex].role = 'admin'
             } else {
-                devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex].role = 'member'
+                devStore[devStore.curAdapter].group_list[groupIndex].member_list[memberInfoIndex].role = 'member'
             }
             return 'ok'
         }
@@ -294,41 +334,61 @@ export class Res {
         
     }
 
+    /**
+     * 设置群匿名用户
+     * @param params 
+     * @returns 
+     */
     set_group_anonymous(params:any) {
 
         return 
     }
 
+    /**
+     * 修改群名片
+     * @param params 
+     * @returns 
+     */
     set_group_card(params:any) {
         const { group_id ,user_id, card } = params
-        let groupIndex = devStore.onebot11.group_list.findIndex((group)=>group.group_id == group_id)
-        let memberInfoIndex = devStore.onebot11.group_list[groupIndex].member_list.findIndex(member => member.user_id == user_id)
+        let groupIndex = devStore[devStore.curAdapter].group_list.findIndex((group)=>group.group_id == group_id)
+        let memberInfoIndex = devStore[devStore.curAdapter].group_list[groupIndex].member_list.findIndex(member => member.user_id == user_id)
         if(memberInfoIndex !== -1) {
-            devStore.onebot11.group_list[groupIndex].member_list[memberInfoIndex].card = card
+            devStore[devStore.curAdapter].group_list[groupIndex].member_list[memberInfoIndex].card = card
         }
         return 
     }
 
+    /**
+     * 设置群名
+     * @param params 
+     * @returns 
+     */
     set_group_name(params:any) {
         const { group_id,group_name } = params 
-        let groupIndex = devStore.onebot11.group_list.findIndex((group)=>group.group_id == group_id)
+        let groupIndex = devStore[devStore.curAdapter].group_list.findIndex((group)=>group.group_id == group_id)
         if(groupIndex !== -1) {
-            devStore.onebot11.group_list[groupIndex].group_name = group_name
+            devStore[devStore.curAdapter].group_list[groupIndex].group_name = group_name
             return 'ok'
         }
         return 'error'
     }
 
+    /**
+     * 解散群聊
+     * @param params 
+     * @returns 
+     */
     set_group_leave(params:any) {
         const { group_id,is_dismiss } = params 
-        let groupIndex = devStore.onebot11.group_list.findIndex((group)=>group.group_id == group_id)
+        let groupIndex = devStore[devStore.curAdapter].group_list.findIndex((group)=>group.group_id == group_id)
         if(groupIndex !== -1) {
             if(is_dismiss) {
-                devStore.onebot11.group_list.splice(groupIndex,1)
+                devStore[devStore.curAdapter].group_list.splice(groupIndex,1)
             } else {
-                let memberIndex = devStore.onebot11.group_list[groupIndex].member_list.findIndex(member => member.user_id == devStore[devStore.curAdapter].cur_bot_id)
+                let memberIndex = devStore[devStore.curAdapter].group_list[groupIndex].member_list.findIndex(member => member.user_id == devStore[devStore.curAdapter].cur_bot_id)
                 if(memberIndex !== -1) {
-                    devStore.onebot11.group_list[groupIndex].member_list.splice(memberIndex,1)
+                    devStore[devStore.curAdapter].group_list[groupIndex].member_list.splice(memberIndex,1)
                 }
             }
             return 'ok'
@@ -337,33 +397,43 @@ export class Res {
     }
 
     set_group_special_title(params:any) {
-        return 
+        const {group_id,user_id,special_title,duration} = params
+        let groupIndex = devStore[devStore.curAdapter].group_list.findIndex((group)=>group.group_id == group_id)
+        let memberInfoIndex = devStore[devStore.curAdapter].group_list[groupIndex].member_list.findIndex(member => member.user_id == user_id)
+        if(memberInfoIndex !== -1) {
+            devStore[devStore.curAdapter].group_list[groupIndex].member_list[memberInfoIndex].title = special_title
+            devStore[devStore.curAdapter].group_list[groupIndex].member_list[memberInfoIndex].title_expire_time = duration
+        }
+        return 'ok'
     }
 
     set_friend_add_request(params:any) {
         const { flag, approve, remark } = params
         
-        return 
+        return 'ok'
     }
 
     set_group_add_request(params:any) {
 
-        return 
+        return 'ok'
     }
 
     get_login_info(params:any) {
+        const curbotID = devStore[devStore.curAdapter].cur_bot_id
+        const botInfo = devStore[devStore.curAdapter].friend_list.find(f=>f.user_id == curbotID)
         return {
-            user_id: devStore.onebot11.cur_bot_id,
-            nickname: 'v崽'
+            user_id: curbotID,
+            nickname: botInfo?botInfo.nickname:String(devStore[devStore.curAdapter].cur_bot_id)
         }
     }
 
     get_stranger_info(params:any) {
+
         return {}
     }
 
     get_friend_list(params:any) {
-        let friends = devStore.onebot11.friend_list.map(friend => {
+        let friends = devStore[devStore.curAdapter].friend_list.map(friend => {
             return {
                 nickname: friend.nickname,
                 remark: friend.remark,
@@ -374,13 +444,12 @@ export class Res {
     }
 
     get_group_info(params:any) {
-        let group = devStore.onebot11.group_list.find(g => g.group_id == params.group_id)
+        let group = devStore[devStore.curAdapter].group_list.find(g => g.group_id == params.group_id)
         return group || {}
     }
 
     get_group_list(params:any) {
-        let groups = devStore.onebot11.group_list.map(group => {
-            
+        let groups = devStore[devStore.curAdapter].group_list.map(group => {
             return {
                 group_id: group.group_id,
                 group_name: group.group_name,
@@ -392,7 +461,7 @@ export class Res {
     }
 
     get_group_member_info(params:any) {
-        let group = devStore.onebot11.group_list.find(g => g.group_id == params.group_id)
+        let group = devStore[devStore.curAdapter].group_list.find(g => g.group_id == params.group_id)
         if(group) {
             let member = group?.member_list?.find((m:groupMemberInfoType) => m.user_id == params.user_id)
             if(member) return member
@@ -401,7 +470,7 @@ export class Res {
     }
 
     get_group_member_list(params:any) {
-        let group = devStore.onebot11.group_list.find(g => g.group_id == params.group_id)
+        let group = devStore[devStore.curAdapter].group_list.find(g => g.group_id == params.group_id)
         return group?.member_list
     }
 
@@ -430,12 +499,12 @@ export class Res {
 
     get_record(params:any) {
         const { file } = params
-        return 'http://127.0.0.1:23306/api/File/' + file
+        return `http://127.0.0.1:${userStore.originPort}/api/File/` + file
     }
 
     get_image(params:any) {
         const { file } = params
-        return 'http://127.0.0.1:23306/api/File/' + file
+        return `http://127.0.0.1:${userStore.originPort}/api/File/` + file
     }
 
     can_send_image(params:any) {
@@ -462,7 +531,7 @@ export class Res {
 
     get_version_info(params:any) {
         return {
-            app_name: 'sandbox.onebot',
+            app_name: 'sandbox.OneBot',
             app_version: '0.0.1',
             protocol_version: 'v11'
         }

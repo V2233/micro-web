@@ -1,6 +1,6 @@
 <template>
     <div class="fakeqq-msglist">
-        <div class="msglist__tabbar" v-if="!devStore.isPortrait">
+        <div class="msglist__tabbar" v-if="!devStore.isPortrait" ref="tabbarRef">
             <!-- 导航栏头像 -->
             <div class="msglist__tabbar__avatar" v-if="!devStore.isPortrait">
                 <img class="msglist__tabbar__avatar__img" :src="`${avatar}`"/>
@@ -172,6 +172,8 @@ const clickTabbarIcon = (type:string) => {
 
 /** 处理分隔线移动 */
 const isDividerDragging = ref(false)
+
+const tabbarRef = ref()
 
 const messagesRef = ref()
 
@@ -411,7 +413,7 @@ onBeforeUnmount(()=>{
         position: relative;
         width: 100%;
         height: 100%;
-        // flex-shrink: 0;
+        flex-shrink: 1;
         display: flex;
         justify-content: center;
         align-items: center;

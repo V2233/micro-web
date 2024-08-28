@@ -15,8 +15,9 @@ marked.setOptions({
   renderer: render, // 这是必填项
   gfm: true,	// 启动类似于Github样式的Markdown语法
   pedantic: false, // 只解析符合Markdwon定义的，不修正Markdown的错误
+  //@ts-ignore
   tables: true,
-  breaks: false,
+  breaks: true,
   smartLists: true,
   smartpants: false,
   // highlight: (code, lang) => hljs.highlight(code, { language: hljs.getLanguage(lang)??'plaintext' }).value,
@@ -25,16 +26,7 @@ marked.setOptions({
 const markdownToHtml = ref("")
 markdownToHtml.value = marked(props.mdContent) as string
 
-const change = (value: string) => {
-  markdownToHtml.value = marked(value) as string
-}
-
-// watch(()=>markdownToHtml.value,(newValue)=>{
-    
-// },{immediate:true})
-
 onMounted(()=>{
-  console.log(markdownToHtml.value)
   hljs.highlightAll()
 })
 

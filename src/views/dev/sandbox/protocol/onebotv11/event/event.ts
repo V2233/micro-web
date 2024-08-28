@@ -376,6 +376,7 @@ export default new class Events {
             remark: data.remark || '',
             msg_queue: data.msg_queue || [],
             searched: data.searched || false,
+            thumbs: data.thumbs || 0,
             avatar: data.avatar || `https://q1.qlogo.cn/g?b=qq&s=0&nk=${data.user_id}`
         }
     }
@@ -590,6 +591,7 @@ export default new class Events {
 
     /**
      * 群红包运气王
+     * @deprecated
      * @param group_id 群号
      * @param user_id 发送者 QQ 号
      * @param target_id 运气王 QQ 号
