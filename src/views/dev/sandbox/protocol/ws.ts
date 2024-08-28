@@ -46,7 +46,9 @@ export default class Onebot {
         this.bot.addEventListener('message', async(e) => {
             console.log('ws收到服务端消息:')
             const json = JSON.parse(e.data)
-            console.log(json)
+            // console.log(json)
+            // api解析动作并响应
+            this.res?.parse_action(json)
             if(json.action) {
                 if(json.action == 'send_group_msg' || (json.action == 'send_msg' && (json.params?.message_type == 'group' || json.params?.group_id))) {
                     if(!msgQueueController.isBotInCurScene) {
@@ -117,13 +119,12 @@ export default class Onebot {
    
                 }
             }
-            // api解析动作并响应
-            this.res?.parse_action(json)
+            
         })
 
         this.bot.addEventListener('close', (e) => {
             console.log('ws服务端关闭！' + JSON.stringify(e))
-            ElMessage.warning('监听到连接断开，请刷新页面重连！！！')
+            ElMessage.warning('监听到ws连接断开，可刷新页面重连')
             if(this.heartbeat_id) {
                 clearInterval(this.heartbeat_id)
             }

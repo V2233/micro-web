@@ -1315,7 +1315,7 @@ const sendMessage = (seg:MessageElem | MessageElem[]) => {
 
     msgQueueController.groupQueue_push(Object.assign(groupMsg,{isSelf: true}))
     Ws.value.bot?.send(JSON.stringify(groupMsg))
-    console.log(groupMsg)
+    // console.log(groupMsg)
   }
 
   if(msgQueueController.curQueueType == 'private') {
@@ -1344,7 +1344,7 @@ const sendMessage = (seg:MessageElem | MessageElem[]) => {
 
     msgQueueController.privateQueue_push(Object.assign(privateMsg,{isSelf: true}))
     Ws.value.bot?.send(JSON.stringify(privateMsg))
-    console.log(privateMsg)
+    // console.log(privateMsg)
   }
 
   /** 关闭工具栏 */
@@ -1944,7 +1944,7 @@ const handleSettingItem = (e:{type:string, data: unknown}) => {
   switch(e.type) {
     /** 添加群聊 */
     case 'add_group':
-      const temp_group_id = isNaN(Number(curNewGroupInfo.group_avatar))?Number(curNewGroupInfo.group_avatar):(Number(Math.random().toFixed(9)) * Math.pow(10,9))
+      const temp_group_id = isNaN(Number(curNewGroupInfo.group_avatar))?(Number(Math.random().toFixed(9)) * Math.pow(10,9)):Number(curNewGroupInfo.group_avatar)
       const isGroupIdExisted = devStore[devStore.curAdapter].group_list.some((group)=>group.group_id == temp_group_id)
       if(isGroupIdExisted) {
         ElMessage.error('该群号已存在！')

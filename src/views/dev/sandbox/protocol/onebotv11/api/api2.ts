@@ -120,23 +120,23 @@ export class Res {
     }
 
     send_private_msg(params:any) {
-        return 
+        return 'ok'
     }
 
     send_group_msg(params:any) {
-        return 
+        return 'ok'
     }
     
     send_msg(params:any) {
-        return
+        return 'ok'
     }
 
     send_group_forward_msg(params:any) {
-        return
+        return 'ok'
     }
 
     send_private_forward_msg(params:any) {
-        return
+        return 'ok'
     }
         
     /**
