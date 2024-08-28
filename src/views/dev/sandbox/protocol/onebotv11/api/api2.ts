@@ -74,6 +74,7 @@ export class Res {
             get_friend_list: this.get_friend_list,
             get_group_info: this.get_group_info,
             get_group_list: this.get_group_list,
+            get_group_msg_history: this.get_group_msg_history,
             get_group_member_info: this.get_group_member_info,
             get_group_member_list: this.get_group_member_list,
             get_group_honor_info: this.get_group_honor_info,
@@ -396,6 +397,11 @@ export class Res {
         return 
     }
 
+    /**
+     * 设置成员头衔
+     * @param params 
+     * @returns 
+     */
     set_group_special_title(params:any) {
         const {group_id,user_id,special_title,duration} = params
         let groupIndex = devStore[devStore.curAdapter].group_list.findIndex((group)=>group.group_id == group_id)
@@ -407,17 +413,32 @@ export class Res {
         return 'ok'
     }
 
+    /**
+     * 处理加好友请求
+     * @param params 
+     * @returns 
+     */
     set_friend_add_request(params:any) {
         const { flag, approve, remark } = params
         
         return 'ok'
     }
 
+    /**
+     * 处理加群请求
+     * @param params 
+     * @returns 
+     */
     set_group_add_request(params:any) {
 
         return 'ok'
     }
 
+    /**
+     * 获取登录信息
+     * @param params 
+     * @returns 
+     */
     get_login_info(params:any) {
         const curbotID = devStore[devStore.curAdapter].cur_bot_id
         const botInfo = devStore[devStore.curAdapter].friend_list.find(f=>f.user_id == curbotID)
@@ -427,11 +448,21 @@ export class Res {
         }
     }
 
+    /**
+     * 获取陌生人信息
+     * @param params 
+     * @returns 
+     */
     get_stranger_info(params:any) {
 
         return {}
     }
 
+    /**
+     * 获取好友列表
+     * @param params 
+     * @returns 
+     */
     get_friend_list(params:any) {
         let friends = devStore[devStore.curAdapter].friend_list.map(friend => {
             return {
@@ -443,11 +474,21 @@ export class Res {
         return friends
     }
 
+    /**
+     * 获取群信息
+     * @param params 
+     * @returns 
+     */
     get_group_info(params:any) {
         let group = devStore[devStore.curAdapter].group_list.find(g => g.group_id == params.group_id)
         return group || {}
     }
 
+    /**
+     * 获取群聊列表
+     * @param params 
+     * @returns 
+     */
     get_group_list(params:any) {
         let groups = devStore[devStore.curAdapter].group_list.map(group => {
             return {
@@ -460,6 +501,11 @@ export class Res {
         return groups || []
     }
 
+    /**
+     * 获取群成员信息
+     * @param params 
+     * @returns 
+     */
     get_group_member_info(params:any) {
         let group = devStore[devStore.curAdapter].group_list.find(g => g.group_id == params.group_id)
         if(group) {
@@ -469,11 +515,21 @@ export class Res {
         return {}
     }
 
+    /**
+     * 群成员列表
+     * @param params 
+     * @returns 
+     */
     get_group_member_list(params:any) {
         let group = devStore[devStore.curAdapter].group_list.find(g => g.group_id == params.group_id)
         return group?.member_list
     }
 
+    /**
+     * 群荣誉信息
+     * @param params 
+     * @returns 
+     */
     get_group_honor_info(params:any) {
         return {}
     }
@@ -550,4 +606,25 @@ export class Res {
         console.log(params.model_show)
         return 'ok'
     }
+
+    /** 拓展 */
+    /** 注意，如果是机器人发的额消息，文件返回的base64类型 */
+    get_group_msg_history(params:any) {
+        const {group_id,message_seq,message_id,count} = params
+        let group = devStore[devStore.curAdapter].group_list.find(g => g.group_id == group_id)
+        if(group) {
+            const endIndex = group.msg_queue.findIndex(q=>q.message_id == (message_id?message_id:message_seq))
+            if(endIndex) {
+                const safeEndIndex = Math.min(endIndex, group.msg_queue.length - 1);
+                // 截取消息，包含 endIndex 对应的元素（如果它有效），但不超过 count 条
+                const tempQueue = group.msg_queue.slice(endIndex - count + 1, endIndex + 1);
+                return {messages: tempQueue}
+            } else {
+                const tempQueue = group.msg_queue.slice(-count)
+                return {messages: tempQueue}
+            }
+            
+        }
+    }
+
 }
