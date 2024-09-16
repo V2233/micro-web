@@ -201,8 +201,8 @@ const saveAdminConfig = () => {
       return
     }
 
-    if (curAdmin.value.username.value.length < 5 || curAdmin.value.username.value.length > 20) {
-      ElMessage.error('账号长度5-20位！')
+    if (curAdmin.value.username.value.length < 2 || curAdmin.value.username.value.length > 20) {
+      ElMessage.error('账号长度2-20位！')
       return
     }
 

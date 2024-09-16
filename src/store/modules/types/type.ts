@@ -11,6 +11,13 @@ export interface DevState {
   qqScene: number
   isPortrait: boolean
   botsInfo: BotInfoType[]
+  /** ssh连接设置 */
+  sshInfo: { 
+    host:string,
+    port?:number,
+    username:string,
+    password:string
+  }
   /** 避免ts报any类型，后续可拓展 */
   curAdapter:'onebot11'
   onebot11: {

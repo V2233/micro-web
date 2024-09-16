@@ -22,6 +22,9 @@ enum API {
   DOWNLOAD_URL = '/fs/download',
   Filter_TREE_URL = '/fs/filtertree',
   FILES_SIZE_URL = '/fs/filesize',
+
+  CONNECT_SSH_URL = '/fs/openssh',
+  CLOSE_SSH_URL = '/fs/closessh'
 }
 
 // 列出文件目录
@@ -141,4 +144,21 @@ export const reqFilterDirTree = (path: string, ex: string) => {
   return request.get<any, any>(
     API.Filter_TREE_URL + '?path=' + path + '&ex=' + ex,
   )
+}
+
+// ssh连接
+export const reqConnectSSH = (data: { 
+  host:string,
+  port?:number,
+  username:string,
+  password:string
+}) => {
+  return request.get<any, any>(
+    API.CONNECT_SSH_URL + '?host=' + data.host + '&port=' + data.port + '&username=' + data.username + '&password=' + data.password
+  )
+}
+
+// 断开ssh
+export const reqCloseSSH = () => {
+  return request.get<any, any>(API.CLOSE_SSH_URL)
 }

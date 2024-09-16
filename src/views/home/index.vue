@@ -70,9 +70,7 @@
       </el-table-column>
     </el-table>
   </el-card>
-  <!-- <div class="bottoms">
-        <svg-icon name="welcome" width="600px" height="300px"></svg-icon>
-    </div> -->
+
 </template>
 
 <script setup lang="ts">

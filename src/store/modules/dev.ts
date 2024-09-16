@@ -1,4 +1,5 @@
 import { reqBotInfo } from '@/api/dev/plugin'
+import { reqConnectSSH, reqCloseSSH } from '@/api/dev/fs'
 import type { BotInfoResponseType } from '@/api/dev/plugin/type'
 import { defineStore } from 'pinia'
 import type { DevState } from './types/type'
@@ -20,6 +21,14 @@ let useDevStore = defineStore('Dev', {
       scene: 0,
       /** 当前插件编辑模式(add or update) */
       curEditedMode: 'add',
+
+      /** ssh链接配置 */
+      sshInfo: {
+        host: '',
+        port: 22,
+        username: 'root',
+        password: ''
+      },
 
       /** 机器人信息 */
       botsInfo: [],
@@ -68,6 +77,19 @@ let useDevStore = defineStore('Dev', {
       let res:BotInfoResponseType = await reqBotInfo()
       if(res.code == 200) {
         this.botsInfo = res.data
+        return Promise.resolve('ok')
+      } else {
+        return Promise.reject(new Error(res.message))
+      }
+    },
+    fillSSHInfo() {
+      let server = new URL(userStore.originAddress)
+      this.sshInfo.host = server.hostname
+      this.sshInfo.port = 22
+    },
+    async connectSSH() {
+      let res = await reqConnectSSH(this.sshInfo)
+      if(res.code == 200) {
         return Promise.resolve('ok')
       } else {
         return Promise.reject(new Error(res.message))

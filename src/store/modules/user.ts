@@ -44,6 +44,7 @@ let useUserStore = defineStore('User', {
       /** 请求源，用于服务端提供链接 */
       originAddress: '',
       originPort: 23306,
+      
     }
   },
   actions: {

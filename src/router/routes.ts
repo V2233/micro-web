@@ -120,6 +120,16 @@ export const asnycRoute = [
           icon: 'Promotion',
         },
       },
+      {
+        name: 'Database',
+        path: '/dev/database',
+        component: () => import('@/views/dev/database/index.vue'),
+        meta: {
+          title: '数据库',
+          hidden: false,
+          icon: 'Coin',
+        },
+      },
     ],
   },
   {

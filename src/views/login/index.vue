@@ -75,10 +75,10 @@ let loginForms = ref()
 const validatorUsername = (rule: any, value: any, callback: any) => {
   // if(/^\d{5,10}/.test(value)) {
   // console.log(value)
-  if (value.length >= 5 && value.length <= 20) {
+  if (value.length >= 2 && value.length <= 20) {
     callback()
   } else {
-    callback(new Error('账号长度5-20位'))
+    callback(new Error('账号长度2-20位'))
   }
 }
 const validatorPassword = (rule: any, value: any, callback: any) => {
