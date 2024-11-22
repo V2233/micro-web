@@ -5,7 +5,7 @@
       <div v-for="style in itemList" class="color-item" :style="style" @click="handleColorClick(style)"></div>
     </div>
 
-    <el-divider />
+    <!-- <el-divider /> -->
 
     <template v-if="store.current.style">
       <Background v-model="elementBg" />
@@ -81,6 +81,7 @@ function onChange(key: string, value: any) {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
+  margin-bottom: 20px;
 
   .color-item {
     width: 11%;

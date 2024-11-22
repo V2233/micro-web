@@ -1,28 +1,5 @@
 <template>
   <div>
-    <el-row v-for="(block, index) in fontStyleListFormat">
-      <el-button-group style="display: inline-flex">
-        <el-tooltip
-          v-for="item in block"
-          placement="top"
-          :show-after="300"
-          :content="item.label"
-        >
-          <el-button
-            :type="item.selected ? 'primary' : ''"
-            style="flex: 1"
-            :style="index === 0 ? { [item.key]: item.value } : {}"
-            @click="handleFontStyleClick(item)"
-          >
-            <template v-if="index === 0">{{ item.icon }}</template>
-            <SvgIcon v-else :name="item.icon" :size="20" />
-          </el-button>
-        </el-tooltip>
-      </el-button-group>
-    </el-row>
-
-    <el-divider />
-
     <el-row :gutter="10">
       <el-col :span="10">字体颜色:</el-col>
       <el-col :span="14">
@@ -86,6 +63,28 @@
         <el-input type="textarea" v-model="store.current.text" />
       </el-col>
     </el-row>
+
+    <el-row v-for="(block, index) in fontStyleListFormat">
+      <el-button-group style="display: inline-flex">
+        <el-tooltip
+          v-for="item in block"
+          placement="top"
+          :show-after="300"
+          :content="item.label"
+        >
+          <el-button
+            :type="item.selected ? 'primary' : ''"
+            style="flex: 1"
+            :style="index === 0 ? { [item.key]: item.value } : {}"
+            @click="handleFontStyleClick(item)"
+          >
+            <template v-if="index === 0">{{ item.icon }}</template>
+            <SvgIcon v-else :name="item.icon" :size="20" />
+          </el-button>
+        </el-tooltip>
+      </el-button-group>
+    </el-row>
+
   </div>
 </template>
 

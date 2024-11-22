@@ -10,6 +10,8 @@ let useScreenstore = defineStore('Screen', {
       settings: {
         imageWidth: 400,
         isAutoScroll: true,
+        isAutoUpdated: false,
+        updateInterval: 10,
         qpsInterval: 1,
         fontSize: 20
       },

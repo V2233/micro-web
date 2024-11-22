@@ -46,7 +46,14 @@
         readOnly: false,
       })
 
-      let content = (lang == 'json5')? JSON.stringify(JSON.parse(state.option.content), null, 4):state.option.content
+      let content = ''
+      if(lang == 'json5') {
+        try {
+          content = JSON.stringify(JSON.parse(state.option.content), null, 4)
+        } catch(err) {
+          content = state.option.content
+        }
+      }
       editor.setValue(content)
     })
   }

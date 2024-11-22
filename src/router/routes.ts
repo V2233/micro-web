@@ -208,16 +208,16 @@ export const asnycRoute = [
       },
     ],
   },
-  {
-    name: 'Login',
-    path: '/login',
-    component: () => import('@/views/login/index.vue'),
-    meta: {
-      title: '登录',
-      hidden: true,
-      icon: 'Promotion',
-    },
-  },
+  // {
+  //   name: 'Login',
+  //   path: '/login',
+  //   component: () => import('@/views/login/index.vue'),
+  //   meta: {
+  //     title: '登录',
+  //     hidden: true,
+  //     icon: 'Promotion',
+  //   },
+  // },
 ]
 
 //任意路由

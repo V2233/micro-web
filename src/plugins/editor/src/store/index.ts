@@ -35,7 +35,7 @@ export const useEditorStore = defineStore('editor', {
         style: {
           borderWidth: 0,
           borderRadius: 0,
-          borderColor: 'gray'
+          borderColor: 'gray',
         }
       },
       preview: false,

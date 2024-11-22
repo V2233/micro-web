@@ -1,6 +1,6 @@
 <template>
   <div class="logo" v-if="setting.logoHidden == false">
-    <img :src="setting.logo" v-if="layoutSettingStore.foldMode == 0?false:true"/>
+    <!-- <img :src="setting.logo" v-if="layoutSettingStore.foldMode == 0?false:true"/> -->
     <p>{{ layoutSettingStore.foldMode == 2 ? setting.title : '' }}</p>
   </div>
 </template>
@@ -21,7 +21,7 @@ export default {
 .logo {
   width: 100%;
   height: $base-menu-logo-height;
-  color: white;
+  // color: white;
   display: flex;
   align-items: center;
   padding: 20px 5px;

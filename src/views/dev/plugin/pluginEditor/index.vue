@@ -23,7 +23,7 @@
 
           <el-form-item label="正则表达式">
             <el-input v-model="pluginData.reg" placeholder="^hello" style="width: auto"></el-input>
-            <el-select v-model="curFlags" placeholder="默认Flags" style="width: 200px; margin: 0 5px">
+            <el-select v-model="pluginData.flag" placeholder="默认Flags" style="width: 200px; margin: 0 5px">
               <el-option v-for="(item, index) in flagsList" :key="index" :label="item.desc" :value="item.value" />
             </el-select>
           </el-form-item>
@@ -345,9 +345,7 @@
 
     <!-- 图片编辑器 -->
     <div class="pic_editor" v-if="devStore.scene == 2">
-      <el-card>
-        <ImageEditor @outerHTML="setImageData" @mounted="onUpdateImageJson" />
-      </el-card>
+      <ImageEditor @outerHTML="setImageData" @mounted="onUpdateImageJson" />
     </div>
   </div>
 </template>
@@ -421,7 +419,6 @@ const restaurants = ref<{ value: string }[]>([])
 
 const curGroup = ref('')
 const curFriend = ref('')
-const curFlags = ref('')
 const tipsText = ref('')
 
 const curEditedImage = ref(0)
@@ -1029,5 +1026,9 @@ onMounted(() => {
     width: 25px;
     height: 25px;
   }
+}
+
+.pic_editor {
+  height: calc(100vh - 60px);
 }
 </style>

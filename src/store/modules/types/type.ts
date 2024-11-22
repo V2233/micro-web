@@ -53,8 +53,10 @@ export interface DevState {
 }
 
 interface settingType {
+  updateInterval: number
   imageWidth: number
   isAutoScroll: boolean
+  isAutoUpdated: boolean
   qpsInterval: number
   fontSize: number
 }

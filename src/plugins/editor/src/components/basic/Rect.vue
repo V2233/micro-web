@@ -1,9 +1,9 @@
 <template>
-  <div class="es-basic-rect"></div>
+  <div class="es-basic-rect" style="display: flex;"></div>
 </template>
 
 <style>
 .es-basic-rect {
-  border: var(--el-border);
+  border: none;
 }
 </style>

@@ -1,8 +1,10 @@
-import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
+import crypto from 'crypto'
+import { defineConfig, loadEnv } from 'vite'
 import { viteMockServe } from 'vite-plugin-mock'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
@@ -10,6 +12,28 @@ export default defineConfig(({ command, mode }) => {
   return {
     build: {
       outDir: '../public/static',
+      chunkSizeWarningLimit: 1024,
+      // rollupOptions: {
+      //   output: {
+      //     manualChunks: {
+      //       element: ['element-plus'],
+      //       echarts: ['echarts'],
+      //       moment: ['moment'],
+      //       lodash: ['lodash-es','lodash'],
+      //       liquidfill: ['echarts-liquidfill'],
+      //       ace: ['ace-builds'],
+      //       vuerouter: ['vue-router'],
+      //       axios: ['axios'],
+      //       jspdf: ['jspdf'],
+      //       xterm: ['@xterm/xterm'],
+      //       highlight: ['highlight.js'],
+      //       html2canvas: ['html2canvas'],
+      //       emoji: ['emoji-mart-vue-fast'],
+      //       crypto: ['crypto-js']
+      //     },
+      //   }
+        
+      // }
     },
     plugins: [
       vue(),
@@ -19,7 +43,13 @@ export default defineConfig(({ command, mode }) => {
       }),
       viteMockServe({
         localEnabled: command === 'serve',//保证开发阶段可以使用mock接口
-      })
+      }),
+      visualizer({
+        open: true,
+        gzipSize: true, // 分析图生成的文件名  
+        brotliSize: true, // 收集 brotli 大小并将其显示  
+        filename: "stats.html", // 分析图生成的文件名  
+      }),
     ],
     resolve: {
       alias: {
@@ -45,3 +75,12 @@ export default defineConfig(({ command, mode }) => {
     }
   }
 })
+
+
+function generateShortHash(input:string) {
+  // 使用一个哈希函数（如 SHA-256）生成较长的哈希
+  const hash = crypto.createHash('sha256').update(input).digest('hex');
+ 
+  // 取哈希值的前8位作为短哈希
+  return hash.slice(0, 8);
+}

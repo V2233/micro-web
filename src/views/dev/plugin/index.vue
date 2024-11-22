@@ -3,6 +3,16 @@
     <el-card>
       <div class="top_bar">
         <div class="sub-title">指令列表</div>
+        <el-popover placement="bottom" :width="300" trigger="hover">
+          <el-input v-model="searchText" placeholder="筛选指令" size="small" @input="searchPlugin" >
+            <template #append>
+              <el-button icon="Search" @click="searchPlugin"></el-button>
+            </template>
+          </el-input>
+          <template #reference>
+            <el-button icon="Search" circle style="margin-left: auto;"></el-button>
+          </template>
+        </el-popover>
         <el-button type="primary" icon="Plus" @click="goAddPlugin">
           添加指令
         </el-button>
@@ -40,6 +50,19 @@
           </template>
         </el-table-column>
       </el-table>
+      <!-- <el-pagination
+        small
+        lazy
+        v-model:current-page="page.pageNo"
+        v-model:page-size="page.pageSize"
+        :page-sizes="[3, 5, 7, 9]"
+        :disabled="false"
+        :background="true"
+        layout="prev, pager, next, jumper, ->, sizes, total"
+        :total="pluginsList.length"
+        @current-change="pageChange"
+        @size-change="sizeChange"
+      /> -->
     </el-card>
   </div>
 
@@ -50,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { reqPluginsList, reqDeletePlugin } from '@/api/dev/plugin'
 import type { pluginType, pluginResponseType } from '@/api/dev/plugin/type'
 import useDevStore from '@/store/modules/dev'
@@ -61,8 +84,17 @@ const devStore = useDevStore()
 
 const pluginsList = ref<pluginType[]>([])
 
+let pluginsListCopy:pluginType[] = []
+
 const editedPluginValue = ref({
   id: '',
+})
+
+const searchText = ref('')
+
+const page = reactive({
+  pageNo: 1,
+  pageSize: 10
 })
 
 onMounted(() => {
@@ -78,6 +110,7 @@ const getPluginsList = async () => {
   console.log(res)
   if (res.code == 200) {
     pluginsList.value = res.data
+    pluginsListCopy = res.data
   }
 }
 
@@ -112,6 +145,7 @@ const goEditPlugin = async (index: number) => {
  */
 const updatePluginsList = (e: pluginType[]) => {
   pluginsList.value = e
+  pluginsListCopy = e
 }
 
 /**
@@ -124,8 +158,21 @@ const deletePlugin = async (index: number) => {
   console.log(res)
   if (res.code == 200) {
     pluginsList.value = res.data
+    pluginsListCopy = res.data
   }
 }
+
+const searchPlugin = () => {
+  pluginsList.value = pluginsListCopy.filter(plugin=>plugin.reg.includes(searchText.value))
+}
+
+// const sizeChange = (e) => {
+//   console.log(e)
+// }
+
+// const pageChange = (e) => {
+//   console.log(e)
+// }
 </script>
 
 <style scoped lang="scss">

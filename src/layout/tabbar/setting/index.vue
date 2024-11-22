@@ -41,6 +41,7 @@ import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import useLayoutSettingStore from '@/store/modules/setting'
 import useUserStore from '@/store/modules/user'
+import { emitter } from '@/utils/eventBus'
 
 let $router = useRouter()
 let $route = useRoute()
@@ -104,6 +105,7 @@ const changeDark = () => {
   let html = document.documentElement
   //判断HTML标签是否有类名dark
   dark.value ? (html.className = 'dark') : (html.className = '')
+  emitter.emit('themeColor',html.className)
 }
 
 //主题颜色的设置

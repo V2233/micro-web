@@ -67,7 +67,7 @@ watch(
 .es-info-style {
   padding: 10px;
   height: calc(100% - 40px);
-  overflow-y: auto;
+  overflow-y: scroll;
   .el-row {
     margin-bottom: 10px;
     .el-button-group,

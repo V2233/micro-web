@@ -106,6 +106,8 @@ const getRedisKey = async(key:string) => {
     let res = await reqGetRedisKey(key)
     if(res.code == 200) {
         dbValue.value = res.data
+    } else {
+        dbValue.value = '[获取数据失败]:' + res.message
     }
 }
 

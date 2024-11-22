@@ -3,6 +3,8 @@
     ref="textRef"
     :class="['es-text', { editable }]"
     :contenteditable="editable"
+    style="display: flex; width: 100%; height: 100%; word-break: break-all;"
+    @blur="getText"
   >
     <slot>{{ text }}</slot>
   </div>
@@ -10,6 +12,8 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useEditorStore } from '../../store'
+const store = useEditorStore()
 
 const props = defineProps({
   editable: {
@@ -18,6 +22,10 @@ const props = defineProps({
   },
   text: {
     type: String
+  },
+  id: {
+    type: Number,
+    default: 0
   }
 })
 
@@ -32,11 +40,16 @@ function selectText() {
   window.getSelection()!.addRange(range)
 }
 
+function getText(e:any) {
+  store.data.elements[props.id].text = e.target.innerText
+}
+
 watch(
   () => [props.editable],
   () => {
     if (props.editable) {
       selectText()
+      store.data.elements[props.id].style!.display = 'flex'
     }
   }
 )
@@ -51,9 +64,9 @@ watch(
   left: 50%;
   transform: translate(-50%, -50%);
   word-break: break-all;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
   &.editable {
     z-index: 1;
     cursor: text;

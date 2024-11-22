@@ -9,7 +9,7 @@
             <Cpu class="cpu" :cpuData="stateData.cpuInfo" />
             <Ram class="ram" :ramData="stateData.ramInfo" />
             <Gpu class="gpu" v-if="stateData.gpuInfo" :gpuData="stateData.gpuInfo" />
-            <Rank class="rank" />
+            <Rank class="rank" @update-state="switchUpdateState"/>
           </div>
           <div class="center">
             <TopCenter class="top_center" />
@@ -17,7 +17,7 @@
             <Line class="line" />
           </div>
           <div class="right">
-            <TopRight class="top_right" @update-chart="getStatus" />
+            <TopRight class="top_right" @full-screen="toggleFullScreen(screenContainer)" />
             <Disk class="disk" :diskSize="stateData.diskSizeInfo" :swapData="stateData.swapInfo" />
             <Heap class="heap" :nodeData="stateData.nodeInfo" />
             <Other class="other" :otherData="stateData.otherInfo" :networkData="stateData.networkInfo" />
@@ -43,12 +43,17 @@ import Main from './components/main/index.vue'
 import Line from './components/line/index.vue'
 import Rank from './components/rank/index.vue'
 
-import { ref, onMounted, onBeforeMount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { reqStstus } from '@/api/screen/index'
+import useScreenstore from '@/store/modules/screen'
+
+const screenStore = useScreenstore()
 
 // 获取大屏dom
 let screen = ref()
 let screenContainer = ref()
+
+let timeId = ref<any>()
 
 let stateData = ref<any>([])
 
@@ -73,6 +78,46 @@ const getStatus = async () => {
     console.log(res.data)
   }
 }
+
+const switchUpdateState = (isOpen:boolean) => {
+  // console.log(isOpen)
+  timeId.value && clearInterval(timeId.value)
+  if(isOpen) {
+    getStatus()
+    timeId.value = setInterval(() => {
+      getStatus()
+    }, screenStore.settings.updateInterval * 1000)
+  } 
+}
+
+
+/**
+ * 全屏模式
+ * @returns
+ */
+  const toggleFullScreen = (elem:HTMLElement) => {  
+  // 检查传入的元素是否存在  
+  if (!elem) {  
+    console.error('需要传入一个元素');  
+    return;  
+  }  
+  // 检查该元素是否已经是全屏状态  
+  if (!document.fullscreenElement) {  
+    // 如果不是全屏，尝试进入全屏  
+    if (elem.requestFullscreen) {  
+      elem.requestFullscreen().catch(err => {  
+        console.error('全屏请求失败:', err);  
+      });  
+    } else {  
+      console.error('当前浏览器不支持全屏API');  
+    }  
+  } else {  
+    // 如果已经是全屏，则退出全屏  
+    if (document.exitFullscreen) {  
+      document.exitFullscreen();  
+    }  
+  }  
+};
 
 function getScale(isChanged = false, w = 1920, h = 1080) {
   // const { clientWidth, clientHeight } = screenContainer.value.offsetParent
@@ -110,9 +155,12 @@ const changeSize = () => {
 // })
 // observer.observe(screenContainer.value)
 
-onBeforeMount(() => {
+onBeforeUnmount(() => {
   if (resizeObserver.value) {
     resizeObserver.value.unobserve(screenContainer.value)
+  }
+  if(timeId.value) {
+    clearInterval(timeId.value)
   }
 })
 </script>

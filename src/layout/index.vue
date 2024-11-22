@@ -10,7 +10,7 @@
       <el-scrollbar class="scrollbar">
         <!-- 菜单组件 -->
         <el-menu :collapse="layoutSettingStore.foldMode == 1 ? true : false" :default-active="$route.path"
-          background-color="#001529" text-color="white" active-text-color="yellowgreen">
+          active-text-color="rgb(64, 158, 255)">
           <Menu :menuList="useStore.menuRoutes"></Menu>
         </el-menu>
       </el-scrollbar>
@@ -24,10 +24,12 @@
       <Tabbar></Tabbar>
     </div>
     <!-- 内容展示 -->
-    <div class="layout_main" :class="{ 
-      fold: layoutSettingStore.foldMode == 1 ? true : false,
-      hidden: layoutSettingStore.foldMode == 0 ? true : false,
-    }">
+    <div class="layout_main" 
+      :class="{ 
+        fold: layoutSettingStore.foldMode == 1 ? true : false,
+        hidden: layoutSettingStore.foldMode == 0 ? true : false,
+      }"
+    >
       <Main></Main>
     </div>
   </div>
@@ -41,6 +43,7 @@ import Tabbar from './tabbar/index.vue'
 
 import useUserStore from '@/store/modules/user'
 import useLayoutSettingStore from '@/store/modules/setting'
+// import { computed } from 'vue'
 // 获取路由对象
 import { useRoute } from 'vue-router'
 let $route = useRoute()
@@ -51,6 +54,10 @@ let useStore = useUserStore()
 
 let layoutSettingStore = useLayoutSettingStore()
 // console.log(useStore)
+// let bgColor = computed(()=>{
+//   console.log(document.documentElement.className)
+//   return document.documentElement.className == 'dark'?'transparent':'rgb(159, 161, 155)'
+// })
 </script>
 
 <script lang="ts">
@@ -66,8 +73,9 @@ export default {
   .layout_slider {
     width: $base-menu-width;
     height: 100vh;
-    background: $base-menu-background;
-    color: white;
+    // background: $base-menu-background;
+    // color: rgb(2, 255, 15);
+    
     transition: all 0.3s;
 
     .scrollbar {
@@ -113,7 +121,7 @@ export default {
     position: absolute;
     width: calc(100% - $base-menu-width);
     height: calc(100vh - $base-tabbar-height);
-    // background: yellowgreen;
+    // background: rgb(159, 161, 155);
     left: $base-menu-width;
     top: $base-tabbar-height;
     padding: 20px;

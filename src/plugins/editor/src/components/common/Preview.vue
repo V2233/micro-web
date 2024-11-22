@@ -7,7 +7,7 @@
       <el-button type="primary" @click="handleExport('html')">HTML</el-button>
       <el-button type="primary" @click="handleSaveHtml">保存到插件</el-button>
     </div>
-    <div class="es-preview-body" :style="{ width: editorStyle.width, height: editorStyle.height }">
+    <div class="es-preview-body" :style="{ width: editorStyle.width, height: editorStyle.height, border: '1px dashed gray' }">
       <div ref="editorRef" class="es-editor preview" :style="editorStyle">
         <template v-for="item in store.data.elements">
           <component :is="item.component!" v-bind="item.props" :style="{
@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import TextEditor from '../editor/TextEditor.vue'
-import { computed, ref, onMounted, onBeforeMount } from 'vue'
+import { computed, ref, onBeforeUnmount } from 'vue'
 import html2canvas from 'html2canvas'
 import JsPdf from 'jspdf'
 import { dayjs } from 'element-plus'
@@ -53,6 +53,7 @@ const scaleRatio = computed(() => store.data.container?.scaleRatio || 1)
 const handleSaveHtml = () => {
   const { width } = store.data.container.style
   emitter.emit('sendEditorHtml', { data: `<body style="width: ${width}px;">${editorRef.value?.outerHTML}</body>` })
+  store.preview = false
 }
 
 function handleExport(type: 'png' | 'jpg' | 'pdf' | 'html') {
@@ -101,7 +102,7 @@ function handleExport(type: 'png' | 'jpg' | 'pdf' | 'html') {
   })
 }
 
-onBeforeMount(() => {
+onBeforeUnmount(() => {
   emitter.off('getEditorHtml')
 })
 </script>

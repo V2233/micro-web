@@ -8,7 +8,7 @@ nprogress.configure({ showSpinner: false })
 
 let request = axios.create({
   baseURL: '/api',
-  timeout: 30000,
+  timeout: 120000,
 })
 
 request.interceptors.request.use((config) => {
@@ -28,7 +28,7 @@ request.interceptors.response.use(
   },
   (err) => {
     let message = ''
-    let status = err.response.status
+    let status = err.response?.status
     switch (status) {
       case 401:
         message = 'Token过期'

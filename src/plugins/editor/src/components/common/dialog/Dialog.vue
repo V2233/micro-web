@@ -55,6 +55,7 @@ const close = () => {
 const handleConfirm = () => {
   const { confirm } = state.option
   confirm && confirm(editor && editor.getValue())
+  close()
 }
 
 // 点击导出json

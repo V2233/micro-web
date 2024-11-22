@@ -1,7 +1,7 @@
 <template>
   <div ref="editorRef" class="es-editor" :style="editorStyle" @mousedown="onEditorMouseDown"
     @contextmenu.prevent="onEditorContextMenu">
-    <template v-for="item in data.elements">
+    <template v-for="(item, index) in data.elements">
       <ESDrager rotatable v-bind="omit(item, ['style', 'props'])" style="position: absolute" :grid-x="gridSize"
         :grid-y="gridSize" :scaleRatio="scaleRatio" boundary :markline="data.container.markline.show as any"
         :snap="data.container.snap" :snap-threshold="data.container.gridSize" @drag-start="onDragstart(item)"
@@ -11,8 +11,10 @@
           ...pickStyle(item.style, false),
           width: '100%',
           height: '100%',
+          display: 'flex'
         }">
-          <TextEditor v-if="item.text" :editable="item.editable" :text="item.text" :style="pickStyle(item.style)" />
+          <TextEditor v-if="item.text" :editable="item.editable" :text="item.text" :id="index"
+            :style="pickStyle(item.style)" />
         </component>
       </ESDrager>
     </template>
@@ -65,7 +67,7 @@ const editorStyle = computed(() => {
     transform: `scale(${scaleRatio.value})`,
     transformOrigin: 'top left',
     // backdropFilter: `blur(${backdropFilter})`,
-    // zIndex: `${zIndex}`
+
   }
 
   // const defStyle = `box-sizing: border-box; position: relative; width: 100%; height: 100%; `

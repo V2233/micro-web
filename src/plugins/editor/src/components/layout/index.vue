@@ -1,7 +1,7 @@
 <template>
   <div class="es-layout-container">
     <Aside @dragstart="handleAsideDragstart" @dragend="handleAsideDragend" />
-    <div ref="mainRef" class="es-layout-main">
+    <div ref="mainRef" class="es-layout-main" :style="`border: 10px solid ${mainBorderColor};`">
       <div class="es-editor-container" :style="editorContainerStyle">
         <Editor
           v-model="store.data"
@@ -22,12 +22,13 @@ import Aside from './Aside.vue'
 import Info from './info/Info.vue'
 import Editor from '../../components/editor/index.vue'
 import Preview from '../../components/common/Preview.vue'
+import { emitter } from '@/utils/eventBus'
 import { ComponentType, EditorDataType, ToolType } from '../../types'
 import { events } from '../../utils/events'
 import { useCommand } from '../../hooks/useCommand'
 import { $dialog, $upload } from '../../components/common'
 import { useId } from '../../utils/common'
-import { computed, onMounted, ref, CSSProperties } from 'vue'
+import { computed, onMounted, ref, CSSProperties, toRef, onBeforeUnmount } from 'vue'
 import { useEditorStore } from '../../store'
 import {
   RefreshLeft,
@@ -36,6 +37,7 @@ import {
   Download,
   Picture,
   View,
+  Back
 } from '@element-plus/icons-vue'
 import { PropType } from 'vue'
 import { watch } from 'vue'
@@ -52,9 +54,17 @@ const props = defineProps({
 
 const store = useEditorStore()
 
+const mainBorderColor = ref('transparent')
 const mainRef = ref<HTMLElement>()
 const { commands } = useCommand(store)
 const tools: ToolType[] = [
+  { 
+    label: '返回', 
+    icon: Back, 
+    handler: ()=>{
+      emitter.emit('goBack',true)
+    } 
+  },
   { label: '撤销', icon: RefreshLeft, handler: commands.undo },
   { label: '重做', icon: RefreshRight, handler: commands.redo },
   {
@@ -119,7 +129,7 @@ const tools: ToolType[] = [
       })
     },
   },
-  { label: '预览', icon: View, handler: () => (store.preview = true) },
+  { label: '保存', icon: View, handler: () => (store.preview = true) },
 ]
 
 const editorContainerStyle = computed(() => {
@@ -204,8 +214,17 @@ watch(
   },
   { immediate: true },
 )
+
 onMounted(() => {
-  init()
+  init();
+  document.documentElement.className == 'dark'?mainBorderColor.value = 'transparent':mainBorderColor.value = '#EFF2F5'
+  emitter.on('themeColor', (e: any) => {
+    e == 'dark'?mainBorderColor.value = 'transparent':mainBorderColor.value = '#EFF2F5'
+  })
+})
+
+onBeforeUnmount(() => {
+  emitter.off('themeColor')
 })
 
 defineExpose({
@@ -218,14 +237,13 @@ defineExpose({
 .es-layout-container {
   display: flex;
   height: calc(100% - var(--es-header-height));
-  background-color: var(--es-bg-color-page);
+  
 }
 .es-layout-main {
   flex: 1;
   position: relative;
-  margin: 20px;
   overflow: scroll;
-  // max-width: 800px;
+
   &::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -237,7 +255,7 @@ defineExpose({
   }
   &:hover {
     &::-webkit-scrollbar-thumb {
-      background-color: cyan;
+      background-color: #868484;
     }
   }
   .es-editor-container {

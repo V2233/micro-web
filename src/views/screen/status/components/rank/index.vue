@@ -3,13 +3,36 @@
     <template #content>
       <div class="setting-box">
         <div class="settings">
+
           <div class="slider-demo-block">
             <span class="demonstration">自动滚动</span>
             <el-switch
               v-model="screenStore.settings.isAutoScroll"
               class="mb-2"
-              size="large"
+              size="small"
               style="--el-switch-on-color: cyan"
+            />
+          </div>
+
+          <div class="slider-demo-block">
+            <div>
+              <span class="demonstration">自动刷新</span>
+              <el-input-number 
+                v-model="screenStore.settings.updateInterval" 
+                :min="0.5" 
+                :max="120" 
+                size="small" 
+                style="margin-left: 35px;" 
+                @change="changeUpdateInterval"
+              />
+              <span style="margin-left: 10px; font-size: 14px;">s / interval</span>
+            </div>
+            <el-switch
+              v-model="screenStore.settings.isAutoUpdated"
+              class="mb-2"
+              size="small"
+              style="--el-switch-on-color: cyan;"
+              @change="$emit('updateState',$event)"
             />
           </div>
 
@@ -39,6 +62,7 @@
               :max="60"
             />
           </div>
+
         </div>
       </div>
     </template>
@@ -48,15 +72,16 @@
 <script setup lang="ts">
 import DashboardCard from '@/components/dashboard/index.vue'
 import useScreenstore from '@/store/modules/screen'
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 
 const screenStore = useScreenstore()
+const $emit = defineEmits(["updateState"])
 
-const imageWidth = ref(400)
-
-const fontSize = ref(20)
-
-const qpsInterval = ref(1)
+const changeUpdateInterval = (interval: number) => {
+  if(screenStore.settings.isAutoUpdated) {
+    $emit('updateState',true)
+  }
+}
 
 //组件挂载完毕
 onMounted(() => {})
@@ -70,7 +95,7 @@ onMounted(() => {})
   justify-content: center;
   align-items: center;
   .settings {
-    height: 80%;
+    height: 90%;
     width: 80%;
     font-size: 20px;
     color: white;
@@ -80,13 +105,14 @@ onMounted(() => {})
 .slider-demo-block {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 .slider-demo-block .el-slider {
   margin-top: 0;
   margin-left: 12px;
 }
 .slider-demo-block .demonstration {
-  line-height: 44px;
+  line-height: 34px;
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -35,8 +35,6 @@
 <script setup lang="ts">
 import DashboardCard from '@/components/dashboard/index.vue'
 
-import { ref } from 'vue'
-
 defineProps(['otherData', 'networkData'])
 </script>
 

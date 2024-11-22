@@ -1,6 +1,5 @@
 <template>
   <div class="es-layout" @click.stop>
-    <el-button @click="goBack">返回</el-button>
     <div class="es-header-toolbar">
       <div v-for="item in tools" class="es-tool-btn" @click="handleToolClick(item)">
         <el-button :icon="item.icon">{{ item.label }}</el-button>
@@ -13,7 +12,7 @@
 
 <script setup lang="ts">
 import { ESEditor, ToolType, EditorDataType } from '@/plugins/editor'
-import { onMounted, computed, ref, onBeforeMount } from 'vue'
+import { onMounted, computed, ref, onBeforeUnmount } from 'vue'
 import { emitter } from '@/utils/eventBus'
 import useDevStore from '@/store/modules/dev'
 import { getMD5Hash } from '@/utils/hash'
@@ -45,34 +44,7 @@ const data = ref<EditorDataType>({
     style: {},
     scaleRatio: 1,
   },
-  elements: [
-    {
-      id: '1',
-      component: 'div',
-      width: 100,
-      height: 100,
-      left: 100,
-      top: 100,
-      text: 'div1',
-      style: {
-        background: '#ff4500',
-        color: '#fff',
-      },
-    },
-    {
-      id: '2',
-      component: 'div',
-      width: 100,
-      height: 100,
-      left: 300,
-      top: 150,
-      text: 'div2',
-      style: {
-        background: '#00ced1',
-        color: '#fff',
-      },
-    },
-  ],
+  elements: [],
 })
 
 const tools = computed(() => (editorRef.value as any)?.tools || [])
@@ -135,10 +107,14 @@ onMounted(() => {
     editedHtml.value = e.data
     saveImage()
   })
+  emitter.on('goBack', (e: any) => {
+    goBack()
+  })
 })
 
-onBeforeMount(() => {
+onBeforeUnmount(() => {
   emitter.off('sendEditorHtml')
+  emitter.off('goBack')
 })
 </script>
 

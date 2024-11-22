@@ -52,6 +52,9 @@ const borderStyle = computed({
     if (!store.current.style!.borderStyle) {
       store.current.style!.borderStyle = 'solid'
     }
+    if (!store.current.style!.borderWidth) {
+      store.current.style!.borderWidth = 0
+    }
     return store.current.style!.borderStyle || 'solid'
   },
   set: (val) => {

@@ -1,5 +1,5 @@
 <template>
-  <div class="es-basic-circle"></div>
+  <div class="es-basic-circle" style="display: flex;"></div>
 </template>
 
 <style>

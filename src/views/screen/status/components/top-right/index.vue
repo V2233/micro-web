@@ -1,7 +1,7 @@
 <template>
   <div class="top-right">
     <div class="right">
-      <span class="rbtn" @click="$emit('updateChart', 'update')">刷新图表</span>
+      <span class="rbtn" @click="$emit('fullScreen', '')">全屏</span>
       <span class="time">当期时间:{{ time }}</span>
     </div>
   </div>
@@ -14,7 +14,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 let time = ref(moment().format('YYYY-MM-DD/hh:mm:ss'))
 let timeId = ref<any>()
 
-const $emit = defineEmits(['updateChart'])
+const $emit = defineEmits(['fullScreen'])
 
 onMounted(() => {
   timeId.value = setInterval(() => {
