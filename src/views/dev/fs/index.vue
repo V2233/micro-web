@@ -143,9 +143,11 @@
 
     <el-card v-if="scene == 2">
       <el-button style="margin-bottom: 5px" @click="scene = 0">
-        <el-icon><Back /></el-icon>
+        <el-icon>
+          <Back />
+        </el-icon>
       </el-button>
-      <Terminal :dirPath="curPath"/>
+      <Terminal :dirPath="curPath" />
     </el-card>
 
     <!--    <el-pagination
@@ -605,9 +607,9 @@ const createFile = async (
 ) => {
   row.isBlur = false
 
-  if (eMode == 'enter') {
-    return
-  }
+  // if (eMode == 'enter') {
+  //   return
+  // }
 
   if (!row.name) {
     row.name = '新建标题'
@@ -909,7 +911,7 @@ onMounted(() => {
   getDir('0')
 })
 
-onBeforeMount(()=>{
+onBeforeMount(() => {
   window.onresize = null
 })
 </script>
