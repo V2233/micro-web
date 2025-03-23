@@ -132,7 +132,7 @@ const addAdmin = () => {
   adminObj.username.value = ""
   adminObj.password.value = ""
   adminObj.avatar.value = ""
-
+  adminObj.expires.value = "86400s"
   curAdmin.value = adminObj
   // curAdminIndex.value = adminList.value.length
   dialogVisible.value = true

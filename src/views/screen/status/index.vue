@@ -9,7 +9,7 @@
             <Cpu class="cpu" :cpuData="stateData.cpuInfo" />
             <Ram class="ram" :ramData="stateData.ramInfo" />
             <Gpu class="gpu" v-if="stateData.gpuInfo" :gpuData="stateData.gpuInfo" />
-            <Rank class="rank" @update-state="switchUpdateState"/>
+            <Rank class="rank" @update-state="switchUpdateState" />
           </div>
           <div class="center">
             <TopCenter class="top_center" />
@@ -74,20 +74,32 @@ onMounted(() => {
 const getStatus = async () => {
   let res: any = await reqStstus()
   if (res.code == 200) {
+    if (stateData.value.length == 0) {
+      const envEditionData = res.data.otherInfo.find((item: any) => item.first == "环境版本")
+      if (envEditionData) {
+        if (envEditionData.tail.platform !== 'win32') {
+          screenStore.settings.isAutoUpdated = true
+          screenStore.settings.updateInterval = 1
+          setTimeout(() => {
+            switchUpdateState(true)
+          }, screenStore.settings.updateInterval * 1000)
+        }
+      }
+    }
     stateData.value = res.data
-    console.log(res.data)
+    // console.log(res.data)
   }
 }
 
-const switchUpdateState = (isOpen:boolean) => {
+const switchUpdateState = (isOpen: boolean) => {
   // console.log(isOpen)
   timeId.value && clearInterval(timeId.value)
-  if(isOpen) {
+  if (isOpen) {
     getStatus()
     timeId.value = setInterval(() => {
       getStatus()
     }, screenStore.settings.updateInterval * 1000)
-  } 
+  }
 }
 
 
@@ -95,28 +107,28 @@ const switchUpdateState = (isOpen:boolean) => {
  * 全屏模式
  * @returns
  */
-  const toggleFullScreen = (elem:HTMLElement) => {  
+const toggleFullScreen = (elem: HTMLElement) => {
   // 检查传入的元素是否存在  
-  if (!elem) {  
-    console.error('需要传入一个元素');  
-    return;  
-  }  
+  if (!elem) {
+    console.error('需要传入一个元素');
+    return;
+  }
   // 检查该元素是否已经是全屏状态  
-  if (!document.fullscreenElement) {  
+  if (!document.fullscreenElement) {
     // 如果不是全屏，尝试进入全屏  
-    if (elem.requestFullscreen) {  
-      elem.requestFullscreen().catch(err => {  
-        console.error('全屏请求失败:', err);  
-      });  
-    } else {  
-      console.error('当前浏览器不支持全屏API');  
-    }  
-  } else {  
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen().catch(err => {
+        console.error('全屏请求失败:', err);
+      });
+    } else {
+      console.error('当前浏览器不支持全屏API');
+    }
+  } else {
     // 如果已经是全屏，则退出全屏  
-    if (document.exitFullscreen) {  
-      document.exitFullscreen();  
-    }  
-  }  
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
 };
 
 function getScale(isChanged = false, w = 1920, h = 1080) {
@@ -159,7 +171,7 @@ onBeforeUnmount(() => {
   if (resizeObserver.value) {
     resizeObserver.value.unobserve(screenContainer.value)
   }
-  if(timeId.value) {
+  if (timeId.value) {
     clearInterval(timeId.value)
   }
 })

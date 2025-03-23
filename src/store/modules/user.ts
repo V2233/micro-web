@@ -1,7 +1,7 @@
 import { reqLogin, reqUserInfo, reqLogout, reqSaveServerAddress } from '@/api/user'
 import { defineStore } from 'pinia'
 import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from '@/utils/token'
-
+import { ElNotification } from 'element-plus'
 import type {
   loginForm,
   loginResponseData,
@@ -44,7 +44,7 @@ let useUserStore = defineStore('User', {
       /** 请求源，用于服务端提供链接 */
       originAddress: '',
       originPort: 23306,
-      
+
     }
   },
   actions: {
@@ -81,6 +81,7 @@ let useUserStore = defineStore('User', {
 
         return Promise.resolve('ok')
       } else {
+        ElNotification.error(`[${result.code}]${result.message}`)
         return Promise.reject(new Error(JSON.stringify(result.data)))
       }
     },
@@ -99,9 +100,9 @@ let useUserStore = defineStore('User', {
     async getOriginAddress() {
       this.originAddress = window.location.origin
       const urlObj = new URL(this.originAddress)
-      const { hostname, port, protocol, origin} = urlObj
-      let res:any = await reqSaveServerAddress({hostname, port, protocol, origin})
-      if(res.code == 200){
+      const { hostname, port, protocol, origin } = urlObj
+      let res: any = await reqSaveServerAddress({ hostname, port, protocol, origin })
+      if (res.code == 200) {
         this.originPort = res.data.port
         return Promise.resolve('ok')
       } else {

@@ -6,5 +6,11 @@ export default [
         qq: 'http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=6qeMfgydE5k8e_nTorXz0ywmahixBTFw&authKey=9iCyC5qsuluUfxwz4evh5xPmJb3YwlixjoMTxN9He%2BrGu7WiDf2dY8OGk7t%2BGaIu&noverify=0&group_code=397798018',
         github: 'https://github.com/V2233/micro-plugin',
         gitee: 'https://gitee.com/V2233/micro-plugin',
+    },
+    {
+        author: '天才威玩游戏',
+        avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=2357444016',
+        content: 'Micro Panel 移动端 APK 开发',
+        github: 'https://github.com/tiancra',
     }
 ]

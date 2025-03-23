@@ -7,7 +7,7 @@
                     {{ content }}
                 </label>
             </div>
-            
+
         </div>
         <div class="card_back"></div>
         <div class="data">
@@ -19,7 +19,7 @@
             </div>
         </div>
         <div class="btns">
-            <div class="likes">
+            <div class="likes" v-if="github">
                 <a :href="github" target="_blank">
                     <svg t="1720796346257" class="icon" viewBox="0 0 1024 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="4241" width="20" height="20">
@@ -30,7 +30,7 @@
                 </a>
             </div>
 
-            <div class="comments">
+            <div class="comments" v-if="gitee">
                 <a :href="gitee" target="_blank">
                     <svg t="1720797592466" class="icon" viewBox="0 0 1024 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="5544" id="mx_n_1720797592467" width="18" height="18">
@@ -41,7 +41,7 @@
                 </a>
             </div>
 
-            <div class="views">
+            <div class="views" v-if="qq">
                 <a :href="qq" target="_blank">
                     <svg t="1720800651016" class="icon" viewBox="0 0 1024 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="6767" width="20" height="20">
@@ -59,12 +59,12 @@
 
 // defineProps(['avatar', 'author', 'content', 'contact'])
 defineProps({
-    avatar: {type: String, required: true},
-    author: {type: String, required: true},
-    content: {type: String, required: true},
-    qq: {type: String, default: ''},
-    github: {type: String, default: ''},
-    gitee: {type: String, default: ''},
+    avatar: { type: String, required: true },
+    author: { type: String, required: true },
+    content: { type: String, required: true },
+    qq: { type: String, default: '' },
+    github: { type: String, default: '' },
+    gitee: { type: String, default: '' },
 })
 
 </script>
