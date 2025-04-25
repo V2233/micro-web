@@ -44,7 +44,7 @@ let useUserStore = defineStore('User', {
       /** 请求源，用于服务端提供链接 */
       originAddress: '',
       originPort: 23306,
-
+      tokens: {}
     }
   },
   actions: {
@@ -55,6 +55,20 @@ let useUserStore = defineStore('User', {
       if (result.code == 200) {
         this.token = result.data as string
         SET_TOKEN(result.data as string)
+        let savedTokensString = localStorage.getItem('HISTORY_TOKENS')
+        if (!savedTokensString) {
+          this.tokens = {
+            [result.data]: data
+          }
+        } else {
+          this.tokens = JSON.parse(savedTokensString)
+          let existed = Object.keys(this.tokens).find(token => this.tokens[token].username === data.username)
+          if (existed) {
+            delete this.tokens[existed]
+          }
+          this.tokens[result.data as string] = data
+        }
+        localStorage.setItem('HISTORY_TOKENS', JSON.stringify(this.tokens))
         return Promise.resolve('ok')
       } else {
         return Promise.reject(new Error(result.data))

@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-import type { groupInfoType,friendInfoType } from '@/views/dev/sandbox/protocol/onebotv11/api/type'
+import type { groupInfoType, friendInfoType } from '@/views/dev/sandbox/protocol/onebotv11/api/type'
 import type { BotInfoType } from '@/api/dev/plugin/type'
 
 export interface DevState {
@@ -12,14 +12,14 @@ export interface DevState {
   isPortrait: boolean
   botsInfo: BotInfoType[]
   /** ssh连接设置 */
-  sshInfo: { 
-    host:string,
-    port?:number,
-    username:string,
-    password:string
+  sshInfo: {
+    host: string,
+    port?: number,
+    username: string,
+    password: string
   }
   /** 避免ts报any类型，后续可拓展 */
-  curAdapter:'onebot11'
+  curAdapter: 'onebot11'
   onebot11: {
     /** 群聊列表 */
     group_list: Array<groupInfoType>,
@@ -80,5 +80,11 @@ export interface UserState {
   masterQQ?: string | number
   buttons: string[],
   originAddress: string,
-  originPort: number
+  originPort: number,
+  tokens: {
+    [key: string]: {
+      username: string;
+      password: string
+    }
+  }
 }

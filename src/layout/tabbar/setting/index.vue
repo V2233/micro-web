@@ -29,8 +29,15 @@
       </el-icon>
     </span>
     <template #dropdown>
-      <el-dropdown-menu>
+      <el-dropdown-menu :style="{ maxHeight: '200px' }">
         <el-dropdown-item @click="logOut">退出登录</el-dropdown-item>
+        <div v-for="(item, index) in Object.keys(userStore.tokens)" :key="index">
+          <el-dropdown-item v-if="userStore.tokens && (item !== userStore.token)" @click="checkAccout(item)">{{
+            userStore.tokens[item]?.username }}
+            <el-icon class="el-icon-close" style="margin-left: 5px; align-self: center;" @click="deleteToken(item)">
+              <Close />
+            </el-icon></el-dropdown-item>
+        </div>
       </el-dropdown-menu>
     </template>
   </el-dropdown>
@@ -80,6 +87,17 @@ const logOut = async () => {
   })
 }
 
+// 切换账户
+const checkAccout = (token: string) => {
+  localStorage.setItem('TOKEN', String(token))
+  window.location.reload()
+}
+
+const deleteToken = (token: string) => {
+  delete userStore.tokens[token]
+  localStorage.setItem('HISTORY_TOKENS', JSON.stringify(userStore.tokens))
+}
+
 //颜色组件组件的数据
 const color = ref('rgba(255, 69, 0, 0.68)')
 const predefineColors = ref([
@@ -105,7 +123,7 @@ const changeDark = () => {
   let html = document.documentElement
   //判断HTML标签是否有类名dark
   dark.value ? (html.className = 'dark') : (html.className = '')
-  emitter.emit('themeColor',html.className)
+  emitter.emit('themeColor', html.className)
 }
 
 //主题颜色的设置
@@ -128,5 +146,13 @@ export default {
   height: 24px;
   margin: 0 10px;
   border-radius: 50%;
+}
+
+.el-icon-close {
+  border-radius: 50%;
+}
+
+.el-icon-close:hover {
+  background-color: green;
 }
 </style>
