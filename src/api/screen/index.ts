@@ -7,8 +7,8 @@ enum API {
 }
 
 // 日志接口
-export const reqLogs = (id: string | number) => {
-  return request.get<any, logType>(API.LOGS_URL + '?id=' + id)
+export const reqLogs = (id: string | number, page = 0, pageSize = 50) => {
+  return request.get<any, logType>(API.LOGS_URL + '?id=' + id + '&page=' + page + '&size=' + pageSize)
 }
 
 // 状态接口

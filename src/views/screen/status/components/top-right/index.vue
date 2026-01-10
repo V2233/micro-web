@@ -2,7 +2,7 @@
   <div class="top-right">
     <div class="right">
       <span class="rbtn" @click="$emit('fullScreen', '')">全屏</span>
-      <span class="time">当期时间:{{ time }}</span>
+      <span class="time">当前时间:{{ time }}</span>
     </div>
   </div>
 </template>

@@ -21,6 +21,9 @@
             <el-form-item label="字体大小">
               <el-slider v-model="logFontSize" size="large" :min="12" :max="30" @input="changeLogFontSize" />
             </el-form-item>
+            <el-form-item label="分页大小">
+              <el-slider v-model="pageSize" size="large" :min="20" :max="1000" />
+            </el-form-item>
           </el-form>
           <template #reference>
             <el-button size="small" icon="Setting" circle style="margin-right: 5px"></el-button>
@@ -34,12 +37,13 @@
       </div>
     </div>
     <!-- 日志窗口 -->
-    <div class="page-logs" :style="{ height: `${newHeight}px` }">
-      <div class="line" v-for="(item, index) in logs" :key="index" :style="{
+    <ul class="page-logs" :style="{ height: `${newHeight}px` }" v-infinite-scroll="loadPage">
+      <li class="line" v-for="(item, index) in logs" :key="index" :style="{
         fontSize: `${newFontSize}px`,
         marginTop: `${Math.round(newFontSize * 0.2,)}px`,
         lineHeight: `${String(Math.round(1.5 * newFontSize))}px`
       }">
+        <span class="timestamp">[{{ index }}]</span>
         <span class="timestamp">{{ item.time }}</span>
         <span
           :class="LEVEL_MAP[item.level as keyof typeof LEVEL_MAP] ? LEVEL_MAP[item.level as keyof typeof LEVEL_MAP] : LEVEL_MAP['STDOUT']">
@@ -48,8 +52,8 @@
         <span class="detail" :style="{ color: `${detailCssColor}` }">
           {{ item.detail }}
         </span>
-      </div>
-    </div>
+      </li>
+    </ul>
   </el-card>
 </template>
 
@@ -66,7 +70,9 @@ type logType = {
 let logs = ref<logType[]>([])
 let logsList = ref<string[]>([])
 let logId = ref<string>('0')
-let curLog = ref('')
+let curLog = ref('0')
+let page = ref(0)
+let pageSize = ref(50)
 
 // 窗口设置
 let logBoxHeight = ref(500)
@@ -103,6 +109,7 @@ const LEVEL_MAP = ref({
 })
 
 onMounted(() => {
+  newHeight.value = window.innerHeight - 150
   getLog()
 })
 
@@ -114,25 +121,39 @@ const changeLogFontSize = (e: number) => {
   newFontSize.value = logFontSize.value
 }
 
+// const changePageSize = (e: number) => {
+//   console.log(e)
+//   // pageSize.value = e
+// }
+
 const setDetailColor = () => {
   detailCssColor.value = logDetailColor.value
 }
 
 const getLog = async (id?: string) => {
+  console.log(logId.value, id, curLog.value)
+  if (logId.value != id) {
+    logs.value = []
+    logId.value = id || '0'
+    page.value = 0
+  }
   let res: any
   if (id == '0' || !id) {
-    res = await reqLogs('0')
+    res = await reqLogs('0', page.value, pageSize.value)
   } else {
-    res = await reqLogs(id)
+    res = await reqLogs(id, page.value, pageSize.value)
   }
   // console.log(res)
   if (res.code == 200) {
-    logs.value = res.data.logText
-      .split('\r')
-      .map((line: string) => parseLog(line.trim())) as logType[]
+    logs.value.push(...res.data.logs)
     logsList.value = res.data.logList
     curLog.value = res.data.curLog
   }
+}
+
+const loadPage = () => {
+  page.value++
+  getLog(curLog.value)
 }
 
 const changeLog = (e: string) => {
@@ -140,34 +161,9 @@ const changeLog = (e: string) => {
 }
 
 const updateLog = () => {
-  getLog(logId.value)
+  getLog(curLog.value)
 }
 
-const parseLog = (log: string) => {
-  // 正则表达式来匹配时间、日志等级和日志详情
-  // 时间格式：[HH:MM:SS.sss]
-  // 日志等级：ERRO、MARK等（这里假设它是大写且后面紧跟中括号）
-  // 日志详情：其余部分
-  const regex = /^(\[\d+:\d+:\d+.\d+\])\[([A-Z]+?)\](.*)/
-  const match = regex.exec(log)
-
-  if (match && match.length >= 4) {
-    // 提取时间、日志等级和日志详情
-    const time = match[1] as string
-    const level = match[2] as string
-    const detail = match[3] as string
-
-    // 返回提取出的结果
-    return { time, level, detail }
-  } else {
-    // 如果没有匹配到，返回一个表示错误的数组
-    return {
-      time: '',
-      level: '',
-      detail: log,
-    }
-  }
-}
 </script>
 
 <style scoped lang="scss">
@@ -253,13 +249,13 @@ $--terminal-mark: #b7b7b7;
     .timestamp {
       color: $--terminal-timestamp;
       font-weight: bold;
-      margin-right: 0.5rem;
+      margin-right: 0;
     }
 
     .level {
       color: $--terminal-fg;
       font-weight: bold;
-      margin-right: 0.5rem;
+      margin-right: 0;
     }
 
     .detail {
