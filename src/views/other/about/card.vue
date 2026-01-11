@@ -74,11 +74,14 @@ defineProps({
     position: relative;
     margin: 16px;
     /* border: 2px solid blue; */
+    min-height: 15em;
+    display: flex;
+    flex-direction: column;
 }
 
 .card {
-    width: 15em;
-    height: 10em;
+    width: 18em;
+    height: 12em;
     background-color: #252525;
     border-radius: 7px;
     cursor: pointer;
@@ -88,8 +91,8 @@ defineProps({
 
 .card_back {
     position: absolute;
-    width: 240px;
-    height: 210px;
+    width: 18em;
+    height: 12em;
     top: 20px;
     left: 10px;
     background-color: rgba(30, 31, 38, 0.575);
@@ -99,10 +102,10 @@ defineProps({
 }
 
 .main:hover .card_back {
-    width: 260px;
+    width: 19.5em;
     top: -10px;
     left: -10px;
-    height: 270px;
+    height: 14em;
     cursor: pointer;
 }
 
@@ -132,7 +135,7 @@ defineProps({
     flex-direction: column;
     margin-left: 0.5em;
     font-family: Montserrat;
-    color: white;
+    color: white !important;
 }
 
 .text_m {
@@ -148,15 +151,17 @@ defineProps({
     display: flex;
     gap: 0.5em;
     transition: .2s ease-in-out;
+    padding: 0.5em 0;
+    min-height: 3em;
 }
 
 .likes {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.5em;
-    height: 1.5em;
-    border-radius: 4px;
+    width: 2.916em;
+    height: 1.944em;
+    border-radius: 6px;
     margin-top: -0.5em;
     opacity: 0;
     background-color: #444857;
@@ -171,8 +176,8 @@ defineProps({
 }
 
 .likes_svg {
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     fill: white;
 }
 
@@ -185,9 +190,9 @@ defineProps({
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.5em;
-    height: 1.5em;
-    border-radius: 4px;
+    width: 2.916em;
+    height: 1.944em;
+    border-radius: 6px;
     margin-top: -0.5em;
     opacity: 0;
     background-color: #444857;
@@ -202,8 +207,8 @@ defineProps({
 }
 
 .comments_svg {
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     fill: white;
 }
 
@@ -216,9 +221,9 @@ defineProps({
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 3em;
-    height: 1.5em;
-    border-radius: 4px;
+    width: 2.916em;
+    height: 1.944em;
+    border-radius: 6px;
     margin-top: -0.5em;
     opacity: 0;
     background-color: #444857;
@@ -233,8 +238,8 @@ defineProps({
 }
 
 .views_svg {
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     fill: white;
 }
 
@@ -278,7 +283,7 @@ defineProps({
     display: inline-block;
     width: 100%;
     height: 100%;
-    color: white;
+    color: white !important;
 }
 
 /* Hide default HTML checkbox */
@@ -290,12 +295,10 @@ defineProps({
 
 /* The slider */
 .slider_738 {
-    position: absolute;
+    position: relative;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%;
+    height: 2em;
     background-color: #ccc;
     transition: .4s;
     border-radius: 5px;
@@ -304,20 +307,14 @@ defineProps({
 .slider_738:before {
     position: absolute;
     content: "";
-    height: .5em;
-    width: 2.4em;
+    height: 1em;
+    width: 2em;
     border-radius: 5px;
-    left: -0.6em;
-    top: 0.2em;
+    left: 0.5em;
+    top: 0.5em;
     background-color: white;
-    box-shadow: 0 6px 7px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     transition: .4s;
-}
-
-.slider_738:before,
-.slider_738:after {
-    content: "";
-    display: block;
 }
 
 .slider_738:after {
@@ -332,10 +329,10 @@ defineProps({
     transform: translateX(-22.5%) rotate(90deg);
     transform-origin: 25% 50%;
     position: relative;
-    top: 0.5em;
-    left: 0.55em;
-    width: 2em;
-    height: 1em;
+    top: 0.75em;
+    left: 1.25em;
+    width: 1.5em;
+    height: 0.75em;
     box-sizing: border-box;
 }
 
@@ -348,10 +345,16 @@ defineProps({
 }
 
 .chk_738:checked+.slider_738:before {
-    transform: translateY(2.3em);
+    transform: translateX(12em);
 }
 
 .chk_738:checked+.slider_738:after {
     transform: rotateZ(90deg) rotateY(180deg) translateY(0.45em) translateX(-1.4em);
+}
+/* 暗黑模式下文字保持白色 */
+.dark {
+    .text {
+        color: white !important;
+    }
 }
 </style>

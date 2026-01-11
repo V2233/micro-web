@@ -1,6 +1,14 @@
 <template>
     <div class="handle_bar">
-        <el-popover placement="bottom" title="编辑器设置" :width="300" trigger="hover">
+        <!-- 使用el-dialog替代el-popover，实现居中弹窗 -->
+        <el-button icon="Setting" circle size="small" @click="dialogVisible = true"></el-button>
+        
+        <el-dialog
+            v-model="dialogVisible"
+            title="编辑器设置"
+            width="300px"
+            center
+        >
             <!-- 编辑器设置 -->
             <el-form>
                 <el-form-item label="编辑器最小高度(行)">
@@ -16,10 +24,12 @@
                         @input="changeEditorFontSize" />
                 </el-form-item>
             </el-form>
-            <template #reference>
-                <el-button icon="Setting" circle size="small"></el-button>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="dialogVisible = false">关闭</el-button>
+                </div>
             </template>
-        </el-popover>
+        </el-dialog>
 
         <el-select v-model="curLang" placeholder="Language" style="width: 100px; margin: 0 5px" size="small">
             <el-option v-for="(item, index) in registedLangs" :key="index" :label="item.lang" :value="item.lang" />
@@ -74,6 +84,9 @@ const themeList = ref<string[]>([
     'github',
     'solarized_dark',
 ])
+
+// 对话框显示控制
+const dialogVisible = ref<boolean>(false)
 
 watch(
     () => props.ext,

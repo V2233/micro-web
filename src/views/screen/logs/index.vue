@@ -2,17 +2,14 @@
   <el-card class="log_box">
     <div class="log_select">
       <div class="log_title">
-        <span style="margin-right: 10px">日志</span>
-
-        <el-color-picker @change="setDetailColor" v-model="logDetailColor" size="small" show-alpha
-          :predefine="predefineColors" />
+        <span style="margin-right: 10px; color: white">日志</span>
       </div>
       <!-- 日志多选框 -->
       <div class="select_log">
         <el-button class="update_btn" size="small" icon="Refresh" circle @click="updateLog"
           style="margin-right: -5px"></el-button>
         <!-- 设置 -->
-        <el-popover placement="bottom" title="日志设置" :width="300" trigger="hover">
+        <el-popover placement="bottom" title="日志设置" :width="300" trigger="click">
           <!-- 表单元素 -->
           <el-form>
             <el-form-item label="窗口高度">
@@ -43,13 +40,13 @@
         marginTop: `${Math.round(newFontSize * 0.2,)}px`,
         lineHeight: `${String(Math.round(1.5 * newFontSize))}px`
       }">
-        <span class="timestamp">[{{ index }}]</span>
+        <span class="timestamp">{{ index }}</span>
         <span class="timestamp">{{ item.time }}</span>
         <span
           :class="LEVEL_MAP[item.level as keyof typeof LEVEL_MAP] ? LEVEL_MAP[item.level as keyof typeof LEVEL_MAP] : LEVEL_MAP['STDOUT']">
           [{{ item.level }}]
         </span>
-        <span class="detail" :style="{ color: `${detailCssColor}` }">
+        <span class="detail">
           {{ item.detail }}
         </span>
       </li>
@@ -77,23 +74,8 @@ let pageSize = ref(50)
 // 窗口设置
 let logBoxHeight = ref(500)
 let newHeight = ref(500)
-let logDetailColor = ref('#c8c7c7')
-let detailCssColor = ref('#c8c7c7')
-
 let logFontSize = ref(16)
 let newFontSize = ref(16)
-
-const predefineColors = ref([
-  '#c8c7c7',
-  'rgba(30, 244, 251, 1)',
-  '#ff4500',
-  '#ff8c00',
-  '#ffd700',
-  '#90ee90',
-  '#00ced1',
-  '#1e90ff',
-  '#c71585',
-])
 
 const LEVEL_MAP = ref({
   STDOUT: 'stdout',
@@ -125,10 +107,6 @@ const changeLogFontSize = (e: number) => {
 //   console.log(e)
 //   // pageSize.value = e
 // }
-
-const setDetailColor = () => {
-  detailCssColor.value = logDetailColor.value
-}
 
 const getLog = async (id?: string) => {
   console.log(logId.value, id, curLog.value)
@@ -170,21 +148,21 @@ const updateLog = () => {
 @import '@/../node_modules/@fontsource/roboto-mono/index.css';
 
 $--terminal-bg: #24292f;
-$--terminal-fg: #d0d7de;
+$--terminal-fg: white;
 $--terminal-bg-hover: #32383f;
-$--terminal-fg-hover: #f6f8fa;
+$--terminal-fg-hover: white;
 $--terminal-bg-selection: rgba(33, 139, 255, 0.15);
 $--terminal-separator: rgba(140, 149, 159, 0.75);
-$--terminal-timestamp: #3c8de9;
-$--terminal-detail: #c8c7c7;
+$--terminal-timestamp: white;
+$--terminal-detail: white;
 
-$--terminal-trace: #2a0cec;
-$--terminal-debug: #4194e7;
-$--terminal-info: #87f355;
-$--terminal-warn: #f8c471;
-$--terminal-error: #f37672;
-$--terminal-fatal: #f72a1b;
-$--terminal-mark: #b7b7b7;
+$--terminal-trace: white;
+$--terminal-debug: white;
+$--terminal-info: white;
+$--terminal-warn: white;
+$--terminal-error: white;
+$--terminal-fatal: white;
+$--terminal-mark: white;
 
 .log_box {
   width: 100%;
@@ -206,7 +184,7 @@ $--terminal-mark: #b7b7b7;
 }
 
 .page-logs {
-  color: $--terminal-fg;
+  color: white !important;
   background-color: $--terminal-bg;
   margin-top: 20rpx;
   border-radius: 5px;
@@ -236,9 +214,10 @@ $--terminal-mark: #b7b7b7;
     font-family: 'Roboto Mono', monospace, serif;
     max-width: 200rpx;
     word-wrap: break-word;
+    color: white !important;
 
     &:hover {
-      color: $--terminal-fg-hover;
+      color: white !important;
       background-color: $--terminal-bg-hover;
     }
 
@@ -247,52 +226,52 @@ $--terminal-mark: #b7b7b7;
     }
 
     .timestamp {
-      color: $--terminal-timestamp;
+      color: white !important;
       font-weight: bold;
       margin-right: 0;
     }
 
     .level {
-      color: $--terminal-fg;
+      color: white !important;
       font-weight: bold;
       margin-right: 0;
     }
 
     .detail {
-      color: $--terminal-detail;
+      color: white !important;
       font-weight: bold;
     }
 
     .level-trace {
-      color: $--terminal-trace;
+      color: white !important;
     }
 
     .level-debug {
-      color: $--terminal-debug;
+      color: white !important;
     }
 
     .level-info {
-      color: $--terminal-info;
+      color: white !important;
     }
 
     .level-warn {
-      color: $--terminal-warn;
+      color: white !important;
     }
 
     .level-error {
-      color: $--terminal-error;
+      color: white !important;
     }
 
     .level-fatal {
-      color: $--terminal-fatal;
+      color: white !important;
     }
 
     .level-mark {
-      color: $--terminal-mark;
+      color: white !important;
     }
 
     .stdout {
-      color: $--terminal-fg;
+      color: white !important;
     }
   }
 }
