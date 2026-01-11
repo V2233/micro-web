@@ -1,9 +1,9 @@
 <template>
-  <router-view v-slot="{ Component }">
-    <transition name="fade">
+  <router-view v-slot="{ Component, route }">
+    <transition name="page-slide">
       <!-- 渲染layout以及路由组件的子路由 -->
-      <div class="com">
-        <component :is="Component" v-if="flag" />
+      <div class="com" :key="route.fullPath">
+        <component :is="Component" />
       </div>
     </transition>
   </router-view>
@@ -15,17 +15,18 @@ import { ref, watch, nextTick, onMounted } from 'vue'
 import useLayoutSettingStore from '@/store/modules/setting'
 let layoutSettingStore = useLayoutSettingStore()
 
-// 控制组件是否销毁重建
-let flag = ref(true)
-
 // 监听仓库数据变化
 watch(
   () => layoutSettingStore.refresh,
   () => {
-    flag.value = false
-    nextTick(() => {
-      flag.value = true
-    })
+    // 页面刷新时重新渲染组件
+    const comElement = document.querySelector('.com')
+    if (comElement) {
+      comElement.classList.remove('page-slide-enter-active')
+      nextTick(() => {
+        comElement.classList.add('page-slide-enter-active')
+      })
+    }
   },
 )
 </script>
@@ -37,15 +38,38 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.fade-enter-from {
+// 页面切换动画 - 向右划出 + 从右侧划入
+// Out Sine缓动函数: cubic-bezier(0.61, 1, 0.88, 1)
+.page-slide-enter-from {
   opacity: 0;
-  transform: scale(0);
+  transform: translateX(100%);
 }
-.fade-enter-active {
-  transition: all 1s;
+.page-slide-enter-active {
+  transition: all 1s cubic-bezier(0.61, 1, 0.88, 1);
 }
-.fade-enter-to {
+.page-slide-enter-to {
   opacity: 1;
-  transform: scale(1);
+  transform: translateX(0);
+}
+.page-slide-leave-from {
+  opacity: 1;
+  transform: translateX(0);
+}
+.page-slide-leave-active {
+  transition: all 1s cubic-bezier(0.61, 1, 0.88, 1);
+}
+.page-slide-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.com {
+  /* 确保动画效果正确显示，两个页面能够重叠 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 </style>

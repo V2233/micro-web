@@ -2,7 +2,8 @@
   <el-button type="primary" size="small" icon="Refresh" circle @click="updateRefresh"></el-button>
   <el-button type="primary" size="small" icon="FullScreen" circle @click="fullScreen"></el-button>
 
-  <el-popover placement="bottom" title="主题设置" :width="300" trigger="hover">
+  <!-- 修改关闭判定为点击外部或按下Esc -->
+  <el-popover ref="popoverRef" placement="bottom" title="主题设置" :width="300" trigger="click" popper-class="theme-popover" :close-on-click-outside="true" :close-on-press-escape="true">
     <!-- 表单元素 -->
     <el-form>
       <el-form-item label="主题颜色">

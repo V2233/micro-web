@@ -1,39 +1,29 @@
 <template>
   <div class="login_container">
-    <login-bg @mouseenter="card = 1" @mouseleave="card = 0">
-      <template #content>
-        <div class="login_box" v-if="card == 0">
-          <div>
-            <img class="blinking-image" src="/terminal.png">
+    <!-- 黑色遮罩层 -->
+    <div class="login_mask"></div>
+    
+    <div class="login_box">
+      <el-form :model="loginForm" :rules="rules" ref="loginForms" style="width: 100%;">
+        <h2>登录 Yunzai-Dev</h2>
+        <el-form-item prop="username">
+          <el-input class="form_input" :prefix-icon="User" v-model="loginForm.username" :input-style="{
+            width: '100%',
+          }"></el-input>
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input class="form_input" :prefix-icon="Lock" show-password type="password"
+            v-model="loginForm.password" @keydown.enter="login" style="width: 100%;"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <div class="btn_box" @click="login">
+            <LoginBtn />
           </div>
-        </div>
-
-        <div class="login_box" v-if="card == 1">
-          <el-form :model="loginForm" :rules="rules" ref="loginForms" style="width: 100%;">
-            <h2>Please login!</h2>
-            <el-form-item prop="username">
-              <el-input class="form_input" :prefix-icon="User" v-model="loginForm.username" :input-style="{
-                width: '100%',
-              }"></el-input>
-            </el-form-item>
-            <el-form-item prop="password">
-              <el-input class="form_input" :prefix-icon="Lock" show-password type="password"
-                v-model="loginForm.password" @keydown.enter="login" style="width: 100%;"></el-input>
-            </el-form-item>
-            <el-form-item>
-              <div class="btn_box" @click="login">
-                <LoginBtn />
-              </div>
-            </el-form-item>
-            <p>Powered by Yunzai-Bot & Micro-Plugin</p>
-          </el-form>
-
-        </div>
-
-      </template>
-    </login-bg>
+        </el-form-item>
+        <p>Powered by Yunzai-Bot & Micro-Plugin</p>
+      </el-form>
+    </div>
   </div>
-
 </template>
 
 <script setup lang="ts">
@@ -48,7 +38,6 @@ import { reactive, ref, onMounted } from 'vue'
 // 引入 router
 import { useRouter, useRoute } from 'vue-router'
 
-import LoginBg from './bg.vue'
 import LoginBtn from './button.vue'
 
 // 引入仓库
@@ -59,7 +48,6 @@ let $route = useRoute()
 
 // 主题
 let dark = ref<boolean>(true)
-const card = ref(0)
 
 // 登录信息
 let loginForm = reactive({ username: 'admin', password: '114514' })
@@ -143,42 +131,70 @@ const changeDark = () => {
   //判断HTML标签是否有类名dark
   html.className = 'dark'
 }
-
-onMounted(() => {
-  changeDark()
-})
 </script>
 
 <style scoped lang="scss">
 .login_container {
   position: absolute;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   width: 100%;
   height: 100vh;
   background-color: black;
+  background-image: url('/wallpaper.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
   padding: 40px;
   z-index: -50;
+
+  .login_mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5); /* 透明度25%的黑色遮罩 */
+    z-index: 50;
+  }
 
   .login_box {
     position: relative;
     display: flex;
     width: 100%;
-    height: 100%;
+    max-width: 400px;
+    height: auto;
+    min-height: 400px;
     justify-content: center;
     align-items: center;
     color: white;
     z-index: 80;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 40px;
+    margin: 20px;
+    margin-right: calc(100% / 4); /* 调整位置到网页的3/4位置 */
+
+    &:hover {
+      box-shadow: 0 12px 48px rgba(29, 255, 225, 0.2);
+      transform: translateY(-5px);
+    }
 
     h2 {
-      font-size: 20px;
+      font-size: 24px;
       color: rgb(29, 255, 225);
       margin: 20px 0;
+      text-align: center;
+      font-weight: 600;
     }
 
     .btn_box {
-      margin-top: 5px;
+      margin-top: 20px;
       width: 100%;
       height: auto;
       display: flex;
@@ -191,26 +207,71 @@ onMounted(() => {
       line-height: 18px;
       color: #1cffca;
       font-weight: 600;
+      text-align: center;
+      margin-top: 20px;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+      
+      &:hover {
+        opacity: 1;
+      }
     }
 
     .blinking-image {
-      // border: 2px solid red;
       height: 200px;
       animation: blink 1.2s infinite;
-      /* 动画名称、持续时间、重复次数 */
+      transition: all 0.3s;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
     }
 
     @keyframes blink {
-
-      0%,
-      100% {
+      0%, 100% {
         opacity: 1;
+        transform: scale(1);
       }
+      30%, 60% {
+        opacity: 0.5;
+        transform: scale(0.95);
+      }
+    }
 
-      30%,
-      60% {
-        opacity: 0;
+    .el-form {
+      width: 100%;
+    }
+
+    .el-input__wrapper {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(29, 255, 225, 0.3);
+      border-radius: 12px;
+      transition: all 0.3s;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 10px rgba(29, 255, 225, 0.2);
       }
+      
+      &.is-focus {
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 15px rgba(29, 255, 225, 0.3);
+        border-color: rgb(29, 255, 225);
+      }
+    }
+
+    .el-input__inner {
+      color: white;
+      background: transparent;
+    }
+  }
+
+  /* 在网页宽度小于高度时调整布局 */
+  @media (orientation: portrait) {
+    .login_box {
+      width: 100%;
+      max-width: 400px;
+      margin-right: 0;
     }
   }
 

@@ -6,12 +6,13 @@
         v-if="!item.meta.hidden"
         :index="item.path"
         @click="goRoute"
+        class="menu-item"
       >
-        <el-icon>
+        <el-icon class="menu-icon">
           <component :is="item.meta.icon"></component>
         </el-icon>
         <template #title>
-          <span>{{ item.meta.title }}</span>
+          <span class="menu-title">{{ item.meta.title }}</span>
         </template>
       </el-menu-item>
     </template>
@@ -21,26 +22,29 @@
         v-if="!item.children[0].meta.hidden"
         :index="item.children[0].path"
         @click="goRoute"
+        class="menu-item"
       >
-        <el-icon>
+        <el-icon class="menu-icon">
           <component :is="item.children[0].meta.icon"></component>
         </el-icon>
         <template #title>
-          <span>{{ item.children[0].meta.title }}</span>
+          <span class="menu-title">{{ item.children[0].meta.title }}</span>
         </template>
       </el-menu-item>
     </template>
 
     <!-- 有多个子路由 -->
     <template v-if="item.children && item.children.length > 1">
-      <el-sub-menu v-if="!item.meta.hidden" :index="item.path">
+      <el-sub-menu v-if="!item.meta.hidden" :index="item.path" class="sub-menu">
         <template #title>
-          <el-icon>
+          <el-icon class="menu-icon">
             <component :is="item.meta.icon"></component>
           </el-icon>
-          <span>{{ item.meta.title }}</span>
+          <span class="menu-title">{{ item.meta.title }}</span>
         </template>
-        <Menu :menuList="item.children"></Menu>
+        <transition name="submenu-slide" mode="out-in">
+          <Menu :menuList="item.children"></Menu>
+        </transition>
       </el-sub-menu>
     </template>
   </template>
@@ -63,4 +67,65 @@ export default {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.menu-item {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  
+  &:hover {
+    background-color: rgba(64, 158, 255, 0.1) !important;
+  }
+  
+  &.is-active {
+    background-color: rgba(64, 158, 255, 0.2) !important;
+  }
+}
+
+.menu-icon {
+  transition: all 0.3s;
+  
+  .menu-item:hover & {
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+.menu-title {
+  transition: all 0.3s;
+  
+  .menu-item:hover & {
+    color: #409eff;
+  }
+}
+
+.sub-menu {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// 子菜单展开动画
+.submenu-slide-enter-from {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.submenu-slide-enter-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.submenu-slide-enter-to {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.submenu-slide-leave-from {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.submenu-slide-leave-active {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.submenu-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+</style>

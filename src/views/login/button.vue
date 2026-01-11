@@ -1,6 +1,6 @@
 <template>
     <button>
-        Login
+        登录
         <div class="star-1">
             <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1"
                 style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
@@ -97,8 +97,8 @@ button {
     font-size: 17px;
     font-weight: 500;
     font-family: "Roboto", Arial, "Segoe UI", sans-serif;
-    color: #25f3bf;
-    background-color: #212121;
+    color: black;
+    background-color: white;
 
     border-radius: 8px;
 
@@ -236,10 +236,10 @@ button:active {
 }
 
 button:hover {
-    background: transparent;
-    color: #25c455;
-    box-shadow: 0 0 25px #23ffe28c;
-    border: 3px solid rgb(0, 255, 166);
+    background: #f0f0f0;
+    color: black;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+    border: 3px solid #ccc;
 }
 
 button:hover .star-1 {
