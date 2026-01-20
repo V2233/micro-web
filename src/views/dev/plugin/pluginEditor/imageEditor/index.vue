@@ -5,7 +5,7 @@
         <el-button :icon="item.icon">{{ item.label }}</el-button>
       </div>
     </div>
-    <ESEditor ref="editorRef" :data="data" theme="dark" />
+    <ESEditor ref="editorRef" :data="data" :theme="layoutSettingStore.theme" />
   </div>
   <CodeDialog ref="codeRef" />
 </template>
@@ -15,11 +15,14 @@ import { ESEditor, ToolType, EditorDataType } from '@/plugins/editor'
 import { onMounted, computed, ref, onBeforeUnmount } from 'vue'
 import { emitter } from '@/utils/eventBus'
 import useDevStore from '@/store/modules/dev'
+import useLayoutSettingStore from '@/store/modules/setting'
 import { getMD5Hash } from '@/utils/hash'
 import CodeDialog from '@/components/CodeDialog/index.vue'
 import { ElMessage } from 'element-plus'
 
 const devStore = useDevStore()
+
+const layoutSettingStore = useLayoutSettingStore()
 
 const editedHtml = ref('')
 

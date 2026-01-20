@@ -77,6 +77,16 @@ export const asnycRoute = [
           icon: 'Calendar',
         },
       },
+      {
+        name: 'Stdout',
+        path: '/screen/stdout',
+        component: () => import('@/views/screen/stdout/index.vue'),
+        meta: {
+          title: '输出流',
+          hidden: false,
+          icon: 'DataLine',
+        },
+      },
     ],
   },
   {
@@ -232,7 +242,6 @@ export const anyRoute = {
     icon: 'DataLine',
   },
 }
-
 
 // 备份下
 // export const constantRoute = [

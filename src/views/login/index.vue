@@ -7,9 +7,7 @@
       <el-form :model="loginForm" :rules="rules" ref="loginForms" style="width: 100%;">
         <h2>登录 Yunzai-Dev</h2>
         <el-form-item prop="username">
-          <el-input class="form_input" :prefix-icon="User" v-model="loginForm.username" :input-style="{
-            width: '100%',
-          }"></el-input>
+          <el-input class="form_input" :prefix-icon="User" v-model="loginForm.username"></el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input class="form_input" :prefix-icon="Lock" show-password type="password"
@@ -155,7 +153,7 @@ const changeDark = () => {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.5); /* 透明度25%的黑色遮罩 */
+    background-color: rgba(255, 255, 255, 0.2); /* 透明度25%的黑色遮罩 */
     z-index: 50;
   }
 
@@ -187,7 +185,7 @@ const changeDark = () => {
 
     h2 {
       font-size: 24px;
-      color: rgb(29, 255, 225);
+      color: rgb(13, 234, 24);
       margin: 20px 0;
       text-align: center;
       font-weight: 600;
@@ -205,7 +203,7 @@ const changeDark = () => {
     p:last-child {
       font-size: 13px;
       line-height: 18px;
-      color: #1cffca;
+      color: #49dd13;
       font-weight: 600;
       text-align: center;
       margin-top: 20px;
@@ -240,6 +238,10 @@ const changeDark = () => {
 
     .el-form {
       width: 100%;
+    }
+
+    .form_input {
+      color: #000;
     }
 
     .el-input__wrapper {

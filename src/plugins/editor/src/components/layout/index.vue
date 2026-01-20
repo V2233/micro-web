@@ -205,11 +205,17 @@ watch(
   },
   { immediate: true },
 )
+
 watch(
   () => props.theme,
-  () => {
-    if (props.theme) {
-      store.theme = props.theme
+  (newTheme) => {
+    if (newTheme) {
+      store.theme = newTheme
+    }
+    if(newTheme === 'dark') {
+      mainBorderColor.value = 'transparent'
+    } else {
+      mainBorderColor.value = '#EFF2F5'
     }
   },
   { immediate: true },
@@ -217,14 +223,6 @@ watch(
 
 onMounted(() => {
   init();
-  document.documentElement.className == 'dark'?mainBorderColor.value = 'transparent':mainBorderColor.value = '#EFF2F5'
-  emitter.on('themeColor', (e: any) => {
-    e == 'dark'?mainBorderColor.value = 'transparent':mainBorderColor.value = '#EFF2F5'
-  })
-})
-
-onBeforeUnmount(() => {
-  emitter.off('themeColor')
 })
 
 defineExpose({

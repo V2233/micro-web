@@ -46,6 +46,7 @@ import useLayoutSettingStore from '@/store/modules/setting'
 // import { computed } from 'vue'
 // 获取路由对象
 import { useRoute } from 'vue-router'
+import { watch } from 'vue'
 let $route = useRoute()
 
 let useStore = useUserStore()
@@ -58,6 +59,20 @@ let layoutSettingStore = useLayoutSettingStore()
 //   console.log(document.documentElement.className)
 //   return document.documentElement.className == 'dark'?'transparent':'rgb(159, 161, 155)'
 // })
+watch(
+  () => layoutSettingStore.theme,
+  (newTheme, oldTheme) => {
+    if(!newTheme) return
+    let html = document.documentElement
+    if(newTheme == 'dark') {
+      !html.classList.contains('dark') && html.classList.toggle('dark')
+    } else {
+      html.classList.contains('dark') && html.classList.toggle('dark')
+    }
+    newTheme !== oldTheme && localStorage.setItem('THEME', newTheme)
+  },
+  {'immediate':true}
+);
 </script>
 
 <script lang="ts">
@@ -78,6 +93,13 @@ export default {
     
     transition: all 0.3s;
 
+    border-radius: 0 $border-radius-medium $border-radius-medium 0;
+    overflow: auto;
+    box-shadow: $shadow-small;
+    background: rgba(255, 255, 255, 0.5); 
+    backdrop-filter: none;
+    border: none;
+
     .scrollbar {
       width: 100%;
       height: calc(100vh - 3 * $base-logo-title-fontSize);
@@ -96,8 +118,6 @@ export default {
     }
   }
 
-  
-
   .layout_tabbar {
     position: fixed;
     width: calc(100% - $base-menu-width);
@@ -105,6 +125,11 @@ export default {
     top: 0;
     left: $base-menu-width;
     transition: all 0.3s;
+
+    border-radius: 0 0 $border-radius-medium 0;
+    box-shadow: $shadow-small;
+    background: rgba(255, 255, 255, 0.5); /* 控件透明度50% */
+    backdrop-filter: none !important;
 
     &.fold {
       width: calc(100vw - $base-menu-min-width);

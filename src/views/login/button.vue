@@ -98,7 +98,7 @@ button {
     font-weight: 500;
     font-family: "Roboto", Arial, "Segoe UI", sans-serif;
     color: black;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.8);
 
     border-radius: 8px;
 

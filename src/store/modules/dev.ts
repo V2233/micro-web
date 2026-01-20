@@ -1,9 +1,9 @@
+import { reqConnectSSH } from '@/api/dev/fs'
 import { reqBotInfo } from '@/api/dev/plugin'
-import { reqConnectSSH, reqCloseSSH } from '@/api/dev/fs'
 import type { BotInfoResponseType } from '@/api/dev/plugin/type'
 import { defineStore } from 'pinia'
+import { friend_list, group_list } from './default/sandbox'
 import type { DevState } from './types/type'
-import { group_list, friend_list } from './default/sandbox'
 import useUserStore from './user'
 const userStore = useUserStore()
 
@@ -25,9 +25,9 @@ let useDevStore = defineStore('Dev', {
       /** ssh链接配置 */
       sshInfo: {
         host: '',
-        port: 22,
-        username: 'root',
-        password: ''
+        port: undefined,
+        username: '',
+        password: '',
       },
 
       /** 机器人信息 */
@@ -62,20 +62,20 @@ let useDevStore = defineStore('Dev', {
           sex: 'female',
           age: 18,
           area: '',
-          thumbs: 0
+          thumbs: 0,
         },
         settings: {
           ws_forward_address: '',
           heart_beat: false,
-          local_storage: false
-        }
-      }
+          local_storage: false,
+        },
+      },
     }
   },
   actions: {
     async getBotsInfo() {
-      let res:BotInfoResponseType = await reqBotInfo()
-      if(res.code == 200) {
+      let res: BotInfoResponseType = await reqBotInfo()
+      if (res.code == 200) {
         this.botsInfo = res.data
         return Promise.resolve('ok')
       } else {
@@ -89,12 +89,12 @@ let useDevStore = defineStore('Dev', {
     },
     async connectSSH() {
       let res = await reqConnectSSH(this.sshInfo)
-      if(res.code == 200) {
+      if (res.code == 200) {
         return Promise.resolve('ok')
       } else {
         return Promise.reject(new Error(res.message))
       }
-    }
+    },
   },
   getters: {},
 })

@@ -1,17 +1,58 @@
 <template>
-  <el-button type="primary" size="small" icon="Refresh" circle @click="updateRefresh"></el-button>
-  <el-button type="primary" size="small" icon="FullScreen" circle @click="fullScreen"></el-button>
+  <el-button
+    type="primary"
+    size="small"
+    :icon="layoutSettingStore.globalTerminal.visible ? 'Platform' : 'Monitor'"
+    circle
+    @click="toggleTerminal"
+  ></el-button>
+  <el-button
+    type="primary"
+    size="small"
+    icon="Refresh"
+    circle
+    @click="updateRefresh"
+  ></el-button>
+  <el-button
+    type="primary"
+    size="small"
+    icon="FullScreen"
+    circle
+    @click="fullScreen"
+  ></el-button>
 
   <!-- 修改关闭判定为点击外部或按下Esc -->
-  <el-popover ref="popoverRef" placement="bottom" title="主题设置" :width="300" trigger="click" popper-class="theme-popover" :close-on-click-outside="true" :close-on-press-escape="true">
+  <el-popover
+    ref="popoverRef"
+    placement="bottom"
+    title="主题设置"
+    :width="300"
+    trigger="click"
+    popper-class="theme-popover"
+    :close-on-click-outside="true"
+    :close-on-press-escape="true"
+  >
     <!-- 表单元素 -->
     <el-form>
       <el-form-item label="主题颜色">
-        <el-color-picker @change="setColor" v-model="color" size="small" show-alpha :predefine="predefineColors" />
+        <el-color-picker
+          @change="setColor"
+          v-model="color"
+          size="small"
+          show-alpha
+          :predefine="predefineColors"
+        />
       </el-form-item>
       <el-form-item label="暗黑模式">
-        <el-switch @change="changeDark" v-model="dark" class="mt-2" style="margin-left: 24px" inline-prompt
-          active-icon="MoonNight" inactive-icon="Sunny" />
+        <el-switch
+          @change="changeDark"
+          v-model="isDark"
+          class="mt-2"
+          style="margin-left: 24px"
+          inline-prompt
+          active-icon="MoonNight"
+          inactive-icon="Sunny"
+        />
       </el-form-item>
     </el-form>
     <template #reference>
@@ -19,8 +60,14 @@
     </template>
   </el-popover>
 
-  <img class="avatar"
-    :src="userStore.avatar ? userStore.avatar : `https://q1.qlogo.cn/g?b=qq&s=0&nk=${userStore.masterQQ}`" />
+  <img
+    class="avatar"
+    :src="
+      userStore.avatar
+        ? userStore.avatar
+        : `https://q1.qlogo.cn/g?b=qq&s=0&nk=${userStore.masterQQ}`
+    "
+  />
 
   <el-dropdown>
     <span class="el-dropdown-link">
@@ -32,12 +79,23 @@
     <template #dropdown>
       <el-dropdown-menu :style="{ maxHeight: '200px' }">
         <el-dropdown-item @click="logOut">退出登录</el-dropdown-item>
-        <div v-for="(item, index) in Object.keys(userStore.tokens)" :key="index">
-          <el-dropdown-item v-if="userStore.tokens && (item !== userStore.token)" @click="checkAccout(item)">{{
-            userStore.tokens[item]?.username }}
-            <el-icon class="el-icon-close" style="margin-left: 5px; align-self: center;" @click="deleteToken(item)">
+        <div
+          v-for="(item, index) in Object.keys(userStore.tokens)"
+          :key="index"
+        >
+          <el-dropdown-item
+            v-if="userStore.tokens && item !== userStore.token"
+            @click="checkAccout(item)"
+          >
+            {{ userStore.tokens[item]?.username }}
+            <el-icon
+              class="el-icon-close"
+              style="margin-left: 5px; align-self: center"
+              @click="deleteToken(item)"
+            >
               <Close />
-            </el-icon></el-dropdown-item>
+            </el-icon>
+          </el-dropdown-item>
         </div>
       </el-dropdown-menu>
     </template>
@@ -45,11 +103,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
 import useLayoutSettingStore from '@/store/modules/setting'
 import useUserStore from '@/store/modules/user'
-import { emitter } from '@/utils/eventBus'
+import { computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 let $router = useRouter()
 let $route = useRoute()
@@ -57,12 +114,17 @@ let $route = useRoute()
 let layoutSettingStore = useLayoutSettingStore()
 let userStore = useUserStore()
 
-// 搜集开关数组
-let dark = ref<boolean>(false)
+const isDark = computed(() => layoutSettingStore.theme === 'dark')
 
 const updateRefresh = () => {
   layoutSettingStore.refresh = !layoutSettingStore.refresh
 }
+
+const toggleTerminal = () => {
+  layoutSettingStore.globalTerminal.visible =
+    !layoutSettingStore.globalTerminal.visible
+}
+
 const fullScreen = () => {
   // 判断是否全屏
   let full = document.fullscreenElement
@@ -120,11 +182,8 @@ const predefineColors = ref([
 
 //switch开关的chang事件进行暗黑模式的切换
 const changeDark = () => {
-  //获取HTML根节点
-  let html = document.documentElement
-  //判断HTML标签是否有类名dark
-  dark.value ? (html.className = 'dark') : (html.className = '')
-  emitter.emit('themeColor', html.className)
+  layoutSettingStore.theme =
+    layoutSettingStore.theme == 'dark' ? 'light' : 'dark'
 }
 
 //主题颜色的设置

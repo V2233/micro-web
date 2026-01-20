@@ -1,5 +1,5 @@
 import { reqServerPort } from '@/api/user/index'
-import useUserStore from '@/store/modules/user'; 
+import useUserStore from '@/store/modules/user'
 const userStore = useUserStore()
 
 export default class Ws {
@@ -9,13 +9,13 @@ export default class Ws {
   clientId: string
   reConnectSum: number
   address: {
-    publicAddress: string,
+    publicAddress: string
     privateAddress: string
   }
   constructor(url = '/micro/webui/chat') {
     this.address = {
       publicAddress: '',
-      privateAddress: ''
+      privateAddress: '',
     }
     this.ws = null
     this.url = url
@@ -24,10 +24,15 @@ export default class Ws {
     this.reConnectSum = 0
   }
 
-  async openWs(ip = '', cb:Function | null = null) {
-    
+  async openWs(ip = '', cb: Function | null = null) {
     const originUrl = new URL(userStore.originAddress)
-    this.ws = new WebSocket((ip ? ip : `ws://${originUrl.hostname}:${userStore.originPort?userStore.originPort:originUrl.port}`) + this.url)
+    this.ws = new WebSocket(
+      (ip
+        ? ip
+        : `ws://${originUrl.hostname}:${
+            userStore.originPort ? userStore.originPort : originUrl.port
+          }`) + this.url,
+    )
     this.ws.addEventListener('open', (e) => {
       console.log('ws连接成功！' + e.target)
       cb && cb()
@@ -35,9 +40,10 @@ export default class Ws {
 
     this.ws.addEventListener('message', (e) => {
       // console.log('ws收到服务端消息:' + e.data)
-      this.msgQueue.push(JSON.parse(e.data))
-      if (e.data.action == 'meta') {
-        this.clientId = e.data.params
+      const msg = JSON.parse(e.data)
+      this.msgQueue.push(msg)
+      if (msg.action == 'meta') {
+        this.clientId = msg.params
       }
     })
 
@@ -68,6 +74,7 @@ export default class Ws {
   }
 
   sendWs(data: any) {
-    this.ws && this.ws.send(this.clientId ? { ...data, ClientId: this.clientId } : data)
+    this.ws &&
+      this.ws.send(this.clientId ? { ...data, ClientId: this.clientId } : data)
   }
 }

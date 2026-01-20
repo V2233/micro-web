@@ -1,70 +1,68 @@
 <template>
-  <div class="plugins_box" v-if="devStore.scene == 0">
-    <el-card>
-      <div class="top_bar">
-        <div class="sub-title">指令列表</div>
-        <el-popover placement="bottom" :width="300" trigger="hover">
-          <el-input v-model="searchText" placeholder="筛选指令" size="small" @input="searchPlugin" >
-            <template #append>
-              <el-button icon="Search" @click="searchPlugin"></el-button>
+  <el-card v-if="devStore.scene == 0" :body-style="{height: '100%', flex:1, display:'flex', flexDirection: 'column'}" style="height: 100%;">
+    <div class="top_bar">
+      <div class="sub-title">指令列表</div>
+      <el-popover placement="bottom" :width="300" trigger="hover">
+        <el-input v-model="searchText" placeholder="筛选指令" size="small" @input="searchPlugin" >
+          <template #append>
+            <el-button icon="Search" @click="searchPlugin"></el-button>
+          </template>
+        </el-input>
+        <template #reference>
+          <el-button icon="Search" circle style="margin-left: auto;"></el-button>
+        </template>
+      </el-popover>
+      <el-button type="primary" icon="Plus" @click="goAddPlugin">
+        添加指令
+      </el-button>
+    </div>
+
+    <el-table :data="pluginsList">
+      <el-table-column type="index" label="#"></el-table-column>
+
+      <el-table-column label="指令">
+        <template #="{ row, $index }">
+          {{ row.reg }}
+        </template>
+      </el-table-column>
+
+      <el-table-column label="消息类型">
+        <template #="{ row, $index }">
+          <span style="font-size: 12px">[{{ (row.message.map((item: any) => item.type)).join(',') }}]</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="创建时间">
+        <template #="{ row, $index }">
+          <span style="font-size: 12px">{{ row.id }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="操作" fixed="right" min-width="120px">
+        <template #="{ row, $index }">
+          <el-button type="primary" size="small" icon="Edit" @click="goEditPlugin($index)"></el-button>
+          <el-popconfirm title="删除后不可恢复，您确定吗？" @confirm="deletePlugin($index)">
+            <template #reference>
+              <el-button type="primary" size="small" icon="Delete"></el-button>
             </template>
-          </el-input>
-          <template #reference>
-            <el-button icon="Search" circle style="margin-left: auto;"></el-button>
-          </template>
-        </el-popover>
-        <el-button type="primary" icon="Plus" @click="goAddPlugin">
-          添加指令
-        </el-button>
-      </div>
-
-      <el-table :data="pluginsList">
-        <el-table-column type="index" label="#"></el-table-column>
-
-        <el-table-column label="指令">
-          <template #="{ row, $index }">
-            {{ row.reg }}
-          </template>
-        </el-table-column>
-
-        <el-table-column label="消息类型">
-          <template #="{ row, $index }">
-            <span style="font-size: 12px">[{{ (row.message.map((item: any) => item.type)).join(',') }}]</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="创建时间">
-          <template #="{ row, $index }">
-            <span style="font-size: 12px">{{ row.id }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="操作" fixed="right" min-width="120px">
-          <template #="{ row, $index }">
-            <el-button type="primary" size="small" icon="Edit" @click="goEditPlugin($index)"></el-button>
-            <el-popconfirm title="删除后不可恢复，您确定吗？" @confirm="deletePlugin($index)">
-              <template #reference>
-                <el-button type="primary" size="small" icon="Delete"></el-button>
-              </template>
-            </el-popconfirm>
-          </template>
-        </el-table-column>
-      </el-table>
-      <!-- <el-pagination
-        small
-        lazy
-        v-model:current-page="page.pageNo"
-        v-model:page-size="page.pageSize"
-        :page-sizes="[3, 5, 7, 9]"
-        :disabled="false"
-        :background="true"
-        layout="prev, pager, next, jumper, ->, sizes, total"
-        :total="pluginsList.length"
-        @current-change="pageChange"
-        @size-change="sizeChange"
-      /> -->
-    </el-card>
-  </div>
+          </el-popconfirm>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- <el-pagination
+      small
+      lazy
+      v-model:current-page="page.pageNo"
+      v-model:page-size="page.pageSize"
+      :page-sizes="[3, 5, 7, 9]"
+      :disabled="false"
+      :background="true"
+      layout="prev, pager, next, jumper, ->, sizes, total"
+      :total="pluginsList.length"
+      @current-change="pageChange"
+      @size-change="sizeChange"
+    /> -->
+  </el-card>
 
   <!-- 插件编辑器 -->
   <div class="Plugin_editor" v-if="devStore.isPluginEdited">

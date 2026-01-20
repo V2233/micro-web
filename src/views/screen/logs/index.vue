@@ -55,8 +55,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted ,onUnmounted} from 'vue'
 import { reqLogs } from '@/api/screen/index'
+import useUserStore from '@/store/modules/user'
 
 type logType = {
   time: string
@@ -89,6 +90,8 @@ const LEVEL_MAP = ref({
   FATAL: 'level-fatal',
   MARK: 'level-mark',
 })
+
+const userStore = useUserStore()
 
 onMounted(() => {
   newHeight.value = window.innerHeight - 150

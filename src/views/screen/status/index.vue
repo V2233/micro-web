@@ -189,10 +189,10 @@ onBeforeUnmount(() => {
   overflow: hidden;
   // border: 2px solid red;
 
-  // 确保所有文字都是白色
-  * {
-    color: white !important;
-  }
+  // // 确保所有文字都是白色
+  // * {
+  //   color: white !important;
+  // }
 
   .screen_box {
     margin: 0;

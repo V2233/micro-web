@@ -1,14 +1,23 @@
 // layout 组件相关
 import { defineStore } from 'pinia'
+import { SettingState } from './types/type'
+
+let theme = localStorage.getItem('THEME') as 'light' | 'dark'
 
 let useLayoutSettingStore = defineStore('SettingStore', {
-  state: () => {
+  state: (): SettingState => {
     return {
-      // 控制折叠菜单
-      // fold: false,
-      // 0:完全关闭；1:只留图标；2:全展开
       foldMode: 2,
       refresh: false,
+      theme:
+        theme ??
+        (window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'),
+      globalTerminal: {
+        running: false,
+        visible: false,
+      },
     }
   },
 })

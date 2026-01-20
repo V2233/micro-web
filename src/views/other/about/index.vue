@@ -1,47 +1,49 @@
 <template>
     <div class="about-container">
-        <!-- 系统信息展示框 -->
-        <div class="system-info-box">
-            <div class="system-info-content">
-                <div class="system-info-left">
-                    <img src="/terminal.png" alt="Logo" class="system-info-logo" />
-                </div>
-                <div class="system-info-right">
-                    <h1 class="system-info-title">Yunzai Dev</h1>
-                    <p class="system-info-subtitle">低代码开发管理平台</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 折叠面板 -->
-        <el-collapse class="about-collapse">
-            <!-- 开源地址折叠项 -->
-            <el-collapse-item title="开源地址" name="1">
-                <div class="open-source-item">
-                    <div class="open-source-name">Micro Plugin</div>
-                    <div class="open-source-actions">
-                        <a :href="githubUrl" target="_blank" class="open-source-link">{{ githubUrl }}</a>
-                        <el-button type="primary" @click="openGithub">跳转</el-button>
+        <el-card>
+            <!-- 系统信息展示框 -->
+            <div class="system-info-box">
+                <div class="system-info-content">
+                    <div class="system-info-left">
+                        <img src="/terminal.png" alt="Logo" class="system-info-logo" />
+                    </div>
+                    <div class="system-info-right">
+                        <h1 class="system-info-title">Yunzai Dev</h1>
+                        <p class="system-info-subtitle">低代码开发管理平台</p>
                     </div>
                 </div>
-            </el-collapse-item>
+            </div>
 
-            <!-- 贡献者名单折叠项 -->
-            <el-collapse-item title="贡献者名单" name="2">
-                <div class="card_box">
-                    <personal-card 
-                        v-for="(c,index) in contributors"
-                        :key="index"
-                        :author="c.author" 
-                        :avatar="c.avatar"
-                        :content="c.content" 
-                        :qq="c.qq"
-                        :github="c.github"
-                        :gitee="c.gitee" 
-                    />
-                </div>
-            </el-collapse-item>
-        </el-collapse>
+            <!-- 折叠面板 -->
+            <el-collapse class="about-collapse">
+                <!-- 开源地址折叠项 -->
+                <el-collapse-item title="开源地址" name="1">
+                    <div class="open-source-item">
+                        <div class="open-source-name">Micro Plugin</div>
+                        <div class="open-source-actions">
+                            <a :href="githubUrl" target="_blank" class="open-source-link">{{ githubUrl }}</a>
+                            <el-button type="primary" @click="openGithub">跳转</el-button>
+                        </div>
+                    </div>
+                </el-collapse-item>
+
+                <!-- 贡献者名单折叠项 -->
+                <el-collapse-item title="贡献者名单" name="2">
+                    <div class="card_box">
+                        <personal-card 
+                            v-for="(c,index) in contributors"
+                            :key="index"
+                            :author="c.author" 
+                            :avatar="c.avatar"
+                            :content="c.content" 
+                            :qq="c.qq"
+                            :github="c.github"
+                            :gitee="c.gitee" 
+                        />
+                    </div>
+                </el-collapse-item>
+            </el-collapse>
+        </el-card>
     </div>
 </template>
 
@@ -59,10 +61,10 @@ const openGithub = () => {
 </script>
 
 <style scoped lang="scss">
-.about-container {
-    width: 100%;
-    padding: 20px;
-}
+// .about-container {
+//     width: 100%;
+//     padding: 20px;
+// }
 
 /* 系统信息展示框 */
 .system-info-box {

@@ -1,217 +1,215 @@
 <template>
-  <div>
-    <!-- 表格视图 -->
-    <el-card v-show="scene == 0" class="box-card" ref="cardRef">
-      <!-- 路径搜索栏 -->
-      <div class="search_bar">
-        <!-- 左侧 -->
-        <div style="width: 100%; margin-right: 10px;">
-          <el-input v-model="curPath" style="max-width: 600px; width: 100%; min-width: 200px;"
-            class="input-with-select">
-            <template #prepend>
-              <el-button icon="Back" @click="goBackDir" />
-            </template>
+  <!-- 表格视图 -->
+  <el-card v-show="scene == 0" class="box-card" ref="cardRef" :body-style="{height: '100%', flex:1, display:'flex', flexDirection: 'column'}">
+    <!-- 路径搜索栏 -->
+    <div class="search_bar">
+      <!-- 左侧 -->
+      <div style="width: 100%; margin-right: 10px;">
+        <el-input v-model="curPath" style="max-width: 600px; width: 100%; min-width: 200px;"
+          class="input-with-select">
+          <template #prepend>
+            <el-button icon="Back" @click="goBackDir" />
+          </template>
+          <template #append>
+            <el-button icon="DArrowRight" @click="goCustomDir"></el-button>
+          </template>
+        </el-input>
+      </div>
+      <!-- 右侧 -->
+      <div class="search_file">
+        <!-- 搜索文件按钮 -->
+        <el-popover placement="bottom" title="搜索" :width="300" trigger="hover">
+          <el-input v-model="searchText" placeholder="输入搜索文件或目录">
             <template #append>
-              <el-button icon="DArrowRight" @click="goCustomDir"></el-button>
+              <el-button icon="Search" @click="searchFile"></el-button>
             </template>
           </el-input>
-        </div>
-        <!-- 右侧 -->
-        <div class="search_file">
-          <!-- 搜索文件按钮 -->
-          <el-popover placement="bottom" title="搜索" :width="300" trigger="hover">
-            <el-input v-model="searchText" placeholder="输入搜索文件或目录">
-              <template #append>
-                <el-button icon="Search" @click="searchFile"></el-button>
-              </template>
-            </el-input>
+          <template #reference>
+            <el-button icon="Search" circle></el-button>
+          </template>
+        </el-popover>
+      </div>
+    </div>
+
+    <!-- 操作导航 -->
+    <div class="handle_tabbar" style="margin-top: 10px">
+      <el-button size="small" style="margin-right: 5px;" :icon="isMutiChecked ? 'ArrowLeftBold' : 'ArrowRightBold'"
+        @click="isMutiChecked = !isMutiChecked"></el-button>
+      <el-select size="small" placeholder="新建" style="width: 60px" @change="changeCreateMode">
+        <el-option label="目录" value="目录" />
+        <el-option label="文件" value="文件" />
+      </el-select>
+      <el-button v-if="
+        tempDirStorage.length > 0 &&
+        tempDirStorage.every((item) => item.handlerMode)
+      " type="primary" @click="pasteFileOrDir()" size="small" style="margin-left: 5px">
+        粘贴
+      </el-button>
+
+      <el-button v-if="tempDirStorage.length > 0" :disabled="tempDirStorage.every((item) => item.handlerMode == '复制')"
+        type="primary" @click="fileSelectedHandler('复制')" size="small" style="margin-left: 5px">
+        复制
+      </el-button>
+
+      <el-button v-if="tempDirStorage.length > 0" :disabled="tempDirStorage.every((item) => item.handlerMode == '移动')"
+        type="primary" @click="fileSelectedHandler('移动')" size="small" style="margin-left: 5px">
+        移动
+      </el-button>
+
+      <el-button @click="openUploader" size="small" style="margin-left: 5px">
+        上传
+      </el-button>
+
+      <el-button @click="openTerminal" size="small" style="margin-left: 5px">
+        终端
+      </el-button>
+    </div>
+    <!-- 文件表格 -->
+    <el-table v-loading="loading" style="margin-top: 10px" :data="orderedDir" max-height="114514"
+      @selection-change="handleFileSelected" @click="clearPopMenu">
+      <el-table-column type="selection" align="center" v-if="isMutiChecked"></el-table-column>
+      <el-table-column label="文件名称">
+        <template #header>
+          <div class="title-active" @click="changeOrder('name')">
+            文件名称
+          </div>
+        </template>
+        <template #="{ row, $index }">
+          <!-- 包裹菜单 -->
+          <el-popover placement="bottom" :title="row.type == 'file' ? '文件操作' : '文件夹操作'" :width="150"
+            trigger="contextmenu" :visible="row.isRightClicked">
+            <span class="pop_menu" v-for="(popItem, id) in popMenuArr" :key="id">
+              <el-popconfirm v-if="popItem.name == '删除'" :title="`您即将删除路径【${row.path}】,是否继续？`"
+                @confirm="handlePopMenu(row, popItem)">
+                <template #reference>
+                  <el-button>{{ popItem.name }}</el-button>
+                </template>
+              </el-popconfirm>
+              <el-button v-else @click="handlePopMenu(row, popItem)">
+                {{ popItem.name }}
+              </el-button>
+            </span>
             <template #reference>
-              <el-button icon="Search" circle></el-button>
+              <!-- 表格文件名 -->
+              <div @contextmenu.prevent="handleRightClick(row)">
+                <i :class="`iconfont icon-file 
+                                          icon-${row.type == 'file'
+                    ? row.name.split('.').at(-1)
+                    : 'yellowFolder'
+                  }
+                                      `" style="font-size: 20px"></i>
+                &nbsp;
+                <a v-if="!row.isBlur" @click="getChildDir(row)">
+                  {{ row.name }}
+                </a>
+                <el-input v-else :ref="(vc: any) => { inputRefObj[row.name.replace(/\./g, '') + row.type] = vc }"
+                  @blur="createFile(row, 'blur')" @keyup.enter="createFile(row, 'enter')"
+                  v-model="row.name"></el-input>
+              </div>
             </template>
           </el-popover>
-        </div>
-      </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="大小" width="80px">
+        <template #="{ row, $index }">
+          <div @contextmenu.prevent="handleRightClick(row)" style="font-size: 12px">
+            <span v-if="row.size">{{ row.size }}</span>
+            <a v-else @click="getFilesSize(row)">计算</a>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="修改时间">
+        <template #header>
+          <div class="title-active" @click="changeOrder('time')">
+            修改时间
+          </div>
+        </template>
+        <template #="{ row, $index }">
+          <div @contextmenu.prevent="handleRightClick(row)" style="font-size: 12px">
+            {{ row.mtime.replace(/T/, ' ').replace(/\.\d{3}Z/, '') }}
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
+  </el-card>
 
-      <!-- 操作导航 -->
-      <div class="handle_tabbar" style="margin-top: 10px">
-        <el-button size="small" style="margin-right: 5px;" :icon="isMutiChecked ? 'ArrowLeftBold' : 'ArrowRightBold'"
-          @click="isMutiChecked = !isMutiChecked"></el-button>
-        <el-select size="small" placeholder="新建" style="width: 60px" @change="changeCreateMode">
-          <el-option label="目录" value="目录" />
-          <el-option label="文件" value="文件" />
-        </el-select>
-        <el-button v-if="
-          tempDirStorage.length > 0 &&
-          tempDirStorage.every((item) => item.handlerMode)
-        " type="primary" @click="pasteFileOrDir()" size="small" style="margin-left: 5px">
-          粘贴
-        </el-button>
+  <el-card v-show="scene == 1">
+    <el-button style="margin-bottom: 5px" @click="scene = 0">
+      返回
+    </el-button>
+    <Editor :code="fileContent" :ext="ext" @getCode="saveFile" />
+  </el-card>
 
-        <el-button v-if="tempDirStorage.length > 0" :disabled="tempDirStorage.every((item) => item.handlerMode == '复制')"
-          type="primary" @click="fileSelectedHandler('复制')" size="small" style="margin-left: 5px">
-          复制
-        </el-button>
+  <el-card v-if="scene == 2">
+    <el-button style="margin-bottom: 5px" @click="scene = 0">
+      <el-icon>
+        <Back />
+      </el-icon>
+    </el-button>
+    <Terminal :dirPath="curPath" />
+  </el-card>
 
-        <el-button v-if="tempDirStorage.length > 0" :disabled="tempDirStorage.every((item) => item.handlerMode == '移动')"
-          type="primary" @click="fileSelectedHandler('移动')" size="small" style="margin-left: 5px">
-          移动
-        </el-button>
+  <!--    <el-pagination
+              v-model:current-page="pageNo"
+              v-model:page-size="limit"
+              
+              :page-sizes="[3, 5, 7, 9]"
+              :disabled="false"
+              :background="true"
+              layout="prev, pager, next, jumper, ->, sizes, total"
+              :total="total"
+              @current-change="getHasTrademark"
+              @size-change="sizeChange"
+          />
+      </el-card> -->
 
-        <el-button @click="openUploader" size="small" style="margin-left: 5px">
-          上传
-        </el-button>
+  <!-- 富媒体展示和上传 -->
+  <el-dialog v-model="dialogFormVisible" :title="curPathObj.name">
+    <div v-if="dialogMode == 'upload'" class="file_upload_box">
+      <el-upload class="file_uploader" action="/api/fs/upload" multiple ref="uploadRef" v-model:file-list="fileList"
+        :data="extraUploadData" :show-file-list="true" :on-preview="handleFilePreview"
+        :on-success="handleUploadSuccess" :before-upload="handleUpload" :auto-upload="false">
+        <template #trigger>
+          <el-button type="primary">选择文件</el-button>
+        </template>
+      </el-upload>
+    </div>
 
-        <el-button @click="openTerminal" size="small" style="margin-left: 5px">
-          终端
-        </el-button>
-      </div>
-      <!-- 文件表格 -->
-      <el-table v-loading="loading" style="margin: 10px 0" :data="orderedDir" :max-height="tableHeight"
-        @selection-change="handleFileSelected" @click="clearPopMenu">
-        <el-table-column type="selection" align="center" v-if="isMutiChecked"></el-table-column>
-        <el-table-column label="文件名称">
-          <template #header>
-            <div class="title-active" @click="changeOrder('name')">
-              文件名称
-            </div>
-          </template>
-          <template #="{ row, $index }">
-            <!-- 包裹菜单 -->
-            <el-popover placement="bottom" :title="row.type == 'file' ? '文件操作' : '文件夹操作'" :width="150"
-              trigger="contextmenu" :visible="row.isRightClicked">
-              <span class="pop_menu" v-for="(popItem, id) in popMenuArr" :key="id">
-                <el-popconfirm v-if="popItem.name == '删除'" :title="`您即将删除路径【${row.path}】,是否继续？`"
-                  @confirm="handlePopMenu(row, popItem)">
-                  <template #reference>
-                    <el-button>{{ popItem.name }}</el-button>
-                  </template>
-                </el-popconfirm>
-                <el-button v-else @click="handlePopMenu(row, popItem)">
-                  {{ popItem.name }}
-                </el-button>
-              </span>
-              <template #reference>
-                <!-- 表格文件名 -->
-                <div @contextmenu.prevent="handleRightClick(row)">
-                  <i :class="`iconfont icon-file 
-                                            icon-${row.type == 'file'
-                      ? row.name.split('.').at(-1)
-                      : 'yellowFolder'
-                    }
-                                        `" style="font-size: 20px"></i>
-                  &nbsp;
-                  <a v-if="!row.isBlur" @click="getChildDir(row)">
-                    {{ row.name }}
-                  </a>
-                  <el-input v-else :ref="(vc: any) => { inputRefObj[row.name.replace(/\./g, '') + row.type] = vc }"
-                    @blur="createFile(row, 'blur')" @keyup.enter="createFile(row, 'enter')"
-                    v-model="row.name"></el-input>
-                </div>
-              </template>
-            </el-popover>
-          </template>
-        </el-table-column>
-        <el-table-column label="大小" width="80px">
-          <template #="{ row, $index }">
-            <div @contextmenu.prevent="handleRightClick(row)" style="font-size: 12px">
-              <span v-if="row.size">{{ row.size }}</span>
-              <a v-else @click="getFilesSize(row)">计算</a>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="修改时间">
-          <template #header>
-            <div class="title-active" @click="changeOrder('time')">
-              修改时间
-            </div>
-          </template>
-          <template #="{ row, $index }">
-            <div @contextmenu.prevent="handleRightClick(row)" style="font-size: 12px">
-              {{ row.mtime.replace(/T/, ' ').replace(/\.\d{3}Z/, '') }}
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+    <!-- 图片控件 -->
+    <div v-if="dialogMode == 'viewImage'">
+      <el-image :src="imageUrl" lazy />
+    </div>
 
-    <el-card v-show="scene == 1">
-      <el-button style="margin-bottom: 5px" @click="scene = 0">
-        返回
+    <!-- 音频控件 -->
+    <div v-if="dialogMode == 'viewAudio'" :style="{
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    }">
+      <audio ref="audioElement" controls :src="audioUrl" style="width: 100%" @ended="handleMediaPlayEnded"></audio>
+    </div>
+
+    <!-- 视频控件 -->
+    <div v-if="dialogMode == 'viewVideo'" style="width: 100; max-height: 100%">
+      <video controls ref="videoElement" style="width: 100%; height: 100%; object-fit: cover">
+        <source :src="videoUrl" type="video/mp4" />
+        <source :src="videoUrl" type="video/ogg" />
+      </video>
+    </div>
+
+    <!-- 终端 -->
+    <!-- <div v-if="dialogMode == 'terminal'" style="width: 100; max-height: 100%">
+      <Terminal :dirPath="curPath"/>
+    </div> -->
+
+    <template #footer v-if="dialogMode == 'upload'">
+      <el-button type="primary" size="default" @click="confirmUpload">
+        确认提交
       </el-button>
-      <Editor :code="fileContent" :ext="ext" @getCode="saveFile" />
-    </el-card>
-
-    <el-card v-if="scene == 2">
-      <el-button style="margin-bottom: 5px" @click="scene = 0">
-        <el-icon>
-          <Back />
-        </el-icon>
-      </el-button>
-      <Terminal :dirPath="curPath" />
-    </el-card>
-
-    <!--    <el-pagination
-                v-model:current-page="pageNo"
-                v-model:page-size="limit"
-                
-                :page-sizes="[3, 5, 7, 9]"
-                :disabled="false"
-                :background="true"
-                layout="prev, pager, next, jumper, ->, sizes, total"
-                :total="total"
-                @current-change="getHasTrademark"
-                @size-change="sizeChange"
-            />
-        </el-card> -->
-
-    <!-- 富媒体展示和上传 -->
-    <el-dialog v-model="dialogFormVisible" :title="curPathObj.name">
-      <div v-if="dialogMode == 'upload'" class="file_upload_box">
-        <el-upload class="file_uploader" action="/api/fs/upload" multiple ref="uploadRef" v-model:file-list="fileList"
-          :data="extraUploadData" :show-file-list="true" :on-preview="handleFilePreview"
-          :on-success="handleUploadSuccess" :before-upload="handleUpload" :auto-upload="false">
-          <template #trigger>
-            <el-button type="primary">选择文件</el-button>
-          </template>
-        </el-upload>
-      </div>
-
-      <!-- 图片控件 -->
-      <div v-if="dialogMode == 'viewImage'">
-        <el-image :src="imageUrl" lazy />
-      </div>
-
-      <!-- 音频控件 -->
-      <div v-if="dialogMode == 'viewAudio'" :style="{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }">
-        <audio ref="audioElement" controls :src="audioUrl" style="width: 100%" @ended="handleMediaPlayEnded"></audio>
-      </div>
-
-      <!-- 视频控件 -->
-      <div v-if="dialogMode == 'viewVideo'" style="width: 100; max-height: 100%">
-        <video controls ref="videoElement" style="width: 100%; height: 100%; object-fit: cover">
-          <source :src="videoUrl" type="video/mp4" />
-          <source :src="videoUrl" type="video/ogg" />
-        </video>
-      </div>
-
-      <!-- 终端 -->
-      <!-- <div v-if="dialogMode == 'terminal'" style="width: 100; max-height: 100%">
-        <Terminal :dirPath="curPath"/>
-      </div> -->
-
-      <template #footer v-if="dialogMode == 'upload'">
-        <el-button type="primary" size="default" @click="confirmUpload">
-          确认提交
-        </el-button>
-      </template>
-    </el-dialog>
-  </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -237,13 +235,6 @@ interface dirObjType {
 
 interface popMenuType {
   name: string
-}
-
-// 表格高度
-const tableHeight = ref(window.innerHeight - 210)
-
-window.onresize = () => {
-  tableHeight.value = window.innerHeight - 210
 }
 
 // 表格加载
@@ -911,13 +902,15 @@ onMounted(() => {
   getDir('0')
 })
 
-onBeforeMount(() => {
-  window.onresize = null
-})
 </script>
 
 <style scoped lang="scss">
 @import '@/assets/font-icon/iconfont.css';
+
+.box-card {
+  height: 100%;
+
+}
 
 .title-active:hover {
   background-color: rgba(241, 248, 255, 0.75);
