@@ -2,12 +2,7 @@
   <template v-for="item in menuList" :key="item.path">
     <!-- 没有子路由 -->
     <template v-if="!item.children">
-      <el-menu-item
-        v-if="!item.meta.hidden"
-        :index="item.path"
-        @click="goRoute"
-        class="menu-item"
-      >
+      <el-menu-item v-if="!item.meta.hidden" :index="item.path" @click="goRoute" class="menu-item">
         <el-icon class="menu-icon">
           <component :is="item.meta.icon"></component>
         </el-icon>
@@ -51,30 +46,30 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-let $router = useRouter()
+import { useRouter } from 'vue-router';
+let $router = useRouter();
 
-defineProps(['menuList'])
+defineProps(['menuList']);
 
 const goRoute = (vc: any) => {
-  $router.push(vc.index)
-}
+  $router.push(vc.index);
+};
 </script>
 
 <script lang="ts">
 export default {
   name: 'Menu',
-}
+};
 </script>
 
 <style scoped lang="scss">
 .menu-item {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  
+
   &:hover {
     background-color: rgba(64, 158, 255, 0.1) !important;
   }
-  
+
   &.is-active {
     background-color: rgba(64, 158, 255, 0.2) !important;
   }
@@ -82,7 +77,7 @@ export default {
 
 .menu-icon {
   transition: all 0.3s;
-  
+
   .menu-item:hover & {
     transform: scale(1.1) rotate(5deg);
   }
@@ -90,7 +85,7 @@ export default {
 
 .menu-title {
   transition: all 0.3s;
-  
+
   .menu-item:hover & {
     color: #409eff;
   }

@@ -8,23 +8,23 @@
 </template>
 
 <script setup lang="ts">
-import moment from 'moment'
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import moment from 'moment';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 
-let time = ref(moment().format('YYYY-MM-DD/hh:mm:ss'))
-let timeId = ref<any>()
+let time = ref(moment().format('YYYY-MM-DD/hh:mm:ss'));
+let timeId = ref<any>();
 
-const $emit = defineEmits(['fullScreen'])
+const $emit = defineEmits(['fullScreen']);
 
 onMounted(() => {
   timeId.value = setInterval(() => {
-    time.value = moment().format('YYYY-MM-DD/hh:mm:ss')
-  }, 1000)
-})
+    time.value = moment().format('YYYY-MM-DD/hh:mm:ss');
+  }, 1000);
+});
 
 onBeforeUnmount(() => {
-  clearInterval(timeId.value)
-})
+  clearInterval(timeId.value);
+});
 </script>
 
 <style scoped lang="scss">

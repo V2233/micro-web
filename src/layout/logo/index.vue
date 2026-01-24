@@ -6,15 +6,15 @@
 </template>
 
 <script setup lang="ts">
-import setting from '@/settings'
-import useLayoutSettingStore from '@/store/modules/setting'
-let layoutSettingStore = useLayoutSettingStore()
+import setting from '@/settings';
+import useLayoutSettingStore from '@/store/modules/setting';
+let layoutSettingStore = useLayoutSettingStore();
 </script>
 
 <script lang="ts">
 export default {
   name: 'Logo',
-}
+};
 </script>
 
 <style scoped lang="scss">

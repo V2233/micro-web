@@ -1,14 +1,16 @@
 <template>
   <div class="box">
-    <div class="content" ref="scrollContainer" :style="{ fontSize: screenStore.settings.fontSize + 'px' }">
+    <div
+      class="content"
+      ref="scrollContainer"
+      :style="{ fontSize: screenStore.settings.fontSize + 'px' }"
+    >
       <!-- 每条消息 -->
       <div class="message" v-for="(e, index) in msgQueue" :key="index">
         <div class="meta" v-if="msgQueue.length == 0">请等待消息接收...</div>
         <div v-else>
           <span class="msg-origin" v-if="e.group_id" @click="initMsg('group', e.group_id)">
-            {{
-              `[${e.group_id}：${e.group_name}][${e.sender.user_id}：${e.sender.card}]`
-            }}
+            {{ `[${e.group_id}：${e.group_name}][${e.sender.user_id}：${e.sender.card}]` }}
           </span>
           <span class="msg-origin" v-else @click="initMsg('private', e.sender.user_id)">
             {{ `[${e.sender.user_id}：${e.sender.nickname}]` }}
@@ -17,9 +19,17 @@
           <span v-for="(seg, id) in e.message">
             <span v-if="seg.type == 'at'">(@{{ seg.qq }}{{ seg.text }}):</span>
             <span v-if="seg.type == 'text'">{{ seg.text }}</span>
-            <p class="msg-img-box" v-if="seg.type == 'image'"
-              :style="{ width: screenStore.settings.imageWidth + 'px' }">
-              <img class="msg-img" :key="id" :src="seg.url ?? seg.file" referrerpolicy="no-referrer" />
+            <p
+              class="msg-img-box"
+              v-if="seg.type == 'image'"
+              :style="{ width: screenStore.settings.imageWidth + 'px' }"
+            >
+              <img
+                class="msg-img"
+                :key="id"
+                :src="seg.url ?? seg.file"
+                referrerpolicy="no-referrer"
+              />
             </p>
           </span>
         </div>
@@ -33,30 +43,35 @@
           }}{{ preSentMsg.params.id }}
         </div>
         <div class="pop-send" @click="sendMsg">发送</div>
-        <el-input class="input" v-model="preSentMsg.params.msg" type="textarea" :autosize="{ minRows: 3, maxRows: 5 }"
+        <el-input
+          class="input"
+          v-model="preSentMsg.params.msg"
+          type="textarea"
+          :autosize="{ minRows: 3, maxRows: 5 }"
           :input-style="{
             fontFamily: 'Roboto Mono',
             fontSize: '20px',
             color: 'cyan',
             backgroundColor: 'transparent',
-          }"></el-input>
+          }"
+        ></el-input>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import moment from 'moment'
-import Ws from '@/api/ws/index'
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import useScreenStore from '@/store/modules/screen'
-let ws = ref(new Ws())
+import moment from 'moment';
+import Ws from '@/api/ws/index';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import useScreenStore from '@/store/modules/screen';
+let ws = ref(new Ws());
 
-let screenStore = useScreenStore()
-let timeId = ref<any>()
-const scrollContainer = ref()
+let screenStore = useScreenStore();
+let timeId = ref<any>();
+const scrollContainer = ref();
 
-const msgBoxVisual = ref<boolean>(false)
+const msgBoxVisual = ref<boolean>(false);
 
 const preSentMsg = ref({
   type: 'message',
@@ -66,67 +81,66 @@ const preSentMsg = ref({
     id: '',
     msg: '',
   },
-})
+});
 
 const connectWs = async () => {
-  await ws.value.openWs()
-}
+  await ws.value.openWs();
+};
 
 const msgQueue = computed(() => {
-  let newQueue: any[] = []
+  let newQueue: any[] = [];
   ws.value.msgQueue.map((Q: { type: string; action: string; params: any }) => {
     if (Q.type == 'message' && Q.action == 'e_info') {
-      newQueue.push(Q.params)
+      newQueue.push(Q.params);
     }
-  })
-  return newQueue
-})
+  });
+  return newQueue;
+});
 
 // 初始化回复消息
 const initMsg = (type: string, id: string) => {
-  preSentMsg.value.params.type = type
-  preSentMsg.value.params.id = id
-  msgBoxVisual.value = true
-}
+  preSentMsg.value.params.type = type;
+  preSentMsg.value.params.id = id;
+  msgBoxVisual.value = true;
+};
 
 // 回复消息
 const sendMsg = () => {
-  ws.value.sendWs(JSON.stringify(preSentMsg.value))
-  preSentMsg.value.params.msg = ''
-}
+  ws.value.sendWs(JSON.stringify(preSentMsg.value));
+  preSentMsg.value.params.msg = '';
+};
 
 watch(
   () => ws.value.msgQueue,
   () => {
-    if (!screenStore.settings.isAutoScroll) return
-    const lastChild = scrollContainer.value.lastElementChild
+    if (!screenStore.settings.isAutoScroll) return;
+    const lastChild = scrollContainer.value.lastElementChild;
     if (lastChild) {
-      lastChild.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      lastChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
   },
-  { deep: true },
-)
+  { deep: true }
+);
 
 onMounted(() => {
-  connectWs()
+  connectWs();
   timeId.value = setInterval(() => {
-    const difNum = msgQueue.value.length - screenStore.curMsgQueueLength
+    const difNum = msgQueue.value.length - screenStore.curMsgQueueLength;
     screenStore.msgQps.push({
       qps: difNum,
       time: moment().format('hh:mm:ss'),
-    })
+    });
     if (screenStore.msgQps.length > 15) {
-      screenStore.msgQps.shift()
+      screenStore.msgQps.shift();
     }
-    screenStore.curMsgQueueLength = msgQueue.value.length
-  }, 1000 * screenStore.settings.qpsInterval)
-
-})
+    screenStore.curMsgQueueLength = msgQueue.value.length;
+  }, 1000 * screenStore.settings.qpsInterval);
+});
 
 onBeforeUnmount(() => {
-  ws.value.closeWs()
-  clearInterval(timeId.value)
-})
+  ws.value.closeWs();
+  clearInterval(timeId.value);
+});
 </script>
 
 <style scoped lang="scss">

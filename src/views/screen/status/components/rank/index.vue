@@ -3,7 +3,6 @@
     <template #content>
       <div class="setting-box">
         <div class="settings">
-
           <div class="slider-demo-block">
             <span class="demonstration">自动滚动</span>
             <el-switch
@@ -17,52 +16,39 @@
           <div class="slider-demo-block">
             <div>
               <span class="demonstration">自动刷新</span>
-              <el-input-number 
-                v-model="screenStore.settings.updateInterval" 
-                :min="0.5" 
-                :max="120" 
-                size="small" 
-                style="margin-left: 35px;" 
+              <el-input-number
+                v-model="screenStore.settings.updateInterval"
+                :min="0.5"
+                :max="120"
+                size="small"
+                style="margin-left: 35px"
                 @change="changeUpdateInterval"
               />
-              <span style="margin-left: 10px; font-size: 14px;">s / interval</span>
+              <span style="margin-left: 10px; font-size: 14px">s / interval</span>
             </div>
             <el-switch
               v-model="screenStore.settings.isAutoUpdated"
               class="mb-2"
               size="small"
-              style="--el-switch-on-color: cyan;"
-              @change="$emit('updateState',$event)"
+              style="--el-switch-on-color: cyan"
+              @change="$emit('updateState', $event)"
             />
           </div>
 
           <div class="slider-demo-block">
             <span class="demonstration">字体大小</span>
-            <el-slider
-              v-model="screenStore.settings.fontSize"
-              :min="12"
-              :max="50"
-            />
+            <el-slider v-model="screenStore.settings.fontSize" :min="12" :max="50" />
           </div>
 
           <div class="slider-demo-block">
             <span class="demonstration">图片宽度</span>
-            <el-slider
-              v-model="screenStore.settings.imageWidth"
-              :min="50"
-              :max="940"
-            />
+            <el-slider v-model="screenStore.settings.imageWidth" :min="50" :max="940" />
           </div>
 
           <div class="slider-demo-block">
             <span class="demonstration">流量单位</span>
-            <el-slider
-              v-model="screenStore.settings.qpsInterval"
-              :min="1"
-              :max="60"
-            />
+            <el-slider v-model="screenStore.settings.qpsInterval" :min="1" :max="60" />
           </div>
-
         </div>
       </div>
     </template>
@@ -70,21 +56,21 @@
 </template>
 
 <script setup lang="ts">
-import DashboardCard from '@/components/dashboard/index.vue'
-import useScreenstore from '@/store/modules/screen'
-import { onMounted } from 'vue'
+import DashboardCard from '@/components/dashboard/index.vue';
+import useScreenstore from '@/store/modules/screen';
+import { onMounted } from 'vue';
 
-const screenStore = useScreenstore()
-const $emit = defineEmits(["updateState"])
+const screenStore = useScreenstore();
+const $emit = defineEmits(['updateState']);
 
 const changeUpdateInterval = (interval: number) => {
-  if(screenStore.settings.isAutoUpdated) {
-    $emit('updateState',true)
+  if (screenStore.settings.isAutoUpdated) {
+    $emit('updateState', true);
   }
-}
+};
 
 //组件挂载完毕
-onMounted(() => {})
+onMounted(() => {});
 </script>
 
 <style scoped lang="scss">

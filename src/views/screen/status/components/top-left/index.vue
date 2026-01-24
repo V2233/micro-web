@@ -7,12 +7,12 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-let $router = useRouter()
+import { useRouter } from 'vue-router';
+let $router = useRouter();
 
 const goHome = () => {
-  $router.push('/home')
-}
+  $router.push('/home');
+};
 </script>
 
 <style scoped lang="scss">

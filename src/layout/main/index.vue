@@ -15,36 +15,36 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, ref, watch } from 'vue';
 
-import useLayoutSettingStore from '@/store/modules/setting'
-import GlobalTerminal from './GlobalTerminal.vue'
+import useLayoutSettingStore from '@/store/modules/setting';
+import GlobalTerminal from './GlobalTerminal.vue';
 
-let layoutSettingStore = useLayoutSettingStore()
+let layoutSettingStore = useLayoutSettingStore();
 
-let flag = ref(true)
+let flag = ref(true);
 
 watch(
   () => layoutSettingStore.globalTerminal.visible,
   (newValue, oldValue) => {
     if (oldValue == false) {
       if (!layoutSettingStore.globalTerminal.running) {
-        layoutSettingStore.globalTerminal.running = true
+        layoutSettingStore.globalTerminal.running = true;
       }
     }
-    console.log(newValue, oldValue)
-  },
-)
+    console.log(newValue, oldValue);
+  }
+);
 
 // 监听仓库数据变化
 watch(
   () => layoutSettingStore.refresh,
   () => {
-    console.log('刷新')
-    flag.value = false
+    console.log('刷新');
+    flag.value = false;
     nextTick(() => {
-      flag.value = true
-    })
+      flag.value = true;
+    });
     // 页面刷新时重新渲染组件
     // const comElement = document.querySelector('.com')
     // console.log(comElement)
@@ -54,14 +54,14 @@ watch(
     //     comElement.classList.add('page-slide-enter-active')
     //   })
     // }
-  },
-)
+  }
+);
 </script>
 
 <script lang="ts">
 export default {
   name: 'Main',
-}
+};
 </script>
 
 <style scoped lang="scss">

@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
 
 interface AppState {
-  theme: 'light' | 'dark'
+  theme: 'light' | 'dark';
 }
 
 export const useAppStore = defineStore('app', {
@@ -9,6 +9,6 @@ export const useAppStore = defineStore('app', {
     theme: (localStorage.getItem('theme') as any) || 'dark',
   }),
   getters: {
-    isLight: (state) => state.theme === 'light',
+    isLight: state => state.theme === 'light',
   },
-})
+});

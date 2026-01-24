@@ -15,22 +15,13 @@
           >
             是否可旋转
           </el-checkbox>
-          <el-checkbox
-            v-model="options.boundary"
-            @change="handCheckboxChange($event, 'boundary')"
-          >
+          <el-checkbox v-model="options.boundary" @change="handCheckboxChange($event, 'boundary')">
             是否判断边界
           </el-checkbox>
-          <el-checkbox
-            v-model="options.disabled"
-            @change="handCheckboxChange($event, 'disabled')"
-          >
+          <el-checkbox v-model="options.disabled" @change="handCheckboxChange($event, 'disabled')">
             是否禁用
           </el-checkbox>
-          <el-checkbox
-            v-model="options.selected"
-            @change="handCheckboxChange($event, 'selected')"
-          >
+          <el-checkbox v-model="options.selected" @change="handCheckboxChange($event, 'selected')">
             是否可选中
           </el-checkbox>
           <el-checkbox
@@ -45,16 +36,10 @@
           >
             是否开启网格
           </el-checkbox>
-          <el-checkbox
-            v-model="options.snap"
-            @change="handCheckboxChange($event, 'snap')"
-          >
+          <el-checkbox v-model="options.snap" @change="handCheckboxChange($event, 'snap')">
             是否开启网格吸附
           </el-checkbox>
-          <el-checkbox
-            v-model="options.markline"
-            @change="handCheckboxChange($event, 'markline')"
-          >
+          <el-checkbox v-model="options.markline" @change="handCheckboxChange($event, 'markline')">
             是否开启辅助线
           </el-checkbox>
           <el-checkbox
@@ -63,10 +48,7 @@
           >
             是否禁用方向键移动
           </el-checkbox>
-          <el-checkbox
-            v-model="options.border"
-            @change="handCheckboxChange($event, 'border')"
-          >
+          <el-checkbox v-model="options.border" @change="handCheckboxChange($event, 'border')">
             是否显示边框
           </el-checkbox>
           <el-checkbox
@@ -79,11 +61,7 @@
       </el-form>
     </div>
 
-    <div
-      class="render_box"
-      ref="html_box"
-      :style="{ height: renderBoxHeight + 'px' }"
-    >
+    <div class="render_box" ref="html_box" :style="{ height: renderBoxHeight + 'px' }">
       <Drager v-bind="options">
         <div style="width: 100%; height: 100%; background-color: red"></div>
       </Drager>
@@ -92,9 +70,9 @@
 </template>
 
 <script setup lang="ts">
-import Drager from 'es-drager'
-import 'es-drager/lib/style.css'
-import { ref, reactive } from 'vue'
+import Drager from 'es-drager';
+import 'es-drager/lib/style.css';
+import { ref, reactive } from 'vue';
 
 const options = reactive({
   width: 100,
@@ -124,12 +102,12 @@ const options = reactive({
   disabledKeyEvent: false,
   border: true,
   equalProportion: false,
-})
+});
 
-const renderBoxHeight = ref<number>(500)
+const renderBoxHeight = ref<number>(500);
 
 // 控制checkbox开关
-const handCheckboxChange = (e: boolean, prop: string) => {}
+const handCheckboxChange = (e: boolean, prop: string) => {};
 </script>
 
 <style scoped lang="scss">

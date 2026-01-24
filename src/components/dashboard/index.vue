@@ -1,10 +1,7 @@
 <template>
   <div class="box">
     <div class="top_box">
-      <div
-        class="top_title"
-        :style="location == 'right' ? 'left: 40%; width: 60%;' : ''"
-      >
+      <div class="top_title" :style="location == 'right' ? 'left: 40%; width: 60%;' : ''">
         <div class="title_box">
           <p class="title">{{ title }}</p>
           <p class="bg"></p>
@@ -13,11 +10,7 @@
 
       <div
         class="top_desc"
-        :style="
-          location == 'right'
-            ? 'left: 0; width: 40%;'
-            : 'left: 40%; width: 60%;'
-        "
+        :style="location == 'right' ? 'left: 0; width: 40%;' : 'left: 40%; width: 60%;'"
       >
         <slot name="desc"></slot>
       </div>
@@ -30,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-defineProps(['title', 'location'])
+defineProps(['title', 'location']);
 </script>
 
 <style scoped lang="scss">

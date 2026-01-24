@@ -1,20 +1,22 @@
 <template>
-  <el-card v-if="devStore.scene == 0" :body-style="{height: '100%', flex:1, display:'flex', flexDirection: 'column'}" style="height: 100%;">
+  <el-card
+    v-if="devStore.scene == 0"
+    :body-style="{ height: '100%', flex: 1, display: 'flex', flexDirection: 'column' }"
+    style="height: 100%"
+  >
     <div class="top_bar">
       <div class="sub-title">指令列表</div>
       <el-popover placement="bottom" :width="300" trigger="hover">
-        <el-input v-model="searchText" placeholder="筛选指令" size="small" @input="searchPlugin" >
+        <el-input v-model="searchText" placeholder="筛选指令" size="small" @input="searchPlugin">
           <template #append>
             <el-button icon="Search" @click="searchPlugin"></el-button>
           </template>
         </el-input>
         <template #reference>
-          <el-button icon="Search" circle style="margin-left: auto;"></el-button>
+          <el-button icon="Search" circle style="margin-left: auto"></el-button>
         </template>
       </el-popover>
-      <el-button type="primary" icon="Plus" @click="goAddPlugin">
-        添加指令
-      </el-button>
+      <el-button type="primary" icon="Plus" @click="goAddPlugin"> 添加指令 </el-button>
     </div>
 
     <el-table :data="pluginsList">
@@ -28,7 +30,9 @@
 
       <el-table-column label="消息类型">
         <template #="{ row, $index }">
-          <span style="font-size: 12px">[{{ (row.message.map((item: any) => item.type)).join(',') }}]</span>
+          <span style="font-size: 12px"
+            >[{{ row.message.map((item: any) => item.type).join(',') }}]</span
+          >
         </template>
       </el-table-column>
 
@@ -40,7 +44,12 @@
 
       <el-table-column label="操作" fixed="right" min-width="120px">
         <template #="{ row, $index }">
-          <el-button type="primary" size="small" icon="Edit" @click="goEditPlugin($index)"></el-button>
+          <el-button
+            type="primary"
+            size="small"
+            icon="Edit"
+            @click="goEditPlugin($index)"
+          ></el-button>
           <el-popconfirm title="删除后不可恢复，您确定吗？" @confirm="deletePlugin($index)">
             <template #reference>
               <el-button type="primary" size="small" icon="Delete"></el-button>
@@ -71,57 +80,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { reqPluginsList, reqDeletePlugin } from '@/api/dev/plugin'
-import type { pluginType, pluginResponseType } from '@/api/dev/plugin/type'
-import useDevStore from '@/store/modules/dev'
-import PluginEditor from './pluginEditor/index.vue'
-import { getFormatDate } from '@/utils/time'
+import { ref, reactive, onMounted } from 'vue';
+import { reqPluginsList, reqDeletePlugin } from '@/api/dev/plugin';
+import type { pluginType, pluginResponseType } from '@/api/dev/plugin/type';
+import useDevStore from '@/store/modules/dev';
+import PluginEditor from './pluginEditor/index.vue';
+import { getFormatDate } from '@/utils/time';
 
-const devStore = useDevStore()
+const devStore = useDevStore();
 
-const pluginsList = ref<pluginType[]>([])
+const pluginsList = ref<pluginType[]>([]);
 
-let pluginsListCopy:pluginType[] = []
+let pluginsListCopy: pluginType[] = [];
 
 const editedPluginValue = ref({
   id: '',
-})
+});
 
-const searchText = ref('')
+const searchText = ref('');
 
 const page = reactive({
   pageNo: 1,
-  pageSize: 10
-})
+  pageSize: 10,
+});
 
 onMounted(() => {
-  getPluginsList()
-})
+  getPluginsList();
+});
 
 /**
  * 获取插件列表
  * @returns
  */
 const getPluginsList = async () => {
-  let res: pluginResponseType = await reqPluginsList()
-  console.log(res)
+  let res: pluginResponseType = await reqPluginsList();
+  console.log(res);
   if (res.code == 200) {
-    pluginsList.value = res.data
-    pluginsListCopy = res.data
+    pluginsList.value = res.data;
+    pluginsListCopy = res.data;
   }
-}
+};
 
 /**
  * 添加插件
  * @returns
  */
 const goAddPlugin = () => {
-  ; (devStore.isPluginEdited = true), (devStore.scene = 1)
-  devStore.curEditedMode = 'add'
-  editedPluginValue.value.id = getFormatDate()
-  devStore.curPluginId = editedPluginValue.value.id
-}
+  ((devStore.isPluginEdited = true), (devStore.scene = 1));
+  devStore.curEditedMode = 'add';
+  editedPluginValue.value.id = getFormatDate();
+  devStore.curPluginId = editedPluginValue.value.id;
+};
 
 /**
  * 编辑插件
@@ -129,12 +138,12 @@ const goAddPlugin = () => {
  * @returns
  */
 const goEditPlugin = async (index: number) => {
-  devStore.isPluginEdited = true
-  devStore.scene = 1
-  devStore.curEditedMode = 'update'
+  devStore.isPluginEdited = true;
+  devStore.scene = 1;
+  devStore.curEditedMode = 'update';
 
-  editedPluginValue.value = pluginsList.value[index]
-}
+  editedPluginValue.value = pluginsList.value[index];
+};
 
 /**
  * 处理子组件保存事件
@@ -142,9 +151,9 @@ const goEditPlugin = async (index: number) => {
  * @returns
  */
 const updatePluginsList = (e: pluginType[]) => {
-  pluginsList.value = e
-  pluginsListCopy = e
-}
+  pluginsList.value = e;
+  pluginsListCopy = e;
+};
 
 /**
  * 删除插件
@@ -152,17 +161,17 @@ const updatePluginsList = (e: pluginType[]) => {
  * @returns
  */
 const deletePlugin = async (index: number) => {
-  let res: pluginResponseType = await reqDeletePlugin(index)
-  console.log(res)
+  let res: pluginResponseType = await reqDeletePlugin(index);
+  console.log(res);
   if (res.code == 200) {
-    pluginsList.value = res.data
-    pluginsListCopy = res.data
+    pluginsList.value = res.data;
+    pluginsListCopy = res.data;
   }
-}
+};
 
 const searchPlugin = () => {
-  pluginsList.value = pluginsListCopy.filter(plugin=>plugin.reg.includes(searchText.value))
-}
+  pluginsList.value = pluginsListCopy.filter(plugin => plugin.reg.includes(searchText.value));
+};
 
 // const sizeChange = (e) => {
 //   console.log(e)

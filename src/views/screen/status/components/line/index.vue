@@ -1,9 +1,7 @@
 <template>
   <DashboardCard
     :title="`消息流量(qps:条/${
-      screenStore.settings.qpsInterval == 1
-        ? ''
-        : screenStore.settings.qpsInterval
+      screenStore.settings.qpsInterval == 1 ? '' : screenStore.settings.qpsInterval
     }秒)`"
   >
     <template #content>
@@ -17,26 +15,26 @@
 </template>
 
 <script setup lang="ts">
-import * as echarts from 'echarts'
-import { ref, onMounted, watch } from 'vue'
-import DashboardCard from '@/components/dashboard/index.vue'
-import useScreenStore from '@/store/modules/screen'
-let screenStore = useScreenStore()
+import * as echarts from 'echarts';
+import { ref, onMounted, watch } from 'vue';
+import DashboardCard from '@/components/dashboard/index.vue';
+import useScreenStore from '@/store/modules/screen';
+let screenStore = useScreenStore();
 
-let charts = ref()
+let charts = ref();
 
 watch(
   () => screenStore.msgQps,
-  (newQueue) => {
-    updateMsgQpsInfo()
+  newQueue => {
+    updateMsgQpsInfo();
   },
-  { deep: true },
-)
+  { deep: true }
+);
 
 onMounted(() => {
-  charts.value = echarts.init(charts.value)
-  updateMsgQpsInfo()
-})
+  charts.value = echarts.init(charts.value);
+  updateMsgQpsInfo();
+});
 
 const updateMsgQpsInfo = () => {
   //设置配置项
@@ -49,7 +47,7 @@ const updateMsgQpsInfo = () => {
       splitLine: {
         show: false,
       },
-      data: screenStore.msgQps.map((item) => item.time),
+      data: screenStore.msgQps.map(item => item.time),
       //轴线的设置
       axisLine: {
         show: true,
@@ -82,7 +80,7 @@ const updateMsgQpsInfo = () => {
     series: [
       {
         type: 'line',
-        data: screenStore.msgQps.map((item) => item.qps),
+        data: screenStore.msgQps.map(item => item.qps),
         //平滑曲线的设置
         smooth: true,
         //区域填充样式
@@ -108,8 +106,8 @@ const updateMsgQpsInfo = () => {
         },
       },
     ],
-  })
-}
+  });
+};
 </script>
 
 <style scoped lang="scss">

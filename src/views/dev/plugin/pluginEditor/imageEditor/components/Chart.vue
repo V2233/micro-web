@@ -3,13 +3,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import * as echarts from 'echarts'
-const chartRef = ref()
-let chart: echarts.ECharts | null = null
+import { ref, onMounted } from 'vue';
+import * as echarts from 'echarts';
+const chartRef = ref();
+let chart: echarts.ECharts | null = null;
 
 function init() {
-  chart = echarts.init(chartRef.value)
+  chart = echarts.init(chartRef.value);
   // 绘制图表
   chart.setOption({
     title: {
@@ -27,18 +27,18 @@ function init() {
         data: [5, 20, 36, 10, 10, 20],
       },
     ],
-  })
+  });
 }
 
 function resize() {
-  chart?.resize()
+  chart?.resize();
 }
 
 onMounted(() => {
-  init()
-})
+  init();
+});
 
 defineExpose({
   resize,
-})
+});
 </script>

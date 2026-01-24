@@ -1,8 +1,14 @@
 <template>
   <el-card>
     <div class="box">
-      <img :src="userStore.avatar ? userStore.avatar : `https://q1.qlogo.cn/g?b=qq&s=0&nk=${userStore.masterQQ}`"
-        class="avatar" />
+      <img
+        :src="
+          userStore.avatar
+            ? userStore.avatar
+            : `https://q1.qlogo.cn/g?b=qq&s=0&nk=${userStore.masterQQ}`
+        "
+        class="avatar"
+      />
       <div class="bottom">
         <h4 class="title">{{ getTime() }}好！{{ userStore.username }}</h4>
         <p class="subtitle">这里是低代码开发管理平台</p>
@@ -70,33 +76,29 @@
       </el-table-column>
     </el-table>
   </el-card>
-
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { getTime } from '@/utils/time'
-import { reqBotInfo } from '@/api/dev/plugin'
+import { onMounted, ref } from 'vue';
+import { getTime } from '@/utils/time';
+import { reqBotInfo } from '@/api/dev/plugin';
 // import SvgIcon from '@/components/SvgIcon/index.vue'
-import type {
-  BotInfoListType,
-  BotInfoResponseType,
-} from '@/api/dev/plugin/type'
-import useUserStore from '@/store/modules/user'
-let userStore = useUserStore()
+import type { BotInfoListType, BotInfoResponseType } from '@/api/dev/plugin/type';
+import useUserStore from '@/store/modules/user';
+let userStore = useUserStore();
 
-let botInfoList = ref<BotInfoListType>([])
+let botInfoList = ref<BotInfoListType>([]);
 onMounted(() => {
-  getBotInfo()
-})
+  getBotInfo();
+});
 
 const getBotInfo = async () => {
-  let res: BotInfoResponseType = await reqBotInfo()
+  let res: BotInfoResponseType = await reqBotInfo();
   // console.log(res)
   if (res.code == 200) {
-    botInfoList.value = res.data
+    botInfoList.value = res.data;
   }
-}
+};
 </script>
 
 <style scoped lang="scss">

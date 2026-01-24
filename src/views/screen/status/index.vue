@@ -20,7 +20,11 @@
             <TopRight class="top_right" @full-screen="toggleFullScreen(screenContainer)" />
             <Disk class="disk" :diskSize="stateData.diskSizeInfo" :swapData="stateData.swapInfo" />
             <Heap class="heap" :nodeData="stateData.nodeInfo" />
-            <Other class="other" :otherData="stateData.otherInfo" :networkData="stateData.networkInfo" />
+            <Other
+              class="other"
+              :otherData="stateData.otherInfo"
+              :networkData="stateData.networkInfo"
+            />
           </div>
         </div>
       </div>
@@ -29,93 +33,92 @@
 </template>
 
 <script setup lang="ts">
-import Bg from './bg.vue'
-import TopCenter from './components/top-center/index.vue'
-import TopLeft from './components/top-left/index.vue'
-import TopRight from './components/top-right/index.vue'
-import Cpu from './components/cpu/index.vue'
-import Gpu from './components/gpu/index.vue'
-import Ram from './components/ram/index.vue'
-import Disk from './components/disk/index.vue'
-import Heap from './components/heap/index.vue'
-import Other from './components/other/index.vue'
-import Main from './components/main/index.vue'
-import Line from './components/line/index.vue'
-import Rank from './components/rank/index.vue'
+import Bg from './bg.vue';
+import TopCenter from './components/top-center/index.vue';
+import TopLeft from './components/top-left/index.vue';
+import TopRight from './components/top-right/index.vue';
+import Cpu from './components/cpu/index.vue';
+import Gpu from './components/gpu/index.vue';
+import Ram from './components/ram/index.vue';
+import Disk from './components/disk/index.vue';
+import Heap from './components/heap/index.vue';
+import Other from './components/other/index.vue';
+import Main from './components/main/index.vue';
+import Line from './components/line/index.vue';
+import Rank from './components/rank/index.vue';
 
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { reqStstus } from '@/api/screen/index'
-import useScreenstore from '@/store/modules/screen'
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { reqStstus } from '@/api/screen/index';
+import useScreenstore from '@/store/modules/screen';
 
-const screenStore = useScreenstore()
+const screenStore = useScreenstore();
 
 // 获取大屏dom
-let screen = ref()
-let screenContainer = ref()
+let screen = ref();
+let screenContainer = ref();
 
-let timeId = ref<any>()
+let timeId = ref<any>();
 
-let stateData = ref<any>([])
+let stateData = ref<any>([]);
 
-const resizeObserver = ref()
+const resizeObserver = ref();
 
 onMounted(() => {
-  changeSize()
+  changeSize();
   resizeObserver.value = new ResizeObserver(() => {
-    changeSize()
-  })
+    changeSize();
+  });
   if (screenContainer.value) {
-    resizeObserver.value.observe(screenContainer.value)
+    resizeObserver.value.observe(screenContainer.value);
   }
 
-  getStatus()
-})
+  getStatus();
+});
 
 const getStatus = async () => {
-  let res: any = await reqStstus()
+  let res: any = await reqStstus();
   if (res.code == 200) {
     if (stateData.value.length == 0) {
-      const envEditionData = res.data.otherInfo.find((item: any) => item.first == "环境版本")
+      const envEditionData = res.data.otherInfo.find((item: any) => item.first == '环境版本');
       if (envEditionData) {
         if (envEditionData.tail.platform !== 'win32') {
-          screenStore.settings.isAutoUpdated = true
-          screenStore.settings.updateInterval = 1
+          screenStore.settings.isAutoUpdated = true;
+          screenStore.settings.updateInterval = 1;
           setTimeout(() => {
-            switchUpdateState(true)
-          }, screenStore.settings.updateInterval * 1000)
+            switchUpdateState(true);
+          }, screenStore.settings.updateInterval * 1000);
         }
       }
     }
-    stateData.value = res.data
+    stateData.value = res.data;
     // console.log(res.data)
   }
-}
+};
 
 const switchUpdateState = (isOpen: boolean) => {
   // console.log(isOpen)
-  timeId.value && clearInterval(timeId.value)
+  timeId.value && clearInterval(timeId.value);
   if (isOpen) {
-    getStatus()
+    getStatus();
     timeId.value = setInterval(() => {
-      getStatus()
-    }, screenStore.settings.updateInterval * 1000)
+      getStatus();
+    }, screenStore.settings.updateInterval * 1000);
   }
-}
-
+};
 
 /**
  * 全屏模式
  * @returns
  */
 const toggleFullScreen = (elem: HTMLElement) => {
-  // 检查传入的元素是否存在  
+  // 检查传入的元素是否存在
   if (!elem) {
     console.error('需要传入一个元素');
     return;
   }
-  // 检查该元素是否已经是全屏状态  
+  // 检查该元素是否已经是全屏状态
   if (!document.fullscreenElement) {
-    // 如果不是全屏，尝试进入全屏  
+    // 如果不是全屏，尝试进入全屏
     if (elem.requestFullscreen) {
       elem.requestFullscreen().catch(err => {
         console.error('全屏请求失败:', err);
@@ -124,7 +127,7 @@ const toggleFullScreen = (elem: HTMLElement) => {
       console.error('当前浏览器不支持全屏API');
     }
   } else {
-    // 如果已经是全屏，则退出全屏  
+    // 如果已经是全屏，则退出全屏
     if (document.exitFullscreen) {
       document.exitFullscreen();
     }
@@ -133,15 +136,15 @@ const toggleFullScreen = (elem: HTMLElement) => {
 
 function getScale(isChanged = false, w = 1920, h = 1080) {
   // const { clientWidth, clientHeight } = screenContainer.value.offsetParent
-  const { clientWidth, clientHeight } = screenContainer.value
+  const { clientWidth, clientHeight } = screenContainer.value;
   if (isChanged) {
-    const ww = clientWidth / 480
+    const ww = clientWidth / 480;
     // const wh = clientHeight / h
-    return ww * 0.8
+    return ww * 0.8;
   } else {
-    const ww = clientWidth / w
-    const wh = clientHeight / h
-    return ww < wh ? ww : wh
+    const ww = clientWidth / w;
+    const wh = clientHeight / h;
+    return ww < wh ? ww : wh;
   }
 }
 
@@ -150,17 +153,17 @@ function getScale(isChanged = false, w = 1920, h = 1080) {
 // }
 
 const changeSize = () => {
-  let scale = 1
+  let scale = 1;
   if (window.innerWidth > window.innerHeight) {
-    scale = getScale()
+    scale = getScale();
   } else {
-    scale = getScale(true)
+    scale = getScale(true);
   }
   screen.value.style.transform =
     window.innerWidth > window.innerHeight
       ? `scale(${scale}) translate(-50%,-50%)`
-      : `scale(${scale}) translateX(-40%)`
-}
+      : `scale(${scale}) translateX(-40%)`;
+};
 
 // const observer = new ResizeObserver(entries => {
 //     screen.value.style.transform = `scale(${getScale()}) translate(-50%,-50%)`
@@ -169,12 +172,12 @@ const changeSize = () => {
 
 onBeforeUnmount(() => {
   if (resizeObserver.value) {
-    resizeObserver.value.unobserve(screenContainer.value)
+    resizeObserver.value.unobserve(screenContainer.value);
   }
   if (timeId.value) {
-    clearInterval(timeId.value)
+    clearInterval(timeId.value);
   }
-})
+});
 </script>
 
 <style scoped lang="scss">
@@ -299,7 +302,6 @@ onBeforeUnmount(() => {
 
 @media (orientation: portrait) {
   .container {
-
     // overflow: scroll;
     .screen_box {
       overflow: scroll;

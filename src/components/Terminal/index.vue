@@ -39,13 +39,7 @@
               />
             </el-form-item>
             <el-form-item label="背景透明度">
-              <el-slider
-                v-model="termBgOpacity"
-                size="large"
-                :min="0"
-                :max="1"
-                :step="0.05"
-              />
+              <el-slider v-model="termBgOpacity" size="large" :min="0" :max="1" :step="0.05" />
             </el-form-item>
             <slot name="settings"></slot>
           </el-form>
@@ -69,26 +63,26 @@
   </div>
 </template>
 <script setup lang="ts">
-import HeaderTab from '@/components/Tabs/HeaderTab.vue'
+import HeaderTab from '@/components/Tabs/HeaderTab.vue';
 
-import { FitAddon } from '@xterm/addon-fit'
-import { Terminal } from '@xterm/xterm'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { FitAddon } from '@xterm/addon-fit';
+import { Terminal } from '@xterm/xterm';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 // import { WebLinksAddon } from '@xterm/addon-web-links';
 // import { CanvasAddon } from '@xterm/addon-canvas'
 
-import '@xterm/xterm/css/xterm.css'
+import '@xterm/xterm/css/xterm.css';
 
-import useLayoutSettingStore from '@/store/modules/setting'
+import useLayoutSettingStore from '@/store/modules/setting';
 
-const layoutSettingStore = useLayoutSettingStore()
+const layoutSettingStore = useLayoutSettingStore();
 
 /** 终端高度 */
-const termHeight = ref(30)
+const termHeight = ref(30);
 /** 终端字体大小 */
-const termFontSize = ref(14)
+const termFontSize = ref(14);
 /** 终端背景透明度 */
-const termBgOpacity = ref(0.8)
+const termBgOpacity = ref(0.8);
 
 const props = defineProps({
   headerVisible: {
@@ -103,18 +97,18 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-})
+});
 
-const $emit = defineEmits(['pressEnter', 'bgColorChange'])
+const $emit = defineEmits(['pressEnter', 'bgColorChange']);
 
 const termBgColor = computed(() => {
   const color =
     layoutSettingStore.theme === 'dark'
       ? `rgba(0, 0, 0, ${termBgOpacity.value})`
-      : `rgba(255, 255, 255, ${termBgOpacity.value})`
-  $emit('bgColorChange', color)
-  return color
-})
+      : `rgba(255, 255, 255, ${termBgOpacity.value})`;
+  $emit('bgColorChange', color);
+  return color;
+});
 
 const termTheme = computed(() => {
   if (layoutSettingStore.theme === 'dark') {
@@ -137,7 +131,7 @@ const termTheme = computed(() => {
       foreground: '#cccccc',
       selectionBackground: '#3a3d41',
       cursor: '#ffffff',
-    }
+    };
   } else {
     return {
       background: `#ffffff00`,
@@ -158,13 +152,13 @@ const termTheme = computed(() => {
       foreground: '#000000',
       selectionBackground: '#bfdbfe',
       cursor: '#00dacc',
-    }
+    };
   }
-})
+});
 
 // 终端实例
-const termboxRef = ref()
-const terminal = ref<HTMLElement>()
+const termboxRef = ref();
+const terminal = ref<HTMLElement>();
 const term = ref<Terminal>(
   new Terminal({
     lineHeight: 1.2,
@@ -179,33 +173,33 @@ const term = ref<Terminal>(
     // scrollback: 100,
     // tabStopWidth: 4,
     rows: termHeight.value,
-  }),
-)
+  })
+);
 
-const fitAddon = new FitAddon()
+const fitAddon = new FitAddon();
 
 watch(
   () => layoutSettingStore.theme,
   () => {
-    term.value.options.theme = termTheme.value
-  },
-)
+    term.value.options.theme = termTheme.value;
+  }
+);
 
 /**
  * 改变高度
  * @returns
  */
 const changeTermHeight = (rows: number) => {
-  term.value && term.value.resize(term.value.cols, rows)
-}
+  term.value && term.value.resize(term.value.cols, rows);
+};
 
 /**
  * 改变字体大小
  * @returns
  */
 const changeFontSize = (size: number) => {
-  term.value.options.fontSize = size
-}
+  term.value.options.fontSize = size;
+};
 
 /**
  * 改变字体大小
@@ -219,8 +213,8 @@ const changeBgOpacity = (opacity: number) => {
         layoutSettingStore.theme === 'dark'
           ? `rgba(0, 0, 0, ${opacity})`
           : `rgba(255, 255, 255, ${opacity})`,
-    }
-}
+    };
+};
 
 /**
  * 全屏模式
@@ -229,28 +223,28 @@ const changeBgOpacity = (opacity: number) => {
 const toggleFullScreen = (elem: HTMLElement) => {
   // 检查传入的元素是否存在
   if (!elem) {
-    console.error('需要传入一个元素')
-    return
+    console.error('需要传入一个元素');
+    return;
   }
 
   // 检查该元素是否已经是全屏状态
   if (!document.fullscreenElement) {
     // 如果不是全屏，尝试进入全屏
     if (elem.requestFullscreen) {
-      elem.requestFullscreen().catch((err) => {
-        console.error('全屏请求失败:', err)
-      })
+      elem.requestFullscreen().catch(err => {
+        console.error('全屏请求失败:', err);
+      });
     } else {
-      console.error('当前浏览器不支持全屏API')
+      console.error('当前浏览器不支持全屏API');
     }
   } else {
     // 如果已经是全屏，则退出全屏
     if (document.exitFullscreen) {
-      document.exitFullscreen()
+      document.exitFullscreen();
     }
   }
-  fitTermSize()
-}
+  fitTermSize();
+};
 
 /**
  * 终端输入触发事件
@@ -258,51 +252,51 @@ const toggleFullScreen = (elem: HTMLElement) => {
  */
 const onTermData = () => {
   // 输入与粘贴的情况,onData不能重复绑定,不然会发送多次
-  let cache = ''
+  let cache = '';
 
-  term.value.onData((data) => {
+  term.value.onData(data => {
     if (data.endsWith('\n') || data.endsWith('\r') || data.endsWith('\x0D')) {
-      $emit('pressEnter', cache)
-      term.value.write(data)
+      $emit('pressEnter', cache);
+      term.value.write(data);
       if (cache.startsWith('clear')) {
-        term.value.clear()
+        term.value.clear();
       }
-      cache = ''
+      cache = '';
     } else if (data === '\x08' || data === '\x7F') {
-      if (!cache) return
-      cache = cache.slice(0, -1)
-      term.value.write('\b \b')
+      if (!cache) return;
+      cache = cache.slice(0, -1);
+      term.value.write('\b \b');
     } else {
-      cache += data
-      term.value.write(data)
+      cache += data;
+      term.value.write(data);
     }
-  })
-}
+  });
+};
 
-const resizeObserver = ref<ResizeObserver | null>()
+const resizeObserver = ref<ResizeObserver | null>();
 
 /**
  * 适应浏览器尺寸变化
  * @returns
  */
 const fitTermSize = () => {
-  fitAddon.fit()
+  fitAddon.fit();
 
-  const container = terminal.value?.parentElement
-  if (!container) return
+  const container = terminal.value?.parentElement;
+  if (!container) return;
 
-  const availableHeight = container.clientHeight
+  const availableHeight = container.clientHeight;
 
-  if (availableHeight <= 0) return
+  if (availableHeight <= 0) return;
 
-  const rows = Math.floor(availableHeight / (termFontSize.value * 1.2))
+  const rows = Math.floor(availableHeight / (termFontSize.value * 1.2));
 
-  term.value.resize(term.value.cols, rows)
-}
+  term.value.resize(term.value.cols, rows);
+};
 
 onMounted(() => {
-  term.value.open(terminal.value as HTMLElement)
-  term.value.loadAddon(fitAddon)
+  term.value.open(terminal.value as HTMLElement);
+  term.value.loadAddon(fitAddon);
   //   term.value.loadAddon(
   //         new WebLinksAddon((event, uri) => {
   //         if (event.ctrlKey || event.metaKey) {
@@ -312,21 +306,21 @@ onMounted(() => {
   //     );
   // terminal.loadAddon(new CanvasAddon());
   resizeObserver.value = new ResizeObserver(() => {
-    fitTermSize()
-  })
-  resizeObserver.value.observe(termboxRef.value)
-  onTermData()
-})
+    fitTermSize();
+  });
+  resizeObserver.value.observe(termboxRef.value);
+  onTermData();
+});
 
 onBeforeUnmount(() => {
-  resizeObserver.value?.disconnect()
-})
+  resizeObserver.value?.disconnect();
+});
 
 const write = (str: string) => {
-  term.value.write(str)
-}
+  term.value.write(str);
+};
 
-defineExpose({ write, fitTermSize, termRef: term, termBgColor })
+defineExpose({ write, fitTermSize, termRef: term, termBgColor });
 </script>
 <style lang="scss" scoped>
 .bg-main {

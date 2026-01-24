@@ -1,5 +1,5 @@
 export function codeTip() {
-    return `
+  return `
 /**
  * 编写后请记得先点击右上角保存代码，然后点击该页面顶部保存按钮即可保存此插件，保存后立即生效！
  * 这是自定义代码段，拥有JavaScript的正式环境，你可以像正常写yunzai的js插件一样编写执行逻辑
@@ -25,5 +25,5 @@ const moment = (await import('moment')).default
 const now = moment().format('YYYY/MM/DD HH:mm:ss')
 logger.info('现在是：',now)
 e.reply(now)
-    `
+    `;
 }

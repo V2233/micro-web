@@ -42,7 +42,7 @@ export const constantRoute = [
       icon: 'DocumentDelete',
     },
   },
-]
+];
 
 //异步路由
 export const asnycRoute = [
@@ -228,7 +228,7 @@ export const asnycRoute = [
   //     icon: 'Promotion',
   //   },
   // },
-]
+];
 
 //任意路由
 export const anyRoute = {
@@ -241,7 +241,7 @@ export const anyRoute = {
     hidden: true,
     icon: 'DataLine',
   },
-}
+};
 
 // 备份下
 // export const constantRoute = [

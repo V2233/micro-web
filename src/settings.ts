@@ -3,4 +3,4 @@ export default {
   // logo: '/logo.png',
   logo: '/terminal.png',
   logoHidden: false,
-}
+};

@@ -21,7 +21,6 @@
   .el-menu--collapse {
     --el-menu-base-level-padding: 10px;
   }
-
 }
 .layout_main {
   padding: 0 !important;

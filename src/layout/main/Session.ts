@@ -1,5 +1,5 @@
-import useUserStore from '@/store/modules/user'
-const userStore = useUserStore()
+import useUserStore from '@/store/modules/user';
+const userStore = useUserStore();
 
 enum NotieTypes {
   SUCCESS = 'success',
@@ -9,87 +9,77 @@ enum NotieTypes {
 }
 
 export default class Session {
-  static sessions = new Map<string, Session>()
-  static activeSession: Session | null = null
+  static sessions = new Map<string, Session>();
+  static activeSession: Session | null = null;
 
-  static onSessionsChange:
-    | ((type: NotieTypes, message: string) => void)
-    | null = null
+  static onSessionsChange: ((type: NotieTypes, message: string) => void) | null = null;
 
   static deleteSession(session: Session | string) {
-    const sess = Session.sessions.get(
-      typeof session === 'string' ? session : session.id,
-    )
+    const sess = Session.sessions.get(typeof session === 'string' ? session : session.id);
     if (sess) {
-      Session.sessions.delete(sess.id)
-      sess.ws?.close()
-      Session.onSessionsChange?.(
-        NotieTypes.SUCCESS,
-        sess.name + '会话关闭成功！',
-      )
+      Session.sessions.delete(sess.id);
+      sess.ws?.close();
+      Session.onSessionsChange?.(NotieTypes.SUCCESS, sess.name + '会话关闭成功！');
     }
   }
 
-  ws: WebSocket | null
-  msgQueue: any[]
-  id: string
-  reConnectSum: number
-  baseUrl: string
-  url: string = ''
-  name = `[micro-terminal]`
+  ws: WebSocket | null;
+  msgQueue: any[];
+  id: string;
+  reConnectSum: number;
+  baseUrl: string;
+  url: string = '';
+  name = `[micro-terminal]`;
 
   constructor(public mode: 'ssh' | 'exec' | 'spawn' = 'spawn') {
-    const originUrl = new URL(userStore.originAddress)
+    const originUrl = new URL(userStore.originAddress);
     const host = `${originUrl.hostname}:${
       userStore.originPort ? userStore.originPort : originUrl.port
-    }`
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    }`;
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 
-    this.baseUrl = `${protocol}//${host}`
-    this.ws = null
-    this.msgQueue = []
-    this.reConnectSum = 0
-    this.id = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    this.baseUrl = `${protocol}//${host}`;
+    this.ws = null;
+    this.msgQueue = [];
+    this.reConnectSum = 0;
+    this.id = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
   connect(
     path = '/micro/webui/term',
-    sessionName = `[micro-terminal][${this.id}]`,
+    sessionName = `[micro-terminal][${this.id}]`
   ): Promise<Event> {
-    this.url = this.baseUrl + path
-    this.name = sessionName
+    this.url = this.baseUrl + path;
+    this.name = sessionName;
 
     return new Promise((resolve, reject) => {
-      this.ws = new WebSocket(this.url)
-      this.ws.onopen = (e) => {
-        console.log(`${sessionName}已连接！`)
-        Session.activeSession = this
-        Session.sessions.set(this.id, this)
-        Session.onSessionsChange?.(NotieTypes.SUCCESS, `${sessionName}已连接！`)
-        resolve(e)
-      }
-      this.ws.addEventListener('message', (e) => {
-        const msg = JSON.parse(e.data)
-        this.msgQueue.push(msg)
-      })
-      this.ws.onclose = (e) => {
-        console.log(`${sessionName}已关闭！`, e)
-        const existed = Session.sessions.delete(this.id)
+      this.ws = new WebSocket(this.url);
+      this.ws.onopen = e => {
+        console.log(`${sessionName}已连接！`);
+        Session.activeSession = this;
+        Session.sessions.set(this.id, this);
+        Session.onSessionsChange?.(NotieTypes.SUCCESS, `${sessionName}已连接！`);
+        resolve(e);
+      };
+      this.ws.addEventListener('message', e => {
+        const msg = JSON.parse(e.data);
+        this.msgQueue.push(msg);
+      });
+      this.ws.onclose = e => {
+        console.log(`${sessionName}已关闭！`, e);
+        const existed = Session.sessions.delete(this.id);
         existed &&
           Session.onSessionsChange?.(
             NotieTypes.WARNING,
-            `${sessionName}关闭：${e.reason || e.code}`,
-          )
-      }
-      this.ws.onerror = (err) => {
-        console.log(`${sessionName}连接报错！`, err)
-        Session.sessions.delete(this.id)
-        Session.onSessionsChange?.(
-          NotieTypes.ERROR,
-          `${sessionName}连接报错：${err.type}`,
-        )
-        reject(err)
-      }
-    })
+            `${sessionName}关闭：${e.reason || e.code}`
+          );
+      };
+      this.ws.onerror = err => {
+        console.log(`${sessionName}连接报错！`, err);
+        Session.sessions.delete(this.id);
+        Session.onSessionsChange?.(NotieTypes.ERROR, `${sessionName}连接报错：${err.type}`);
+        reject(err);
+      };
+    });
   }
 }

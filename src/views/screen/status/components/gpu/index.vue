@@ -25,45 +25,45 @@
 </template>
 
 <script setup lang="ts">
-import DashboardCard from '@/components/dashboard/index.vue'
-import * as echarts from 'echarts'
-import 'echarts-liquidfill'
+import DashboardCard from '@/components/dashboard/index.vue';
+import * as echarts from 'echarts';
+import 'echarts-liquidfill';
 
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue';
 
-const props = defineProps(['gpuData'])
+const props = defineProps(['gpuData']);
 
-let charts = ref()
+let charts = ref();
 
 // 初始化echart
-let myCharts = ref()
+let myCharts = ref();
 
 watch(props, () => {
-  updateGpuInfo()
-})
+  updateGpuInfo();
+});
 
 onMounted(() => {
-  myCharts.value = echarts.init(charts.value)
-  updateGpuInfo()
-})
+  myCharts.value = echarts.init(charts.value);
+  updateGpuInfo();
+});
 
 const per2radix = () => {
-  return Number(props.gpuData?.inner ? props.gpuData.inner : 0.5)
-}
+  return Number(props.gpuData?.inner ? props.gpuData.inner : 0.5);
+};
 
 const getColor = (curValue: number) => {
   if (curValue <= 0.6) {
-    return 'rgba(0,55,160,0.6)'
+    return 'rgba(0,55,160,0.6)';
   } else if (curValue < 0.8) {
-    return 'orange'
+    return 'orange';
   } else {
-    return 'red'
+    return 'red';
   }
-}
+};
 
 const updateGpuInfo = () => {
-  const curValue = per2radix() || 0
-  const info = props.gpuData?.info || {}
+  const curValue = per2radix() || 0;
+  const info = props.gpuData?.info || {};
   myCharts.value.setOption({
     // title: {
     //     subtext: info.temperatureGpu,
@@ -104,8 +104,8 @@ const updateGpuInfo = () => {
       top: 0,
       bottom: 0,
     },
-  })
-}
+  });
+};
 </script>
 
 <style scoped lang="scss">

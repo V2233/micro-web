@@ -2,6 +2,11 @@
 
 Mciro-Plugin 前端源码
 
+> [!WARNING] 本库已停止维护
+> 本仓库已合并到 ```micro-plugin``` [详见](https://github.com/V2233/micro-plugin/blob/master/CONTRIBUTING.md)
+
+
+
 ## 安装
 
 - cd 到 micro-plugin 根目录，执行以下命令：
@@ -9,7 +14,9 @@ Mciro-Plugin 前端源码
 ```sh
 git clone https://github.com/V2233/micro-web.git frontend
 ```
+
 或者使用gitee镜像：
+
 ```sh
 git clone https://gitee.com/V2233/micro-web.git frontend
 ```
@@ -21,7 +28,7 @@ npm i yarn -g
 ```
 
 - 安装依赖
-  
+
 ```sh
 yarn install
 ```

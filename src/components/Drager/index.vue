@@ -12,16 +12,16 @@
 </template>
 
 <script setup lang="ts">
-import Drager from 'es-drager'
-import 'es-drager/lib/style.css'
-import { ref, reactive } from 'vue'
+import Drager from 'es-drager';
+import 'es-drager/lib/style.css';
+import { ref, reactive } from 'vue';
 const options = reactive({
   width: 100,
   height: 100,
   left: 0,
   top: 0,
   angle: 0,
-})
+});
 </script>
 
 <style scoped lang="scss">

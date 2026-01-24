@@ -16,49 +16,47 @@
 </template>
 
 <script setup lang="ts">
-import DashboardCard from '@/components/dashboard/index.vue'
-import * as echarts from 'echarts'
-import 'echarts-liquidfill'
+import DashboardCard from '@/components/dashboard/index.vue';
+import * as echarts from 'echarts';
+import 'echarts-liquidfill';
 
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue';
 
-const props = defineProps(['ramData'])
+const props = defineProps(['ramData']);
 
-let people = ref('剩余114514人')
+let people = ref('剩余114514人');
 
-let charts = ref()
+let charts = ref();
 
 // 初始化echart
-let myCharts = ref()
+let myCharts = ref();
 
 watch(props, () => {
-  updateChart()
-})
+  updateChart();
+});
 
 onMounted(() => {
-  myCharts.value = echarts.init(charts.value)
-  updateChart()
-})
+  myCharts.value = echarts.init(charts.value);
+  updateChart();
+});
 
 const per2radix = () => {
-  return Number(
-    props.ramData?.inner ? +props.ramData.inner.replace('%', '') / 100 : 0.5,
-  )
-}
+  return Number(props.ramData?.inner ? +props.ramData.inner.replace('%', '') / 100 : 0.5);
+};
 
 const getColor = (curValue: number) => {
   if (curValue <= 0.6) {
-    return 'rgba(0,55,160,0.6)'
+    return 'rgba(0,55,160,0.6)';
   } else if (curValue < 0.8) {
-    return 'orange'
+    return 'orange';
   } else {
-    return 'red'
+    return 'red';
   }
-}
+};
 
 const updateChart = () => {
-  const curValue = per2radix() || 0
-  const info = props.ramData?.info || ['']
+  const curValue = per2radix() || 0;
+  const info = props.ramData?.info || [''];
   myCharts.value.setOption({
     title: {
       // text: `${info[0]} ${info[1]} \n${info[2]}`,
@@ -99,8 +97,8 @@ const updateChart = () => {
       top: 0,
       bottom: 0,
     },
-  })
-}
+  });
+};
 </script>
 
 <style scoped lang="scss">

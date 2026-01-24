@@ -23,12 +23,8 @@
           ></el-button>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="handleConnectShell">
-                Shell
-              </el-dropdown-item>
-              <el-dropdown-item @click="dialogFormVisible = true">
-                SSH
-              </el-dropdown-item>
+              <el-dropdown-item @click="handleConnectShell"> Shell </el-dropdown-item>
+              <el-dropdown-item @click="dialogFormVisible = true"> SSH </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -83,60 +79,58 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button type="primary" size="default" @click="handleConnectSSH">
-          连接
-        </el-button>
+        <el-button type="primary" size="default" @click="handleConnectSSH"> 连接 </el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 <script setup lang="ts">
-import Terminal from '@/components/Terminal/index.vue'
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import Terminal from '@/components/Terminal/index.vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 // 引入图标
-import { Lock, User } from '@element-plus/icons-vue'
-import { ElNotification } from 'element-plus'
+import { Lock, User } from '@element-plus/icons-vue';
+import { ElNotification } from 'element-plus';
 
-import useDevStore from '@/store/modules/dev'
-import ussLayoutSettingStore from '@/store/modules/setting'
-import useUserStore from '@/store/modules/user'
+import useDevStore from '@/store/modules/dev';
+import ussLayoutSettingStore from '@/store/modules/setting';
+import useUserStore from '@/store/modules/user';
 
-import Session from './Session'
+import Session from './Session';
 
-const props = defineProps(['dirPath'])
+const props = defineProps(['dirPath']);
 
 // ssh表单
-const dialogFormVisible = ref(false)
+const dialogFormVisible = ref(false);
 
-const devStore = useDevStore()
+const devStore = useDevStore();
 
 // 获取用户名
-const userStore = useUserStore()
-const userName = ref(userStore.username)
+const userStore = useUserStore();
+const userName = ref(userStore.username);
 
 // 视图显示PATH
-const prefixPath = ref(props.dirPath)
+const prefixPath = ref(props.dirPath);
 
-const { globalTerminal } = ussLayoutSettingStore()
+const { globalTerminal } = ussLayoutSettingStore();
 
-const termRef = ref<InstanceType<typeof Terminal>>()
+const termRef = ref<InstanceType<typeof Terminal>>();
 
-const termSession = ref<Session>()
+const termSession = ref<Session>();
 
-const tabs = ref<Session[]>([])
+const tabs = ref<Session[]>([]);
 
-const localtionHost = ref(location.hostname || location.host)
+const localtionHost = ref(location.hostname || location.host);
 
 watch(
   () => Session.activeSession,
-  (newValue) => {
-    console.log(newValue)
-  },
-)
+  newValue => {
+    console.log(newValue);
+  }
+);
 
 const onEnter = (text: string) => {
-  if (!termSession.value) return
+  if (!termSession.value) return;
   if (termSession.value?.mode == 'ssh') {
     termSession.value.ws?.send(
       JSON.stringify({
@@ -146,8 +140,8 @@ const onEnter = (text: string) => {
           cmd: text,
           path: null,
         },
-      }),
-    )
+      })
+    );
   } else {
     termSession.value.ws?.send(
       JSON.stringify({
@@ -157,10 +151,10 @@ const onEnter = (text: string) => {
           cmd: text,
           path: null,
         },
-      }),
-    )
+      })
+    );
   }
-}
+};
 
 /** 连接SSH */
 const handleConnectSSH = async () => {
@@ -169,92 +163,87 @@ const handleConnectSSH = async () => {
     port: String(devStore.sshInfo.port),
     username: devStore.sshInfo.username,
     password: devStore.sshInfo.password,
-  })
+  });
 
-  termSession.value = new Session('ssh')
+  termSession.value = new Session('ssh');
   // return
-  termSession.value
-    .connect('/micro/webui/term/ssh?' + urlParams.toString())
-    .then((e) => {
-      termSession.value?.ws?.send(
-        JSON.stringify({
-          type: 'ssh',
-          params: {},
-        }),
-      )
-      termSession.value?.ws?.addEventListener('message', (e) => {
-        const msg = JSON.parse(e.data)
-        console.log(msg)
-        if (msg.type === 'ssh' && msg.action === 'stdout') {
-          termRef.value?.write(msg.params)
-        }
+  termSession.value.connect('/micro/webui/term/ssh?' + urlParams.toString()).then(e => {
+    termSession.value?.ws?.send(
+      JSON.stringify({
+        type: 'ssh',
+        params: {},
       })
-    })
-}
+    );
+    termSession.value?.ws?.addEventListener('message', e => {
+      const msg = JSON.parse(e.data);
+      console.log(msg);
+      if (msg.type === 'ssh' && msg.action === 'stdout') {
+        termRef.value?.write(msg.params);
+      }
+    });
+  });
+};
 
 /** 连接Shell */
 const handleConnectShell = async () => {
-  termSession.value = new Session('spawn')
-  termSession.value.connect().then((e) => {
-    termSession.value?.ws?.addEventListener('message', (e) => {
-      const msg = JSON.parse(e.data)
-      console.log(msg)
+  termSession.value = new Session('spawn');
+  termSession.value.connect().then(e => {
+    termSession.value?.ws?.addEventListener('message', e => {
+      const msg = JSON.parse(e.data);
+      console.log(msg);
       if (msg.type === 'exec' && msg.action === 'stdout') {
-        termRef.value?.write(msg.params)
+        termRef.value?.write(msg.params);
       }
-    })
-  })
-}
+    });
+  });
+};
 
 const changeTab = (session: Session) => {
-  if (session.id == termSession.value?.id) return
-  Session.activeSession = session
-  termSession.value = session
-  termRef.value?.termRef.clear()
+  if (session.id == termSession.value?.id) return;
+  Session.activeSession = session;
+  termSession.value = session;
+  termRef.value?.termRef.clear();
   termRef.value?.write(
     session.msgQueue
-      .map((v) => {
-        if (
-          (v?.type === 'exec' || v?.type === 'ssh') &&
-          v?.action === 'stdout'
-        ) {
-          return v.params
+      .map(v => {
+        if ((v?.type === 'exec' || v?.type === 'ssh') && v?.action === 'stdout') {
+          return v.params;
         } else {
-          return ''
+          return '';
         }
       })
-      .join('\n'),
-  )
-}
+      .join('\n')
+  );
+};
 
 const deleteSession = (session: Session) => {
   if (tabs.value.length == 1) {
-    ElNotification.warning('请按右侧电源键！')
-    return
+    ElNotification.warning('请按右侧电源键！');
+    return;
   }
-  Session.deleteSession(session)
+  Session.deleteSession(session);
   if (tabs.value.length >= 0) {
-    changeTab(tabs.value[0])
+    changeTab(tabs.value[0]);
   }
-}
+};
 
 const destroy = () => {
-  Session.sessions.forEach((session) => {
+  Session.sessions.forEach(session => {
     if (session.ws?.readyState == session.ws?.OPEN) {
-      session.ws?.close()
+      session.ws?.close();
     }
-    session.msgQueue = []
-  })
-  Session.sessions.clear()
-  Session.activeSession = null
-}
+    session.msgQueue = [];
+  });
+  Session.sessions.clear();
+  Session.activeSession = null;
+};
 
 const getNetworkInfo = () => {
   // 重要：检查浏览器是否支持此API
   //@ts-ignore
   if (navigator?.connection && navigator?.connection?.effectiveType) {
     //@ts-ignore
-    const connection = navigator?.connection
+    const connection = navigator?.connection;
     return {
       // 网络类型：'slow-2g', '2g', '3g', '4g', '5g'
       effectiveType: connection.effectiveType,
@@ -266,27 +255,27 @@ const getNetworkInfo = () => {
       rtt: connection.rtt,
       // 是否在节约数据模式
       saveData: connection.saveData,
-    }
+    };
   } else {
-    return { error: '您的浏览器不支持 Network Information API' }
+    return { error: '您的浏览器不支持 Network Information API' };
   }
-}
+};
 
 onMounted(() => {
   Session.onSessionsChange = (type, message) => {
     ElNotification({
       type,
       message,
-    })
-    tabs.value = tabs.value = Array.from(Session.sessions.values())
-  }
-  handleConnectShell()
-})
+    });
+    tabs.value = tabs.value = Array.from(Session.sessions.values());
+  };
+  handleConnectShell();
+});
 
 onBeforeUnmount(() => {
-  destroy()
-  Session.onSessionsChange = null
-})
+  destroy();
+  Session.onSessionsChange = null;
+});
 </script>
 <style lang="scss" scoped>
 .log_box {

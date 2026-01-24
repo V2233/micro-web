@@ -32,7 +32,7 @@ defineProps({
     type: String,
     default: '16px',
   },
-})
+});
 </script>
 
 <style scoped></style>

@@ -19,47 +19,47 @@
 </template>
 
 <script setup lang="ts">
-import DashboardCard from '@/components/dashboard/index.vue'
-import * as echarts from 'echarts'
-import 'echarts-liquidfill'
+import DashboardCard from '@/components/dashboard/index.vue';
+import * as echarts from 'echarts';
+import 'echarts-liquidfill';
 
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue';
 
-const props = defineProps(['cpuData'])
+const props = defineProps(['cpuData']);
 
-let people = ref('剩余114514人')
+let people = ref('剩余114514人');
 
-let charts = ref()
+let charts = ref();
 
 // 初始化echart
-let myCharts = ref()
+let myCharts = ref();
 
 watch(props.cpuData, () => {
-  updateCpuInfo()
-})
+  updateCpuInfo();
+});
 
 onMounted(() => {
-  myCharts.value = echarts.init(charts.value)
-  updateCpuInfo()
-})
+  myCharts.value = echarts.init(charts.value);
+  updateCpuInfo();
+});
 
 const per2radix = () => {
-  return Number(props.cpuData?.inner ? props.cpuData.inner : 0.5)
-}
+  return Number(props.cpuData?.inner ? props.cpuData.inner : 0.5);
+};
 
 const getColor = (curValue: number) => {
   if (curValue <= 0.6) {
-    return 'rgba(0,55,160,0.6)'
+    return 'rgba(0,55,160,0.6)';
   } else if (curValue < 0.8) {
-    return 'orange'
+    return 'orange';
   } else {
-    return 'red'
+    return 'red';
   }
-}
+};
 
 const updateCpuInfo = () => {
-  const curValue = per2radix() || 0
-  const info = props.cpuData?.info || ['', '', '']
+  const curValue = per2radix() || 0;
+  const info = props.cpuData?.info || ['', '', ''];
   myCharts.value.setOption({
     title: {
       text: `${info[0]} ${info[1]} \n${info[2]}`,
@@ -100,8 +100,8 @@ const updateCpuInfo = () => {
       top: 0,
       bottom: 0,
     },
-  })
-}
+  });
+};
 </script>
 
 <style scoped lang="scss">

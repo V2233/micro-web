@@ -57,7 +57,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { PropType } from 'vue'
+import { PropType } from 'vue';
 
 const props = defineProps({
   type: {
@@ -80,5 +80,5 @@ const props = defineProps({
     type: String,
     default: undefined,
   },
-})
+});
 </script>

@@ -6,20 +6,8 @@
     circle
     @click="toggleTerminal"
   ></el-button>
-  <el-button
-    type="primary"
-    size="small"
-    icon="Refresh"
-    circle
-    @click="updateRefresh"
-  ></el-button>
-  <el-button
-    type="primary"
-    size="small"
-    icon="FullScreen"
-    circle
-    @click="fullScreen"
-  ></el-button>
+  <el-button type="primary" size="small" icon="Refresh" circle @click="updateRefresh"></el-button>
+  <el-button type="primary" size="small" icon="FullScreen" circle @click="fullScreen"></el-button>
 
   <!-- 修改关闭判定为点击外部或按下Esc -->
   <el-popover
@@ -79,10 +67,7 @@
     <template #dropdown>
       <el-dropdown-menu :style="{ maxHeight: '200px' }">
         <el-dropdown-item @click="logOut">退出登录</el-dropdown-item>
-        <div
-          v-for="(item, index) in Object.keys(userStore.tokens)"
-          :key="index"
-        >
+        <div v-for="(item, index) in Object.keys(userStore.tokens)" :key="index">
           <el-dropdown-item
             v-if="userStore.tokens && item !== userStore.token"
             @click="checkAccout(item)"
@@ -103,66 +88,65 @@
 </template>
 
 <script setup lang="ts">
-import useLayoutSettingStore from '@/store/modules/setting'
-import useUserStore from '@/store/modules/user'
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import useLayoutSettingStore from '@/store/modules/setting';
+import useUserStore from '@/store/modules/user';
+import { computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-let $router = useRouter()
-let $route = useRoute()
+let $router = useRouter();
+let $route = useRoute();
 
-let layoutSettingStore = useLayoutSettingStore()
-let userStore = useUserStore()
+let layoutSettingStore = useLayoutSettingStore();
+let userStore = useUserStore();
 
-const isDark = computed(() => layoutSettingStore.theme === 'dark')
+const isDark = computed(() => layoutSettingStore.theme === 'dark');
 
 const updateRefresh = () => {
-  layoutSettingStore.refresh = !layoutSettingStore.refresh
-}
+  layoutSettingStore.refresh = !layoutSettingStore.refresh;
+};
 
 const toggleTerminal = () => {
-  layoutSettingStore.globalTerminal.visible =
-    !layoutSettingStore.globalTerminal.visible
-}
+  layoutSettingStore.globalTerminal.visible = !layoutSettingStore.globalTerminal.visible;
+};
 
 const fullScreen = () => {
   // 判断是否全屏
-  let full = document.fullscreenElement
+  let full = document.fullscreenElement;
   if (!full) {
     // 开启全屏
-    document.documentElement.requestFullscreen()
+    document.documentElement.requestFullscreen();
   } else {
-    document.exitFullscreen()
+    document.exitFullscreen();
   }
-}
+};
 
 const logOut = async () => {
   // 向后端发请求
 
   // 清空token
-  await userStore.logOut()
+  await userStore.logOut();
   // 跳转登录页
   $router.push({
     path: '/login',
     query: {
       redirect: $route.path,
     },
-  })
-}
+  });
+};
 
 // 切换账户
 const checkAccout = (token: string) => {
-  localStorage.setItem('TOKEN', String(token))
-  window.location.reload()
-}
+  localStorage.setItem('TOKEN', String(token));
+  window.location.reload();
+};
 
 const deleteToken = (token: string) => {
-  delete userStore.tokens[token]
-  localStorage.setItem('HISTORY_TOKENS', JSON.stringify(userStore.tokens))
-}
+  delete userStore.tokens[token];
+  localStorage.setItem('HISTORY_TOKENS', JSON.stringify(userStore.tokens));
+};
 
 //颜色组件组件的数据
-const color = ref('rgba(255, 69, 0, 0.68)')
+const color = ref('rgba(255, 69, 0, 0.68)');
 const predefineColors = ref([
   '#ff4500',
   '#ff8c00',
@@ -178,26 +162,25 @@ const predefineColors = ref([
   'hsl(181, 100%, 37%)',
   'hsla(209, 100%, 56%, 0.73)',
   '#c7158577',
-])
+]);
 
 //switch开关的chang事件进行暗黑模式的切换
 const changeDark = () => {
-  layoutSettingStore.theme =
-    layoutSettingStore.theme == 'dark' ? 'light' : 'dark'
-}
+  layoutSettingStore.theme = layoutSettingStore.theme == 'dark' ? 'light' : 'dark';
+};
 
 //主题颜色的设置
 const setColor = () => {
   //通知js修改根节点的样式对象的属性与属性值
-  const html = document.documentElement
-  html.style.setProperty('--el-color-primary', color.value)
-}
+  const html = document.documentElement;
+  html.style.setProperty('--el-color-primary', color.value);
+};
 </script>
 
 <script lang="ts">
 export default {
   name: 'Setting',
-}
+};
 </script>
 
 <style scoped lang="scss">

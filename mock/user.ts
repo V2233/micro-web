@@ -12,8 +12,8 @@ function createUserList() {
       buttons: ['cuser.detail'],
       routes: ['home'],
       token: 'Admin Token',
-    }
-  ]
+    },
+  ];
 }
 //对外暴露一个数组:数组里面包含两个接口
 //登录假的接口
@@ -25,35 +25,35 @@ export default [
     method: 'post', //请求方式
     response: ({ body }) => {
       //获取请求体携带过来的用户名与密码
-      const { username, password } = body
+      const { username, password } = body;
       //调用获取用户信息函数,用于判断是否有此用户
       const checkUser = createUserList().find(
-        (item) => item.username === username && item.password === password,
-      )
+        item => item.username === username && item.password === password
+      );
       //没有用户返回失败信息
       if (!checkUser) {
-        return { code: 201, data: { message: '账号或者密码不正确' } }
+        return { code: 201, data: { message: '账号或者密码不正确' } };
       }
       //如果有返回成功信息
-      const { token } = checkUser
-      return { code: 200, data: { token } }
+      const { token } = checkUser;
+      return { code: 200, data: { token } };
     },
   },
   // 获取用户信息
   {
     url: '/api/user/666/info',
     method: 'get',
-    response: (request) => {
+    response: request => {
       //获取请求头携带token
-      const token = request.headers.token
+      const token = request.headers.token;
       //查看用户信息是否包含有次token用户
-      const checkUser = createUserList().find((item) => item.token === token)
+      const checkUser = createUserList().find(item => item.token === token);
       //没有返回失败的信息
       if (!checkUser) {
-        return { code: 201, data: { message: '获取用户信息失败' } }
+        return { code: 201, data: { message: '获取用户信息失败' } };
       }
       //如果有返回成功信息
-      return { code: 200, data: { checkUser } }
+      return { code: 200, data: { checkUser } };
     },
   },
-]
+];

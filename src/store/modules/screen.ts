@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia'
-import type { ScreenState } from './types/type'
+import { defineStore } from 'pinia';
+import type { ScreenState } from './types/type';
 
 let useScreenstore = defineStore('Screen', {
   state: (): ScreenState => {
@@ -13,12 +13,12 @@ let useScreenstore = defineStore('Screen', {
         isAutoUpdated: false,
         updateInterval: 10,
         qpsInterval: 1,
-        fontSize: 20
+        fontSize: 20,
       },
-    }
+    };
   },
   actions: {},
   getters: {},
-})
+});
 
-export default useScreenstore
+export default useScreenstore;

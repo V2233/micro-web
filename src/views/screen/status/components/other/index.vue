@@ -19,11 +19,7 @@
             <span class="title">网络状态</span>
             ：
             <span class="detail">
-              <span>
-                {{ item.iface }} 进：{{ item.rx_bytes }}/ 出：{{
-                  item.tx_bytes
-                }}
-              </span>
+              <span> {{ item.iface }} 进：{{ item.rx_bytes }}/ 出：{{ item.tx_bytes }} </span>
             </span>
           </div>
         </div>
@@ -33,9 +29,9 @@
 </template>
 
 <script setup lang="ts">
-import DashboardCard from '@/components/dashboard/index.vue'
+import DashboardCard from '@/components/dashboard/index.vue';
 
-defineProps(['otherData', 'networkData'])
+defineProps(['otherData', 'networkData']);
 </script>
 
 <style scoped lang="scss">

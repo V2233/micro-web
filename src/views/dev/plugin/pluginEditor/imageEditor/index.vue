@@ -11,27 +11,27 @@
 </template>
 
 <script setup lang="ts">
-import { ESEditor, ToolType, EditorDataType } from '@/plugins/editor'
-import { onMounted, computed, ref, onBeforeUnmount } from 'vue'
-import { emitter } from '@/utils/eventBus'
-import useDevStore from '@/store/modules/dev'
-import useLayoutSettingStore from '@/store/modules/setting'
-import { getMD5Hash } from '@/utils/hash'
-import CodeDialog from '@/components/CodeDialog/index.vue'
-import { ElMessage } from 'element-plus'
+import { ESEditor, ToolType, EditorDataType } from '@/plugins/editor';
+import { onMounted, computed, ref, onBeforeUnmount } from 'vue';
+import { emitter } from '@/utils/eventBus';
+import useDevStore from '@/store/modules/dev';
+import useLayoutSettingStore from '@/store/modules/setting';
+import { getMD5Hash } from '@/utils/hash';
+import CodeDialog from '@/components/CodeDialog/index.vue';
+import { ElMessage } from 'element-plus';
 
-const devStore = useDevStore()
+const devStore = useDevStore();
 
-const layoutSettingStore = useLayoutSettingStore()
+const layoutSettingStore = useLayoutSettingStore();
 
-const editedHtml = ref('')
+const editedHtml = ref('');
 
-const codeRef = ref()
+const codeRef = ref();
 
-const $emit = defineEmits(['outerHTML', 'mounted'])
+const $emit = defineEmits(['outerHTML', 'mounted']);
 
 // editorRef.value?.getData() // 获取最新数据
-const editorRef = ref<InstanceType<typeof ESEditor> | null>(null)
+const editorRef = ref<InstanceType<typeof ESEditor> | null>(null);
 
 // 初始数据
 const data = ref<EditorDataType>({
@@ -48,9 +48,9 @@ const data = ref<EditorDataType>({
     scaleRatio: 1,
   },
   elements: [],
-})
+});
 
-const tools = computed(() => (editorRef.value as any)?.tools || [])
+const tools = computed(() => (editorRef.value as any)?.tools || []);
 
 /**
  * 处理工具按钮点击实际
@@ -58,7 +58,7 @@ const tools = computed(() => (editorRef.value as any)?.tools || [])
  */
 function handleToolClick(item: ToolType) {
   if (typeof item.handler === 'function') {
-    item.handler()
+    item.handler();
   }
 }
 
@@ -75,23 +75,23 @@ function handleToolClick(item: ToolType) {
  * @returns
  */
 const goBack = () => {
-  devStore.scene = 1
-}
+  devStore.scene = 1;
+};
 
 /**
  * 保存图片
  * @returns
  */
 const saveImage = async () => {
-  const md5 = await getMD5Hash(editedHtml.value)
+  const md5 = await getMD5Hash(editedHtml.value);
   $emit('outerHTML', {
     hash: md5,
     data: editedHtml.value,
-    json: JSON.stringify(editorRef.value?.getData())
-  })
-  ElMessage.success('保存成功！')
-  devStore.scene = 1
-}
+    json: JSON.stringify(editorRef.value?.getData()),
+  });
+  ElMessage.success('保存成功！');
+  devStore.scene = 1;
+};
 
 /**
  * 保存HTML
@@ -105,20 +105,20 @@ const saveImage = async () => {
 // }
 
 onMounted(() => {
-  $emit('mounted', 'Please set project json!')
+  $emit('mounted', 'Please set project json!');
   emitter.on('sendEditorHtml', (e: any) => {
-    editedHtml.value = e.data
-    saveImage()
-  })
+    editedHtml.value = e.data;
+    saveImage();
+  });
   emitter.on('goBack', (e: any) => {
-    goBack()
-  })
-})
+    goBack();
+  });
+});
 
 onBeforeUnmount(() => {
-  emitter.off('sendEditorHtml')
-  emitter.off('goBack')
-})
+  emitter.off('sendEditorHtml');
+  emitter.off('goBack');
+});
 </script>
 
 <style lang="scss">
@@ -139,7 +139,7 @@ onBeforeUnmount(() => {
     align-items: center;
     margin: 10px 0;
 
-    .es-tool-btn+.es-tool-btn {
+    .es-tool-btn + .es-tool-btn {
       margin-left: 10px;
     }
   }

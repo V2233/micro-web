@@ -1,6 +1,6 @@
 export interface variableType {
-  prop: string
-  tip: string
+  prop: string;
+  tip: string;
 }
 
 export const varList = [
@@ -136,4 +136,4 @@ export const varList = [
     prop: 'e.isMaster',
     tip: '是否是主人',
   },
-]
+];

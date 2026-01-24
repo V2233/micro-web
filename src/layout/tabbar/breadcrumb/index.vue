@@ -1,7 +1,7 @@
 <template>
   <!-- 顶部左侧静态 -->
   <el-icon style="margin-right: 10px" @click="changeIcon">
-    <component :is="layoutSettingStore.foldMode == 2 ? 'Expand':'Fold'" />
+    <component :is="layoutSettingStore.foldMode == 2 ? 'Expand' : 'Fold'" />
   </el-icon>
   <!-- 左侧面包屑 -->
   <el-breadcrumb separator-icon="ArrowRight">
@@ -21,29 +21,29 @@
 
 <script setup lang="ts">
 // import {ref} from 'vue'
-import { useRoute } from 'vue-router'
-import useLayoutSettingStore from '@/store/modules/setting'
+import { useRoute } from 'vue-router';
+import useLayoutSettingStore from '@/store/modules/setting';
 
-let $route = useRoute()
+let $route = useRoute();
 
 // 获取仓库配置
-let layoutSettingStore = useLayoutSettingStore()
+let layoutSettingStore = useLayoutSettingStore();
 // 用于折叠图标切换
 const changeIcon = () => {
   // layoutSettingStore.fold = !layoutSettingStore.fold
   // console.log(layoutSettingStore.foldMode)
-  if(layoutSettingStore.foldMode >= 2) {
-    layoutSettingStore.foldMode = 0
-    return
+  if (layoutSettingStore.foldMode >= 2) {
+    layoutSettingStore.foldMode = 0;
+    return;
   }
-  layoutSettingStore.foldMode++
-}
+  layoutSettingStore.foldMode++;
+};
 </script>
 
 <script lang="ts">
 export default {
   name: 'Breadcrumb',
-}
+};
 </script>
 
 <style scoped lang="scss"></style>

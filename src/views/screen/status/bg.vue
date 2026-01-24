@@ -58,11 +58,8 @@
   bottom: 0;
   left: 0;
   overflow: hidden;
-  background-image: radial-gradient(
-      1px 2px at 50px 50px,
-      #eee,
-      rgba(0, 0, 0, 0)
-    ),
+  background-image:
+    radial-gradient(1px 2px at 50px 50px, #eee, rgba(0, 0, 0, 0)),
     radial-gradient(2px 3px at 20px 35px, #fff, rgba(0, 0, 0, 0)),
     radial-gradient(3px 3px at 60px 20px, #ddd, rgba(0, 0, 0, 0));
   background-repeat: repeat;
@@ -98,11 +95,8 @@
   overflow: hidden;
 }
 .sky-stars {
-  background-image: radial-gradient(
-      2px 2px at 50px 200px,
-      #eee,
-      rgba(0, 0, 0, 0)
-    ),
+  background-image:
+    radial-gradient(2px 2px at 50px 200px, #eee, rgba(0, 0, 0, 0)),
     radial-gradient(3px 3px at 40px 60px, #fff, rgba(0, 0, 0, 0)),
     radial-gradient(4px 5px at 100px 30px, #ddd, rgba(0, 0, 0, 0));
   background-repeat: repeat;

@@ -1,11 +1,11 @@
-import { reqConnectSSH } from '@/api/dev/fs'
-import { reqBotInfo } from '@/api/dev/plugin'
-import type { BotInfoResponseType } from '@/api/dev/plugin/type'
-import { defineStore } from 'pinia'
-import { friend_list, group_list } from './default/sandbox'
-import type { DevState } from './types/type'
-import useUserStore from './user'
-const userStore = useUserStore()
+import { reqConnectSSH } from '@/api/dev/fs';
+import { reqBotInfo } from '@/api/dev/plugin';
+import type { BotInfoResponseType } from '@/api/dev/plugin/type';
+import { defineStore } from 'pinia';
+import { friend_list, group_list } from './default/sandbox';
+import type { DevState } from './types/type';
+import useUserStore from './user';
+const userStore = useUserStore();
 
 let useDevStore = defineStore('Dev', {
   state: (): DevState => {
@@ -70,33 +70,33 @@ let useDevStore = defineStore('Dev', {
           local_storage: false,
         },
       },
-    }
+    };
   },
   actions: {
     async getBotsInfo() {
-      let res: BotInfoResponseType = await reqBotInfo()
+      let res: BotInfoResponseType = await reqBotInfo();
       if (res.code == 200) {
-        this.botsInfo = res.data
-        return Promise.resolve('ok')
+        this.botsInfo = res.data;
+        return Promise.resolve('ok');
       } else {
-        return Promise.reject(new Error(res.message))
+        return Promise.reject(new Error(res.message));
       }
     },
     fillSSHInfo() {
-      let server = new URL(userStore.originAddress)
-      this.sshInfo.host = server.hostname
-      this.sshInfo.port = 22
+      let server = new URL(userStore.originAddress);
+      this.sshInfo.host = server.hostname;
+      this.sshInfo.port = 22;
     },
     async connectSSH() {
-      let res = await reqConnectSSH(this.sshInfo)
+      let res = await reqConnectSSH(this.sshInfo);
       if (res.code == 200) {
-        return Promise.resolve('ok')
+        return Promise.resolve('ok');
       } else {
-        return Promise.reject(new Error(res.message))
+        return Promise.reject(new Error(res.message));
       }
     },
   },
   getters: {},
-})
+});
 
-export default useDevStore
+export default useDevStore;

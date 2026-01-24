@@ -1,11 +1,17 @@
 <template>
-  <div class="cus_input" :contenteditable="true" ref="input" @input="exposeInnerText" :style="{
-    width: width,
-    lineHeight: lineHeight,
-    border: '2px solid ' + color,
-    fontSize: fontSize,
-    minWidth: minWidth,
-  }"></div>
+  <div
+    class="cus_input"
+    :contenteditable="true"
+    ref="input"
+    @input="exposeInnerText"
+    :style="{
+      width: width,
+      lineHeight: lineHeight,
+      border: '2px solid ' + color,
+      fontSize: fontSize,
+      minWidth: minWidth,
+    }"
+  ></div>
 
   <!-- 弹出多选框 -->
   <el-dialog v-model="dialogTableVisible" title="事件变量" width="360">
@@ -22,23 +28,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
-import { varList, type variableType } from './varList'
-import { addVariable } from './method'
-import { nextTick } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { varList, type variableType } from './varList';
+import { addVariable } from './method';
+import { nextTick } from 'vue';
 
-const $emit = defineEmits(['innerText'])
+const $emit = defineEmits(['innerText']);
 
-const input = ref()
+const input = ref();
 
 // 存储键盘符/的个数
-let sepCount = 0
+let sepCount = 0;
 
 // 变量列表
-const variableList = ref<variableType[]>(varList)
+const variableList = ref<variableType[]>(varList);
 
 // 变量弹窗是否显示
-const dialogTableVisible = ref<boolean>(false)
+const dialogTableVisible = ref<boolean>(false);
 
 //接受父组件传递过来的参数
 const props = defineProps({
@@ -70,47 +76,47 @@ const props = defineProps({
     type: String,
     default: '',
   },
-})
+});
 
 watch(
   () => props.cusInputValue,
-  (newValue) => {
+  newValue => {
     // console.log(newValue)
     nextTick(() => {
       if (!newValue) {
-        input.value.innerText = ''
+        input.value.innerText = '';
       } else {
-        input.value.innerText = newValue
+        input.value.innerText = newValue;
       }
-    })
+    });
   },
-  { immediate: true },
-)
+  { immediate: true }
+);
 
 const exposeInnerText = () => {
-  $emit('innerText', input.value.innerText)
+  $emit('innerText', input.value.innerText);
   // 兼容软键盘
-  const curSepCount = (input.value.innerText.match(/\//g)) || []
-  if (curSepCount.length == (sepCount + 1)) {
-    dialogTableVisible.value = true
+  const curSepCount = input.value.innerText.match(/\//g) || [];
+  if (curSepCount.length == sepCount + 1) {
+    dialogTableVisible.value = true;
   }
-  sepCount = curSepCount.length
-}
+  sepCount = curSepCount.length;
+};
 
 const getText = () => {
-  return input.value.innerText
-}
+  return input.value.innerText;
+};
 
 const setText = (value: string) => {
-  input.value.innerText = value
-}
+  input.value.innerText = value;
+};
 
 const add = (row: variableType) => {
-  dialogTableVisible.value = false
-  addVariable(row)
-}
+  dialogTableVisible.value = false;
+  addVariable(row);
+};
 
-defineExpose({ getText, setText })
+defineExpose({ getText, setText });
 </script>
 
 <style lang="scss">
@@ -121,7 +127,8 @@ defineExpose({ getText, setText })
 
 // .variable-template-Text:hover {
 //     display: inline-block;
-// }</style>
+// }
+</style>
 
 <style scoped lang="scss">
 .cus_input {

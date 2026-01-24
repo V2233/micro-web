@@ -1,5 +1,5 @@
 // /**
-//  * 示例 
+//  * 示例
 // openDB('todo').then((db)=>{
 //     console.log(db)
 //     let data = {
@@ -15,7 +15,6 @@
 //     getDataByIndex(db, 'users', 'age', 4)
 // })
 //  */
-
 
 // /**
 //  * @params dbName 数据库名
@@ -214,7 +213,7 @@
 //     let request = store
 //         .index(indexName)
 //         .openCursor(IDBKeyRange.only(indexValue))
-        
+
 //     request.onsuccess = function(e) {
 //         let cursor = e.target.result
 
@@ -232,7 +231,7 @@
 //             console.log(list)
 //         }
 //     }
-// }   
+// }
 
 // /**
 //  * 更新数据
@@ -322,7 +321,7 @@
 //                 console.log('游标删除该记录成功！')
 //             }
 //             cursor.continue()
-//         } 
+//         }
 //     }
 
 // }
@@ -335,4 +334,3 @@
 //     db.close()
 //     console.log('数据库已关闭')
 // }
-

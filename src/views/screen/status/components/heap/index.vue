@@ -11,23 +11,23 @@
 </template>
 
 <script setup lang="ts">
-import DashboardCard from '@/components/dashboard/index.vue'
+import DashboardCard from '@/components/dashboard/index.vue';
 
-import * as echarts from 'echarts'
-import { ref, onMounted, watch } from 'vue'
+import * as echarts from 'echarts';
+import { ref, onMounted, watch } from 'vue';
 
-const props = defineProps(['nodeData'])
+const props = defineProps(['nodeData']);
 
-let charts = ref()
+let charts = ref();
 
 watch(props, () => {
-  updateChart()
-})
+  updateChart();
+});
 
 onMounted(() => {
-  charts.value = echarts.init(charts.value)
-  updateChart()
-})
+  charts.value = echarts.init(charts.value);
+  updateChart();
+});
 
 const updateChart = () => {
   const node = props.nodeData || {
@@ -39,7 +39,7 @@ const updateChart = () => {
       heapUsed: '0 MB',
       occupy: 0,
     },
-  }
+  };
   //设置配置项
   let option = {
     tooltip: {
@@ -93,9 +93,9 @@ const updateChart = () => {
       right: 0,
       bottom: 0,
     },
-  }
-  charts.value.setOption(option)
-}
+  };
+  charts.value.setOption(option);
+};
 </script>
 
 <style scoped lang="scss">

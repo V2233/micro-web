@@ -1,5 +1,5 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import { constantRoute } from './routes'
+import { createRouter, createWebHashHistory } from 'vue-router';
+import { constantRoute } from './routes';
 
 let router = createRouter({
   history: createWebHashHistory(),
@@ -8,8 +8,8 @@ let router = createRouter({
     return {
       left: 0,
       top: 0,
-    }
+    };
   },
-})
+});
 
-export default router
+export default router;

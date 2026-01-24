@@ -24,23 +24,23 @@
 </template>
 
 <script setup lang="ts">
-import DashboardCard from '@/components/dashboard/index.vue'
+import DashboardCard from '@/components/dashboard/index.vue';
 
-import * as echarts from 'echarts'
-import { ref, onMounted, computed, watch } from 'vue'
-let charts = ref()
+import * as echarts from 'echarts';
+import { ref, onMounted, computed, watch } from 'vue';
+let charts = ref();
 
-const props = defineProps(['diskSize', 'swapData'])
+const props = defineProps(['diskSize', 'swapData']);
 
 const getStatus = (curValue: number) => {
   if (curValue <= 0.6) {
-    return '#409EFF'
+    return '#409EFF';
   } else if (curValue < 0.8) {
-    return '#E6A23C'
+    return '#E6A23C';
   } else {
-    return '#F56C6c'
+    return '#F56C6c';
   }
-}
+};
 
 const computedDiskSize = computed(() => {
   let tempDiskSize = props.diskSize
@@ -57,9 +57,9 @@ const computedDiskSize = computed(() => {
           rw: true,
           percentage: 0,
         },
-      ]
+      ];
 
-  let swap = props.swapData
+  let swap = props.swapData;
   if (swap) {
     tempDiskSize.push({
       fs: swap.title + ':',
@@ -69,22 +69,22 @@ const computedDiskSize = computed(() => {
       used: swap.info[0],
       mount: swap.title,
       percentage: Number(swap.inner.replace('%', '')) / 100,
-    })
+    });
   }
 
   return tempDiskSize.map((item: any) => {
-    item.barColor = getStatus(item.percentage)
-    return item
-  })
-})
+    item.barColor = getStatus(item.percentage);
+    return item;
+  });
+});
 
 onMounted(() => {
   // console.log(props.diskSize)
-})
+});
 
 const updateDiskSize = () => {
-  console.log(props.diskSize)
-}
+  console.log(props.diskSize);
+};
 </script>
 
 <style scoped lang="scss">

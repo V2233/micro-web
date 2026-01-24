@@ -1,31 +1,41 @@
 <template>
   <div class="layout_container">
     <!-- 左侧菜单 -->
-    <div class="layout_slider" :class="{ 
+    <div
+      class="layout_slider"
+      :class="{
         fold: layoutSettingStore.foldMode == 1 ? true : false,
         hidden: layoutSettingStore.foldMode == 0 ? true : false,
-    }">
+      }"
+    >
       <Logo></Logo>
       <!-- 展示菜单 滚动组件 -->
       <el-scrollbar class="scrollbar">
         <!-- 菜单组件 -->
-        <el-menu :collapse="layoutSettingStore.foldMode == 1 ? true : false" :default-active="$route.path"
-          active-text-color="rgb(64, 158, 255)">
+        <el-menu
+          :collapse="layoutSettingStore.foldMode == 1 ? true : false"
+          :default-active="$route.path"
+          active-text-color="rgb(64, 158, 255)"
+        >
           <Menu :menuList="useStore.menuRoutes"></Menu>
         </el-menu>
       </el-scrollbar>
     </div>
     <!-- 顶部导航 -->
-    <div class="layout_tabbar" :class="{ 
-      fold: layoutSettingStore.foldMode == 1 ? true : false,
-      hidden: layoutSettingStore.foldMode == 0 ? true : false,
-    }">
+    <div
+      class="layout_tabbar"
+      :class="{
+        fold: layoutSettingStore.foldMode == 1 ? true : false,
+        hidden: layoutSettingStore.foldMode == 0 ? true : false,
+      }"
+    >
       <!-- 顶部导航 -->
       <Tabbar></Tabbar>
     </div>
     <!-- 内容展示 -->
-    <div class="layout_main" 
-      :class="{ 
+    <div
+      class="layout_main"
+      :class="{
         fold: layoutSettingStore.foldMode == 1 ? true : false,
         hidden: layoutSettingStore.foldMode == 0 ? true : false,
       }"
@@ -36,24 +46,24 @@
 </template>
 
 <script setup lang="ts">
-import Logo from './logo/index.vue'
-import Menu from './menu/index.vue'
-import Main from './main/index.vue'
-import Tabbar from './tabbar/index.vue'
+import Logo from './logo/index.vue';
+import Menu from './menu/index.vue';
+import Main from './main/index.vue';
+import Tabbar from './tabbar/index.vue';
 
-import useUserStore from '@/store/modules/user'
-import useLayoutSettingStore from '@/store/modules/setting'
+import useUserStore from '@/store/modules/user';
+import useLayoutSettingStore from '@/store/modules/setting';
 // import { computed } from 'vue'
 // 获取路由对象
-import { useRoute } from 'vue-router'
-import { watch } from 'vue'
-let $route = useRoute()
+import { useRoute } from 'vue-router';
+import { watch } from 'vue';
+let $route = useRoute();
 
-let useStore = useUserStore()
+let useStore = useUserStore();
 
 // 获取仓库配置
 
-let layoutSettingStore = useLayoutSettingStore()
+let layoutSettingStore = useLayoutSettingStore();
 // console.log(useStore)
 // let bgColor = computed(()=>{
 //   console.log(document.documentElement.className)
@@ -62,23 +72,23 @@ let layoutSettingStore = useLayoutSettingStore()
 watch(
   () => layoutSettingStore.theme,
   (newTheme, oldTheme) => {
-    if(!newTheme) return
-    let html = document.documentElement
-    if(newTheme == 'dark') {
-      !html.classList.contains('dark') && html.classList.toggle('dark')
+    if (!newTheme) return;
+    let html = document.documentElement;
+    if (newTheme == 'dark') {
+      !html.classList.contains('dark') && html.classList.toggle('dark');
     } else {
-      html.classList.contains('dark') && html.classList.toggle('dark')
+      html.classList.contains('dark') && html.classList.toggle('dark');
     }
-    newTheme !== oldTheme && localStorage.setItem('THEME', newTheme)
+    newTheme !== oldTheme && localStorage.setItem('THEME', newTheme);
   },
-  {'immediate':true}
+  { immediate: true }
 );
 </script>
 
 <script lang="ts">
 export default {
   name: 'Layout',
-}
+};
 </script>
 <style scoped lang="scss">
 .layout_container {
@@ -90,13 +100,13 @@ export default {
     height: 100vh;
     // background: $base-menu-background;
     // color: rgb(2, 255, 15);
-    
+
     transition: all 0.3s;
 
     border-radius: 0 $border-radius-medium $border-radius-medium 0;
     overflow: auto;
     box-shadow: $shadow-small;
-    background: rgba(255, 255, 255, 0.5); 
+    background: rgba(255, 255, 255, 0.5);
     backdrop-filter: none;
     border: none;
 
